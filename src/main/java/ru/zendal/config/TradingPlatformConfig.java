@@ -1,4 +1,7 @@
-package ru.zendal;
+package ru.zendal.config;
+
+import org.bukkit.configuration.file.YamlConfiguration;
+import ru.zendal.TradingPlatform;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -12,12 +15,17 @@ public class TradingPlatformConfig {
 
     private String[] availableLanguage = new String[]{"english", "russian"};
 
+    private File config;
+
+    private YamlConfiguration yamlConfig;
+
+    private LanguageConfig languageConfig;
+
     public TradingPlatformConfig(TradingPlatform plugin) {
         this.plugin = plugin;
         this.setup();
         this.processConfig();
     }
-
 
 
     private void setup() {
@@ -29,8 +37,15 @@ public class TradingPlatformConfig {
             e.printStackTrace();
         }
     }
-    
+
     private void processConfig() {
+        this.yamlConfig = YamlConfiguration.loadConfiguration(config);
+        this.initLanguage();
+    }
+
+    private void initLanguage() {
+        String langName = this.yamlConfig.getString("settings.lang");
+        languageConfig = new LanguageConfig(this.getLanguageFileByName(langName));
     }
 
     /**
@@ -53,7 +68,7 @@ public class TradingPlatformConfig {
     private void checkAllLanguage() throws IOException {
         for (String lang : this.availableLanguage) {
             String langPath = "lang/" + lang + ".lang";
-            File langFile = new File(this.plugin.getDataFolder(), langPath);
+            File langFile = this.getLanguageFileByName(lang);
             if (langFile.exists()) {
                 continue;
             }
@@ -79,12 +94,18 @@ public class TradingPlatformConfig {
         }
     }
 
+
+    private File getLanguageFileByName(String langName) {
+        return new File(this.plugin.getDataFolder(), "lang/" + langName + ".lang");
+    }
+
     private void initConfigFile() throws IOException {
         File file = new File(this.plugin.getDataFolder(), "config.yml");
+        this.config = file;
         if (file.exists()) {
             return;
         }
-        if (!file.createNewFile()){
+        if (!file.createNewFile()) {
             this.plugin.getLogger().warning("Failed create config file");
             return;
         }
@@ -93,8 +114,8 @@ public class TradingPlatformConfig {
     }
 
 
-    public String getMessage(String message) {
-        return "";
+    public LanguageConfig getLanguageConfig() {
+        return this.languageConfig;
     }
 
 }
