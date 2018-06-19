@@ -3,8 +3,8 @@ apply plugin: 'java'
 group = pluginGroup
 version = pluginVersion
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 1.9
+targetCompatibility = 1.9
 
 repositories {
     mavenCentral()
@@ -31,7 +31,7 @@ processResources {
     }
 }
 task finalize << {
-   ant.move(file: "/Users/bigtows/Projects/TradePlace/build/libs/TradingPlatform-1.0-SNAPSHOT.jar", tofile: "/Volumes/LaCie/Spigot/server/plugins/TradingPlatform-1.0-SNAPSHOT.jar")
+   ant.move(file: "/Users/bigtows/Projects/TradingPlatform/build/libs/TradingPlatform-"+version+".jar", tofile: "/Volumes/LaCie/Spigot/server/plugins/TradingPlatform.jar")
 
 }
 

@@ -7,16 +7,16 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import ru.zendal.ServerHolderInventory;
-import ru.zendal.TradePlace;
+import ru.zendal.TradingPlatform;
 import ru.zendal.session.TradeSession;
 import ru.zendal.session.exception.TradeSessionManagerException;
 
 public class ChestEvent implements Listener {
 
 
-    private final TradePlace plugin;
+    private final TradingPlatform plugin;
 
-    public ChestEvent(TradePlace instance) {
+    public ChestEvent(TradingPlatform instance) {
         this.plugin = instance;
     }
 

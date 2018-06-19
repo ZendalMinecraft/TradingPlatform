@@ -5,17 +5,19 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import ru.zendal.TradingPlatform;
+import ru.zendal.config.AdaptiveMessage;
 import ru.zendal.session.TradeSession;
-import ru.zendal.TradePlace;
 import ru.zendal.session.exception.TradeSessionManagerException;
 
 
 public class CommandProcessor implements CommandExecutor {
 
 
-    private final TradePlace plugin;
+    private final TradingPlatform plugin;
 
-    public CommandProcessor(TradePlace instance) {
+
+    public CommandProcessor(TradingPlatform instance) {
         this.plugin = instance;
     }
 
@@ -41,8 +43,13 @@ public class CommandProcessor implements CommandExecutor {
         this.plugin.getSessionManager().createSession((Player) sender, Bukkit.getPlayer("gasfull"));
         // ((Player) sender).openInventory(inventory);
         Player player = Bukkit.getPlayer("gasfull");
-        Bukkit.getPlayer("gasfull").sendMessage("Confirm trade");
+        Bukkit.getPlayer("gasfull").sendMessage(this.getAdaptiveMessageByMessage("trade.confirm").setBuyer(player).setSeller(((Player) sender).getPlayer()).toString());
 
         return true;
+    }
+
+
+    private AdaptiveMessage getAdaptiveMessageByMessage(String message) {
+        return this.plugin.getTradingPlatformConfig().getLanguageConfig().getMessage(message);
     }
 }

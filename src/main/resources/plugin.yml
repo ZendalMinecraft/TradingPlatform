@@ -1,6 +1,6 @@
-name: TradePlace
+name: TradingPlatform
 version: 1.0
-main: ru.zendal.TradePlace
+main: ru.zendal.TradingPlatform
 commands:
   trade:
     usage: /trade
