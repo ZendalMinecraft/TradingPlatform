@@ -1,0 +1,7 @@
+name: TradePlace
+version: 1.0
+main: ru.zendal.TradePlace
+commands:
+  trade:
+    usage: /trade
+    description: Test
