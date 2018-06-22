@@ -24,6 +24,11 @@ public class TradingPlatform extends JavaPlugin {
     }
 
 
+    @Override
+    public void onDisable() {
+        this.getSessionManager().cancelAllSession();
+    }
+
     private void enableConfig() {
        this.tradingPlatformConfig = new TradingPlatformConfig(this);
     }

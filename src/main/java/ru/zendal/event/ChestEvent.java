@@ -1,12 +1,13 @@
 package ru.zendal.event;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
-import ru.zendal.ServerHolderInventory;
+import ru.zendal.TradeSessionHolderInventory;
 import ru.zendal.TradingPlatform;
 import ru.zendal.session.TradeSession;
 import ru.zendal.session.exception.TradeSessionManagerException;
@@ -24,7 +25,7 @@ public class ChestEvent implements Listener {
     @EventHandler
     public void onChestMoveItem(InventoryClickEvent event) {
         Inventory inventory = event.getInventory();
-        if (inventory.getHolder() instanceof ServerHolderInventory) {
+        if (inventory.getHolder() instanceof TradeSessionHolderInventory) {
             if (event.getClickedInventory() == null) {
                 return;
             }
@@ -72,8 +73,11 @@ public class ChestEvent implements Listener {
 
     @EventHandler
     public void onDragEventInTrade(InventoryDragEvent event) {
-        if (event.getInventory().getHolder() instanceof ServerHolderInventory) {
+        if (event.getInventory().getHolder() instanceof TradeSessionHolderInventory) {
             event.getRawSlots().forEach(data -> {
+                if (data>53){
+                    return;
+                }
                 try {
                     TradeSession session = plugin.getSessionManager().getSessionByInventory(event.getInventory());
 

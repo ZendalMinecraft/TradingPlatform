@@ -1,1 +1,12 @@
+trade.create.between.undefinedUser=User %1% undefined.
+trade.create.between.notSetUser=Please pick user like: /trade to UserName
+trade.confirm.notHaveSession=Sorry you don't have any sessions
+trade.confirm.select.undefinedSession=Sorry we can't search session for %buyer% betwean %seller%
+trade.help.message="
+test
+ALAlla
+asdsad
+
+"
+
 trade.confirm=§6Confirm trade from %seller%

@@ -8,19 +8,37 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Class for access to Config file plugin
+ */
 public class TradingPlatformConfig {
 
-
+    /**
+     * Instance plugin file
+     */
     private final TradingPlatform plugin;
 
+    /**
+     * Available language for restore from plugin
+     */
     private String[] availableLanguage = new String[]{"english", "russian"};
 
-    private File config;
-
+    /**
+     * Instance config file
+     */
     private YamlConfiguration yamlConfig;
 
+    /**
+     * Instance language config
+     */
     private LanguageConfig languageConfig;
 
+
+    /**
+     * Instantiates a new Trading platform config.
+     *
+     * @param plugin the plugin
+     */
     public TradingPlatformConfig(TradingPlatform plugin) {
         this.plugin = plugin;
         this.setup();
@@ -39,13 +57,12 @@ public class TradingPlatformConfig {
     }
 
     private void processConfig() {
-        this.yamlConfig = YamlConfiguration.loadConfiguration(config);
         this.initLanguage();
     }
 
     private void initLanguage() {
         String langName = this.yamlConfig.getString("settings.lang");
-        languageConfig = new LanguageConfig(this.getLanguageFileByName(langName));
+        languageConfig = new LanguageConfig(this.getLanguageFileByName(langName),this.plugin.getLogger());
     }
 
     /**
@@ -101,7 +118,7 @@ public class TradingPlatformConfig {
 
     private void initConfigFile() throws IOException {
         File file = new File(this.plugin.getDataFolder(), "config.yml");
-        this.config = file;
+        this.yamlConfig = YamlConfiguration.loadConfiguration(file);
         if (file.exists()) {
             return;
         }
@@ -114,6 +131,11 @@ public class TradingPlatformConfig {
     }
 
 
+    /**
+     * Gets language config.
+     *
+     * @return the language config
+     */
     public LanguageConfig getLanguageConfig() {
         return this.languageConfig;
     }

@@ -22,6 +22,18 @@ public class AdaptiveMessage {
         return this;
     }
 
+    public AdaptiveMessage setCustomMessage(int index, String text) {
+        this.message = this.message.replace("%" + index + "%", text);
+        return this;
+    }
+
+    public void sendMessage(Player player) {
+        for (String text : this.message.split("\n")) {
+            player.sendMessage(text);
+        }
+    }
+
+
     @Override
     public String toString() {
         return this.message;

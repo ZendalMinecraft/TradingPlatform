@@ -71,6 +71,7 @@ public class TradeSession {
         return items;
     }
 
+    //TODO add block Trade
 
     public List<ItemStack> getBuyerItems() {
         List<ItemStack> items = new ArrayList<>();

@@ -5,7 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import ru.zendal.ServerHolderInventory;
+import ru.zendal.TradeSessionHolderInventory;
 import ru.zendal.session.exception.TradeSessionManagerException;
 
 import java.util.ArrayList;
@@ -38,9 +38,40 @@ public class TradeSessionManager {
                 return session;
             }
         }
-        throw new TradeSessionManagerException("UndefinedSession");
+        throw new TradeSessionManagerException("trade.undefinedSessions");
     }
 
+
+    public TradeSession getSessionForSellerAndBuyer(Player seller, Player buyer) throws TradeSessionManagerException {
+        for (TradeSession session : sessionList) {
+            if (session.getSeller() == seller &&
+                    session.getBuyer() == buyer) {
+                return session;
+            }
+        }
+        throw new TradeSessionManagerException("trade.confirm.select.undefinedSession");
+    }
+
+
+    public int getCountSessionsBuyer(Player buyer) {
+        int count = 0;
+        for (TradeSession session : sessionList) {
+            if (session.getBuyer() == buyer) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public int getCountSessionsSeller(Player seller) {
+        int count = 0;
+        for (TradeSession session : sessionList) {
+            if (session.getSeller() == seller) {
+                count++;
+            }
+        }
+        return count;
+    }
 
     public TradeSession getSessionByInventory(Inventory inventory) throws TradeSessionManagerException {
         for (TradeSession session : sessionList) {
@@ -69,7 +100,7 @@ public class TradeSessionManager {
      * @return Inventory for trading
      */
     private Inventory createTradeInventory(Player seller, Player buyer) {
-        Inventory inventory = Bukkit.createInventory(new ServerHolderInventory(), 9 * 6, "Trade " + seller.getDisplayName() + " and " + buyer.getDisplayName());
+        Inventory inventory = Bukkit.createInventory(new TradeSessionHolderInventory(), 9 * 6, "Trade " + seller.getDisplayName() + " and " + buyer.getDisplayName());
         ItemStack stick = new ItemStack(Material.STICK);
         for (int i = 0; i < 6; i++) {
             inventory.setItem(9 * i + 4, stick);
@@ -86,6 +117,8 @@ public class TradeSessionManager {
 
 
     private void onReady(TradeSession tradeSession) {
+        //TODO Added check offline player
+        //TODO Если у пользователя полный инвентарь, то предметы не добавляются
         tradeSession.getSeller().getInventory().addItem(tradeSession.getBuyerItems().toArray(new ItemStack[0]));
         tradeSession.getBuyer().getInventory().addItem(tradeSession.getSellerItems().toArray(new ItemStack[0]));
         tradeSession.getBuyer().closeInventory();
@@ -107,6 +140,19 @@ public class TradeSessionManager {
             this.removeSession(tradeSession);
         } catch (TradeSessionManagerException e) {
             e.printStackTrace();
+        }
+    }
+
+
+    public void cancelAllSession() {
+        if (sessionList.size() == 0) {
+            return;
+        }
+        for (TradeSession tradeSession : sessionList) {
+            tradeSession.getSeller().getInventory().addItem(tradeSession.getSellerItems().toArray(new ItemStack[0]));
+            tradeSession.getBuyer().getInventory().addItem(tradeSession.getBuyerItems().toArray(new ItemStack[0]));
+            tradeSession.getBuyer().closeInventory();
+            tradeSession.getSeller().closeInventory();
         }
     }
 }
