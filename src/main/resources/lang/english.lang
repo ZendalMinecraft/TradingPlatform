@@ -1,4 +1,5 @@
 trade.create.between.undefinedUser=User %1% undefined.
+trade.player.offile=User %buyer% is offline.
 trade.create.between.notSetUser=Please pick user like: /trade to UserName
 trade.confirm.notHaveSession=Sorry you don't have any sessions
 trade.confirm.select.undefinedSession=Sorry we can't search session for %buyer% betwean %seller%
@@ -10,3 +11,7 @@ asdsad
 "
 
 trade.confirm=§6Confirm trade from %seller%
+
+
+trade.confirm.list=You have many trades: %1%. For confirm type /trade confirm Username
+trade.to.openInventory=For trade with %buyer% please type /trade to %buyer%

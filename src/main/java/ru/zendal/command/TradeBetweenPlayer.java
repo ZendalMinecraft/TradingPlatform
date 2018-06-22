@@ -39,21 +39,33 @@ public class TradeBetweenPlayer implements ArgsCommandProcessor {
             return true;
         }
 
-
-        return false;
+        return this.initSession(seller, buyer);
     }
 
-    private boolean initSession(Player seller,Player buyer){
+    /**
+     * Init session between players
+     *
+     * @param seller Seller trade
+     * @param buyer  Buyer trade
+     * @return Status command
+     */
+    private boolean initSession(Player seller, Player buyer) {
 
         try {
             //If session already exits, just open inventory on seller
-            TradeSession session =  this.tradeSessionManager.getSessionForSellerAndBuyer(seller,buyer);
+            TradeSession session = this.tradeSessionManager.getSessionForSellerOrBuyer(seller, buyer);
             seller.openInventory(session.getInventory());
         } catch (TradeSessionManagerException e) {
-           //Else create session
-
+            //Else create session
+            if (!buyer.isOnline()) {
+                this.languageConfig.getMessage("trade.player.offline").setBuyer(buyer).sendMessage(buyer);
+                return true;
+            }
+            this.languageConfig.getMessage("trade.confirm").setBuyer(buyer).setSeller(seller).sendMessage(buyer);
+            this.tradeSessionManager.createSession(seller, buyer);
+            //TODO added message "Request send"
         }
-
+        return true;
     }
 
 

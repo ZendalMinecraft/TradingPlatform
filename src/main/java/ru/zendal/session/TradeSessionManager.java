@@ -32,9 +32,9 @@ public class TradeSessionManager {
     }
 
 
-    public TradeSession getSessionByBuyer(Player player) throws TradeSessionManagerException {
+    public TradeSession getSessionByBuyer(Player buyer) throws TradeSessionManagerException {
         for (TradeSession session : sessionList) {
-            if (session.getBuyer() == player) {
+            if (session.getBuyer() == buyer) {
                 return session;
             }
         }
@@ -52,6 +52,26 @@ public class TradeSessionManager {
         throw new TradeSessionManagerException("trade.confirm.select.undefinedSession");
     }
 
+    public TradeSession getSessionForSellerOrBuyer(Player seller, Player buyer) throws TradeSessionManagerException {
+        for (TradeSession session : sessionList) {
+            if ((session.getSeller() == seller && session.getBuyer() == buyer) ||
+                    (session.getSeller() == buyer && session.getBuyer() == seller)) {
+                return session;
+            }
+        }
+        throw new TradeSessionManagerException("trade.confirm.select.undefinedSession");
+    }
+
+
+    public List<TradeSession> getAllAvalibleSessionsForBuyer(Player buyer) {
+        List<TradeSession> tradeSessions = new ArrayList<>();
+        for (TradeSession tradeSession : sessionList) {
+            if (tradeSession.getBuyer() == buyer) {
+                tradeSessions.add(tradeSession);
+            }
+        }
+        return tradeSessions;
+    }
 
     public int getCountSessionsBuyer(Player buyer) {
         int count = 0;
