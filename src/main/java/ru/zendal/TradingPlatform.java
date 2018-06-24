@@ -2,6 +2,7 @@ package ru.zendal;
 
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.zendal.command.CommandProcessor;
+import ru.zendal.config.AdaptiveMessage;
 import ru.zendal.config.TradingPlatformConfig;
 import ru.zendal.event.ChestEvent;
 import ru.zendal.session.TradeSessionManager;
@@ -31,6 +32,11 @@ public class TradingPlatform extends JavaPlugin {
 
     private void enableConfig() {
        this.tradingPlatformConfig = new TradingPlatformConfig(this);
+    }
+
+
+    public AdaptiveMessage getAdaptiveMessage(String message){
+        return  this.tradingPlatformConfig.getLanguageConfig().getMessage(message);
     }
 
 

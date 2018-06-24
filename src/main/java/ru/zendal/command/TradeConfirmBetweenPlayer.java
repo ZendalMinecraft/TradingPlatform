@@ -72,7 +72,7 @@ public class TradeConfirmBetweenPlayer implements ArgsCommandProcessor {
                     setCustomMessage(
                             1,
                             this.prepareListTradeSessionToListSeller(
-                                    this.tradeSessionManager.getAllAvalibleSessionsForBuyer(buyer)
+                                    this.tradeSessionManager.getAllAvailableSessionsForBuyer(buyer)
                             )
                     ).sendMessage(buyer);
             return true;

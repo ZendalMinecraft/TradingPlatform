@@ -61,9 +61,9 @@ public class TradeBetweenPlayer implements ArgsCommandProcessor {
                 this.languageConfig.getMessage("trade.player.offline").setBuyer(buyer).sendMessage(buyer);
                 return true;
             }
+            this.languageConfig.getMessage("trade.to.success").setBuyer(buyer).sendMessage(seller);
             this.languageConfig.getMessage("trade.confirm").setBuyer(buyer).setSeller(seller).sendMessage(buyer);
             this.tradeSessionManager.createSession(seller, buyer);
-            //TODO added message "Request send"
         }
         return true;
     }

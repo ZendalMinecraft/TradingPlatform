@@ -27,7 +27,7 @@ public class TradeSessionManager {
         if (buyer != null) {
             inventory = createTradeInventory(seller, buyer);
         }
-        sessionList.add(new TradeSession(inventory, seller, buyer, this::onReady));
+        sessionList.add(new TradeSession(seller, buyer, this::onReady));
         return this;
     }
 
@@ -63,7 +63,7 @@ public class TradeSessionManager {
     }
 
 
-    public List<TradeSession> getAllAvalibleSessionsForBuyer(Player buyer) {
+    public List<TradeSession> getAllAvailableSessionsForBuyer(Player buyer) {
         List<TradeSession> tradeSessions = new ArrayList<>();
         for (TradeSession tradeSession : sessionList) {
             if (tradeSession.getBuyer() == buyer) {
