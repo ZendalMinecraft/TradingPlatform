@@ -1,4 +1,4 @@
-package ru.zendal;
+package ru.zendal.session.inventory;
 
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;

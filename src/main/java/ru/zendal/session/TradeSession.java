@@ -117,9 +117,13 @@ public class TradeSession {
                 newInventory.setItem(index, itemStack);
             }
         }
+
+        if (buyer.getOpenInventory().getTopInventory().hashCode() == inventory.hashCode())
+            buyer.openInventory(newInventory);
+        if (seller.getOpenInventory().getTopInventory().hashCode() == inventory.hashCode())
+            seller.openInventory(newInventory);
+
         inventory = newInventory;
-        buyer.openInventory(newInventory);
-        seller.openInventory(newInventory);
     }
 
     //TODO add block Trade

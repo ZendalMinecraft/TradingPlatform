@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import ru.zendal.CreateTradeHolderInventory;
+import ru.zendal.session.inventory.CreateTradeHolderInventory;
 import ru.zendal.TradingPlatform;
 import ru.zendal.config.AdaptiveMessage;
 import ru.zendal.session.TradeSession;
@@ -42,6 +42,10 @@ public class CommandProcessor implements CommandExecutor {
                 this.plugin.getTradingPlatformConfig().getLanguageConfig()
         ));
 
+        processors.add(new GetStorage(
+                this.plugin.getSessionManager(),
+                this.plugin.getTradingPlatformConfig().getLanguageConfig()
+        ));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package ru.zendal.event;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -43,6 +44,7 @@ public class ChestEvent implements Listener {
                     session = plugin.getSessionManager().getSessionByInventory(inventory);
                 } catch (TradeSessionManagerException e) {
                     e.printStackTrace();
+                    event.setCancelled(true);
                     return;
                 }
                 if (this.isServiceSlot(event.getSlot())) {

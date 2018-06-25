@@ -19,3 +19,7 @@ trade.to.success=Request trade send to %buyer%.
 
 
 trade.inventory.shift=Sorry you can't move items with use shift, sorry.
+
+trade.storage.clear=Your storage clear.
+
+trade.confirm.tooManyItems=Some things didn't fit in your inventory so they were added to the storage /trade storage

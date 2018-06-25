@@ -1,20 +1,34 @@
 package ru.zendal.session;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import ru.zendal.TradeSessionHolderInventory;
+import ru.zendal.config.LanguageConfig;
 import ru.zendal.session.exception.TradeSessionManagerException;
+import ru.zendal.session.inventory.StorageHolderInventory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TradeSessionManager {
 
+    private final LanguageConfig languageConfig;
     private List<TradeSession> sessionList = new ArrayList<>();
 
+    /**
+     * Storage inventories players
+     */
+    private HashMap<String, Inventory> storageInventories = new HashMap<>();
+
+
+    public TradeSessionManager(LanguageConfig config){
+        this.languageConfig = config;
+        storageInventories.put(Bukkit.getPlayer("gasfull").getUniqueId().toString(),
+                this.createStorageInventory(Bukkit.getPlayer("gasfull")));
+    }
 
     public TradeSessionManager addSession(TradeSession session) {
         sessionList.add(session);
@@ -25,7 +39,6 @@ public class TradeSessionManager {
     public TradeSessionManager createSession(Player seller, Player buyer) {
         Inventory inventory = null;
         if (buyer != null) {
-            inventory = createTradeInventory(seller, buyer);
         }
         sessionList.add(new TradeSession(seller, buyer, this::onReady));
         return this;
@@ -73,6 +86,14 @@ public class TradeSessionManager {
         return tradeSessions;
     }
 
+    public Inventory getInventorySabotageForPlayer(Player player) throws TradeSessionManagerException {
+        Inventory inventory = this.storageInventories.get(player.getUniqueId().toString());
+        if (inventory==null){
+            throw new TradeSessionManagerException("undefined Player");
+        }
+        return inventory;
+    }
+
     public int getCountSessionsBuyer(Player buyer) {
         int count = 0;
         for (TradeSession session : sessionList) {
@@ -112,42 +133,52 @@ public class TradeSessionManager {
         throw new TradeSessionManagerException("UndefinedSession");
     }
 
-    /**
-     * Create Inventory for trade between players
-     *
-     * @param seller Who create trade
-     * @param buyer  Who accept trade
-     * @return Inventory for trading
-     */
-    private Inventory createTradeInventory(Player seller, Player buyer) {
-        Inventory inventory = Bukkit.createInventory(new TradeSessionHolderInventory(), 9 * 6, "Trade " + seller.getDisplayName() + " and " + buyer.getDisplayName());
-        ItemStack stick = new ItemStack(Material.STICK);
-        for (int i = 0; i < 6; i++) {
-            inventory.setItem(9 * i + 4, stick);
-        }
-
-        ItemStack redWool = new ItemStack(Material.WOOL, 1, (short) 14);
-        ItemStack greenWool = new ItemStack(Material.WOOL, 1, (short) 5);
-
-        inventory.setItem(9 * 4 + 4, redWool);
-        inventory.setItem(9 * 1 + 4, greenWool);
-
-        return inventory;
-    }
-
 
     private void onReady(TradeSession tradeSession) {
         //TODO Added check offline player
         //TODO Если у пользователя полный инвентарь, то предметы не добавляются
-        tradeSession.getSeller().getInventory().addItem(tradeSession.getBuyerItems().toArray(new ItemStack[0]));
-        tradeSession.getBuyer().getInventory().addItem(tradeSession.getSellerItems().toArray(new ItemStack[0]));
-        tradeSession.getBuyer().closeInventory();
-        tradeSession.getSeller().closeInventory();
+        this.addNotFitItemsIntoStorageInventory(
+                tradeSession.getSeller().getInventory().addItem(
+                        tradeSession.getBuyerItems().toArray(new ItemStack[0])),
+                tradeSession.getSeller()
+        );
+        this.addNotFitItemsIntoStorageInventory(tradeSession.getBuyer().getInventory().addItem(
+                tradeSession.getSellerItems().toArray(new ItemStack[0])),
+                tradeSession.getBuyer()
+        );
+
+        if (tradeSession.getBuyer().getOpenInventory().getTopInventory().hashCode() == tradeSession.getInventory().hashCode()) {
+            tradeSession.getBuyer().closeInventory();
+        }
+        if (tradeSession.getSeller().getOpenInventory().getTopInventory().hashCode() == tradeSession.getInventory().hashCode()) {
+            tradeSession.getSeller().closeInventory();
+        }
+
         try {
             this.removeSession(tradeSession);
         } catch (TradeSessionManagerException e) {
             e.printStackTrace();
         }
+    }
+
+    private void addNotFitItemsIntoStorageInventory(Map<Integer, ItemStack> items, Player player) {
+        if (items.size()==0){
+            return;
+        }
+        languageConfig.getMessage("trade.confirm.tooManyItems").sendMessage(player);
+        Inventory inventory = storageInventories.get(player.getUniqueId().toString());
+        if (inventory == null) {
+            inventory = this.createStorageInventory(player);
+            storageInventories.put(player.getUniqueId().toString(), inventory);
+        }
+        Inventory finalInventory = inventory;
+        items.forEach((index, item) -> {
+            finalInventory.addItem(item);
+        });
+    }
+
+    private Inventory createStorageInventory(Player player) {
+        return Bukkit.createInventory(new StorageHolderInventory(), 54, "Storage " + player.getDisplayName());
     }
 
 
