@@ -1,4 +1,10 @@
 package ru.zendal.session.storage.connection;
 
-public class mongo {
+public interface ConnectionBuilder<T> {
+
+    /**
+     * Get connection
+     * @return
+     */
+    T build();
 }

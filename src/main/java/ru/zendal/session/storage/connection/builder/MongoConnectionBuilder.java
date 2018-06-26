@@ -1,10 +1,10 @@
-package ru.zendal.session.storage.connection.mongo;
+package ru.zendal.session.storage.connection.builder;
 
 import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoClients;
 import ru.zendal.session.storage.connection.ConnectionBuilder;
 
-public class MongoConnectionBuilder implements ConnectionBuilder<MongoConnection> {
+public class MongoConnectionBuilder implements ConnectionBuilder<MongoClient> {
 
 
     private int port;
@@ -24,12 +24,7 @@ public class MongoConnectionBuilder implements ConnectionBuilder<MongoConnection
     }
 
     @Override
-    public MongoConnection build() {
-        return new MongoConnection() {
-            @Override
-            public MongoDatabase getDataBase(String nameDataBase) {
-                return ;
-            }
-        };
+    public MongoClient build() {
+        return MongoClients.create("mongodb://" + host + ":" + port);
     }
 }
