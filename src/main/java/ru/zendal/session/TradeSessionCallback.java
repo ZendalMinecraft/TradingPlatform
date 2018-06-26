@@ -2,5 +2,5 @@ package ru.zendal.session;
 
 public interface TradeSessionCallback {
 
-    public void onReady(TradeSession tradeSession);
+    public void onReady(Session tradeSession);
 }

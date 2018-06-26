@@ -6,8 +6,11 @@ import ru.zendal.command.CommandProcessor;
 import ru.zendal.config.AdaptiveMessage;
 import ru.zendal.config.TradingPlatformConfig;
 import ru.zendal.event.ChestEvent;
+import ru.zendal.event.ChestOfflineSessionEvent;
 import ru.zendal.event.ChestStorageEvent;
+import ru.zendal.event.PlayerOfflineSessionEvent;
 import ru.zendal.session.TradeSessionManager;
+import ru.zendal.session.storage.MongoStorageSessions;
 
 public class TradingPlatform extends JavaPlugin {
 
@@ -19,7 +22,7 @@ public class TradingPlatform extends JavaPlugin {
     @Override
     public void onEnable() {
         this.enableConfig();
-        tradeSessionManager = new TradeSessionManager(tradingPlatformConfig.getLanguageConfig());
+        tradeSessionManager = new TradeSessionManager(new MongoStorageSessions(),tradingPlatformConfig.getLanguageConfig());
         this.initListeners();
         this.getCommand("trade").setExecutor(new CommandProcessor(this));
     }
@@ -29,6 +32,8 @@ public class TradingPlatform extends JavaPlugin {
         PluginManager pluginManager = this.getServer().getPluginManager();
         pluginManager.registerEvents(new ChestEvent(this), this);
         pluginManager.registerEvents(new ChestStorageEvent(this), this);
+        pluginManager.registerEvents(new ChestOfflineSessionEvent(tradeSessionManager), this);
+        pluginManager.registerEvents(new PlayerOfflineSessionEvent(this),this);
     }
 
     @Override

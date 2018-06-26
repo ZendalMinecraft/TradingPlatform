@@ -46,6 +46,11 @@ public class CommandProcessor implements CommandExecutor {
                 this.plugin.getSessionManager(),
                 this.plugin.getTradingPlatformConfig().getLanguageConfig()
         ));
+
+        processors.add(new TradeCreate(
+                this.plugin.getSessionManager(),
+                this.plugin.getTradingPlatformConfig().getLanguageConfig()
+        ));
     }
 
     @Override

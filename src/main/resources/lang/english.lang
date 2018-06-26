@@ -23,3 +23,9 @@ trade.inventory.shift=Sorry you can't move items with use shift, sorry.
 trade.storage.clear=Your storage clear.
 
 trade.confirm.tooManyItems=Some things didn't fit in your inventory so they were added to the storage /trade storage
+
+
+storage.item.getAllItems.caption=Get all items.
+
+trade.offline.onMove=Please pick items to trade.
+trade.offline.onInteract=Please pick items to trade.2

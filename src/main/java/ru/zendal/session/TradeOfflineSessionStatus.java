@@ -1,4 +1,7 @@
 package ru.zendal.session;
 
-public class TradeOfflineSessionStatus {
+public enum  TradeOfflineSessionStatus {
+    FIRST_PHASE,
+    SECOND_PHASE,
+    FINISH;
 }

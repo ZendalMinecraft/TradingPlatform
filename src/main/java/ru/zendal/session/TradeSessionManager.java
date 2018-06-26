@@ -1,22 +1,25 @@
 package ru.zendal.session;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import ru.zendal.config.LanguageConfig;
 import ru.zendal.session.exception.TradeSessionManagerException;
 import ru.zendal.session.inventory.StorageHolderInventory;
+import ru.zendal.session.storage.StorageSessions;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TradeSessionManager {
 
     private final LanguageConfig languageConfig;
+    private final StorageSessions storage;
     private List<TradeSession> sessionList = new ArrayList<>();
+
+    private List<TradeOfflineSession> offlineSessionList = new ArrayList<>();
 
     /**
      * Storage inventories players
@@ -24,10 +27,11 @@ public class TradeSessionManager {
     private HashMap<String, Inventory> storageInventories = new HashMap<>();
 
 
-    public TradeSessionManager(LanguageConfig config){
+    private HashMap<String, TradeOfflineSession> allOfflineSessions = new HashMap<>();
+
+    public TradeSessionManager(StorageSessions storageSessions, LanguageConfig config) {
         this.languageConfig = config;
-        storageInventories.put(Bukkit.getPlayer("gasfull").getUniqueId().toString(),
-                this.createStorageInventory(Bukkit.getPlayer("gasfull")));
+        this.storage = storageSessions;
     }
 
     public TradeSessionManager addSession(TradeSession session) {
@@ -44,6 +48,27 @@ public class TradeSessionManager {
         return this;
     }
 
+    public TradeSessionManager createSession(Player player) {
+        offlineSessionList.add(new TradeOfflineSession(player, this::onReadyOfflineSession));
+
+        return this;
+    }
+
+    private void onReadyOfflineSession(Session session) {
+        if (!(session instanceof TradeOfflineSession)) {
+            return;
+        }
+        TradeOfflineSession offlineSession = (TradeOfflineSession) session;
+        this.offlineSessionList.remove(offlineSession);
+        Bukkit.broadcastMessage("asd");
+        storage.saveOfflineSession(offlineSession);
+        allOfflineSessions.put(this.getUniqueIdentification(), offlineSession);
+    }
+
+
+    private String getUniqueIdentification() {
+        return UUID.randomUUID().toString();
+    }
 
     public TradeSession getSessionByBuyer(Player buyer) throws TradeSessionManagerException {
         for (TradeSession session : sessionList) {
@@ -75,6 +100,17 @@ public class TradeSessionManager {
         throw new TradeSessionManagerException("trade.confirm.select.undefinedSession");
     }
 
+    public TradeSessionManager cancelOfflineSessionByPlayer(Player player) throws TradeSessionManagerException {
+        for (TradeOfflineSession session : offlineSessionList) {
+            if (session.getPlayer() == player) {
+                session.cancelTrade();
+                offlineSessionList.remove(session);
+                return this;
+            }
+        }
+        throw new TradeSessionManagerException("undefined offline session");
+    }
+
 
     public List<TradeSession> getAllAvailableSessionsForBuyer(Player buyer) {
         List<TradeSession> tradeSessions = new ArrayList<>();
@@ -88,7 +124,7 @@ public class TradeSessionManager {
 
     public Inventory getInventorySabotageForPlayer(Player player) throws TradeSessionManagerException {
         Inventory inventory = this.storageInventories.get(player.getUniqueId().toString());
-        if (inventory==null){
+        if (inventory == null) {
             throw new TradeSessionManagerException("undefined Player");
         }
         return inventory;
@@ -134,35 +170,40 @@ public class TradeSessionManager {
     }
 
 
-    private void onReady(TradeSession tradeSession) {
+    private void onReady(Session tradeSession) {
+        if (!(tradeSession instanceof TradeSession)) {
+            return;
+        }
         //TODO Added check offline player
         //TODO Если у пользователя полный инвентарь, то предметы не добавляются
+
+        TradeSession session = (TradeSession) tradeSession;
         this.addNotFitItemsIntoStorageInventory(
-                tradeSession.getSeller().getInventory().addItem(
-                        tradeSession.getBuyerItems().toArray(new ItemStack[0])),
-                tradeSession.getSeller()
+                session.getSeller().getInventory().addItem(
+                        session.getBuyerItems().toArray(new ItemStack[0])),
+                session.getSeller()
         );
-        this.addNotFitItemsIntoStorageInventory(tradeSession.getBuyer().getInventory().addItem(
-                tradeSession.getSellerItems().toArray(new ItemStack[0])),
-                tradeSession.getBuyer()
+        this.addNotFitItemsIntoStorageInventory(session.getBuyer().getInventory().addItem(
+                session.getSellerItems().toArray(new ItemStack[0])),
+                session.getBuyer()
         );
 
-        if (tradeSession.getBuyer().getOpenInventory().getTopInventory().hashCode() == tradeSession.getInventory().hashCode()) {
-            tradeSession.getBuyer().closeInventory();
+        if (session.getBuyer().getOpenInventory().getTopInventory().hashCode() == tradeSession.getInventory().hashCode()) {
+            session.getBuyer().closeInventory();
         }
-        if (tradeSession.getSeller().getOpenInventory().getTopInventory().hashCode() == tradeSession.getInventory().hashCode()) {
-            tradeSession.getSeller().closeInventory();
+        if (session.getSeller().getOpenInventory().getTopInventory().hashCode() == tradeSession.getInventory().hashCode()) {
+            session.getSeller().closeInventory();
         }
 
         try {
-            this.removeSession(tradeSession);
+            this.removeSession(session);
         } catch (TradeSessionManagerException e) {
             e.printStackTrace();
         }
     }
 
     private void addNotFitItemsIntoStorageInventory(Map<Integer, ItemStack> items, Player player) {
-        if (items.size()==0){
+        if (items.size() == 0) {
             return;
         }
         languageConfig.getMessage("trade.confirm.tooManyItems").sendMessage(player);
@@ -178,7 +219,13 @@ public class TradeSessionManager {
     }
 
     private Inventory createStorageInventory(Player player) {
-        return Bukkit.createInventory(new StorageHolderInventory(), 54, "Storage " + player.getDisplayName());
+        Inventory inventory = Bukkit.createInventory(new StorageHolderInventory(), 54, "Storage " + player.getDisplayName());
+        ItemStack itemGetAllItems = new ItemStack(Material.TORCH);
+        ItemMeta meta = itemGetAllItems.getItemMeta();
+        meta.setDisplayName(this.languageConfig.getMessage("storage.item.getAllItems.caption").toString());
+        itemGetAllItems.setItemMeta(meta);
+        inventory.setItem(53, itemGetAllItems);
+        return inventory;
     }
 
 
@@ -205,5 +252,14 @@ public class TradeSessionManager {
             tradeSession.getBuyer().closeInventory();
             tradeSession.getSeller().closeInventory();
         }
+    }
+
+    public TradeOfflineSession getOfflineSessionByPlayer(Player player) throws TradeSessionManagerException {
+        for (TradeOfflineSession session : offlineSessionList) {
+            if (session.getPlayer() == player) {
+                return session;
+            }
+        }
+        throw new TradeSessionManagerException("Undefined offline session");
     }
 }

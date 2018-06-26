@@ -10,7 +10,7 @@ import ru.zendal.TradeSessionHolderInventory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TradeSession {
+public class TradeSession implements Session {
 
     /**
      * Callback after all Player set Status Ready
@@ -33,7 +33,7 @@ public class TradeSession {
         this.initInventory();
     }
 
-
+    @Override
     public Inventory getInventory() {
         return inventory;
     }
