@@ -16,13 +16,13 @@ public class TradeSession implements Session {
      * Callback after all Player set Status Ready
      */
     private final TradeSessionCallback callback;
-    private Inventory inventory;
+    protected Inventory inventory;
 
-    private final Player seller;
+    private Player seller;
 
-    private final Player buyer;
+    private Player buyer;
 
-    private boolean sellerReady = false;
+    protected boolean sellerReady = false;
     private boolean buyerReady = false;
 
 
@@ -33,7 +33,6 @@ public class TradeSession implements Session {
         this.initInventory();
     }
 
-    @Override
     public Inventory getInventory() {
         return inventory;
     }
@@ -83,11 +82,20 @@ public class TradeSession implements Session {
         return items;
     }
 
+    protected void setSeller(Player seller) {
+        this.seller = seller;
+    }
+
+
+    protected void setBuyer(Player buyer) {
+        this.buyer = buyer;
+    }
+
     /**
      * Initialize inventory for trade between players
      */
     private void initInventory() {
-        inventory = Bukkit.createInventory(new TradeSessionHolderInventory(), 9 * 6, this.getTitleForInventoryTrade());
+        this.createInventory();
         ItemStack stick = new ItemStack(Material.STICK);
         for (int i = 0; i < 6; i++) {
             inventory.setItem(9 * i + 4, stick);
@@ -106,10 +114,15 @@ public class TradeSession implements Session {
         inventory.setItem(9 * 5 + 4, stick);
     }
 
+    protected void createInventory(){
+        inventory = Bukkit.createInventory(new TradeSessionHolderInventory(), 9 * 6, this.getTitleForInventoryTrade());
+    }
+
+
     /**
      * Change title inventory for users
      */
-    private void changeTitleInventory(String title) {
+    protected void changeTitleInventory(String title) {
         Inventory newInventory = Bukkit.createInventory(inventory.getHolder(), inventory.getSize(), title);
         for (int index = 0; index < inventory.getSize(); index++) {
             ItemStack itemStack = inventory.getItem(index);
@@ -147,7 +160,8 @@ public class TradeSession implements Session {
     /**
      *
      */
-    private void checkReadyTrade() {
+    protected void checkReadyTrade() {
+
         if (!(this.buyerReady && this.sellerReady)) {
             this.changeVisualStatusTrade();
             this.changeTitleInventory(this.getTitleForInventoryTrade());
@@ -192,7 +206,7 @@ public class TradeSession implements Session {
      *
      * @return Title
      */
-    private String getTitleForInventoryTrade() {
+    protected String getTitleForInventoryTrade() {
         StringBuilder titleInventory = new StringBuilder();
         titleInventory.append(seller.getDisplayName()).append("(").append(this.sellerReady ? "✔" : "×").append(")");
 

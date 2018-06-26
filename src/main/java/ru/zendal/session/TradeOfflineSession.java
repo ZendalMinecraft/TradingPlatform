@@ -2,103 +2,108 @@ package ru.zendal.session;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import ru.zendal.session.inventory.CreateOfflineTradeHolderInventory;
+import ru.zendal.session.inventory.CreateOffline;
 
-public class TradeOfflineSession implements Session {
 
-    private final Player player;
-    private final TradeSessionCallback callback;
-    private GameMode gameModePlayer;
-    private Inventory inventory;
-    private TradeOfflineSessionStatus status = TradeOfflineSessionStatus.FIRST_PHASE;
+/**
+ * This is a normal trade Session, only here is the emulation of 2 users
+ */
+public class TradeOfflineSession extends TradeSession {
 
-    private ItemStack[] playerContent;
 
-    private ItemStack[] playerWant;
+    private GameMode gameModePost;
 
-    public TradeOfflineSession(Player player,TradeSessionCallback callback) {
-        this.player = player;
-        this.callback = callback;
-        this.initInventory();
+    private ItemStack[] inventoryPost;
+
+
+    public TradeOfflineSession(Player seller, TradeSessionCallback callback) {
+        super(seller, null, callback);
+        getSeller().openInventory(getInventory());
     }
 
-    private void initInventory() {
-        //TODO change messsage to Lang
-        this.inventory = Bukkit.createInventory(new CreateOfflineTradeHolderInventory(), 54, "Input your items");
-        ItemStack nextViewItem = new ItemStack(Material.REDSTONE_TORCH_ON);
-        this.inventory.setItem(53, nextViewItem);
-        player.openInventory(inventory);
+
+    @Override
+    protected void createInventory() {
+        inventory = Bukkit.createInventory(new CreateOffline(), 9 * 6, this.getTitleForInventoryTrade());
+    }
+
+
+    @Override
+    public TradeOfflineSession setReadySeller(boolean ready) {
+        this.sellerReady = ready;
+        this.checkReadyTrade();
+        this.givePlayerCreative();
+        setBuyer(getSeller());
+        setSeller(null);
+        return this;
+    }
+
+    private void givePlayerCreative() {
+        inventoryPost = getSeller().getInventory().getContents();
+        gameModePost = getSeller().getGameMode();
+        getSeller().setGameMode(GameMode.CREATIVE);
+        getSeller().getInventory().clear();
     }
 
     @Override
-    public Inventory getInventory() {
-        return inventory;
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public TradeOfflineSessionStatus getStatus() {
-        return status;
-    }
-
-    public void playerReady() {
-        if (status == TradeOfflineSessionStatus.FIRST_PHASE) {
-            this.processFirstPhase();
-        } else if (status == TradeOfflineSessionStatus.SECOND_PHASE) {
-            this.processSecondPhase();
+    protected void checkReadyTrade() {
+        super.checkReadyTrade();
+        if (this.isBuyerReady() && this.isSellerReady()) {
+            this.rollBackPlayer();
         }
     }
 
+    @Override
+    protected String getTitleForInventoryTrade() {
+        StringBuilder titleInventory = new StringBuilder();
+        titleInventory.append("Your items").append("(").append(this.isSellerReady() ? "✔" : "×").append(")");
 
-    private void processFirstPhase() {
-        status = TradeOfflineSessionStatus.SECOND_PHASE;
-        playerContent = player.getInventory().getContents();
-        gameModePlayer = player.getGameMode();
-        player.setGameMode(GameMode.CREATIVE);
-        player.getInventory().clear();
-        this.updateInventoryForSecondPhase(player.getInventory());
-        player.closeInventory();
+        StringBuilder subTitleInventory = new StringBuilder("Creative");
+        subTitleInventory.append("(").append(this.isBuyerReady() ? "✔" : "×").append(")");
+
+        int countSpace = 36 - titleInventory.length() - subTitleInventory.length();
+        while (--countSpace > 0) {
+            titleInventory.append(" ");
+        }
+        titleInventory.append(subTitleInventory);
+        return titleInventory.toString();
     }
 
-    private void processSecondPhase() {
-        status = TradeOfflineSessionStatus.FINISH;
-        player.setGameMode(gameModePlayer);
-        playerWant = player.getInventory().getContents();
-        player.getInventory().clear();
-        player.getInventory().setContents(playerContent);
-        player.closeInventory();
-        callback.onReady(this);
+    @Override
+    protected void changeTitleInventory(String title) {
+        Inventory newInventory = Bukkit.createInventory(inventory.getHolder(), inventory.getSize(), title);
+        for (int index = 0; index < inventory.getSize(); index++) {
+            ItemStack itemStack = inventory.getItem(index);
+            if (itemStack != null) {
+                newInventory.setItem(index, itemStack);
+            }
+        }
+        if (getSeller() != null && getSeller().getOpenInventory().getTopInventory().hashCode() == inventory.hashCode())
+            getSeller().openInventory(newInventory);
+
+        if (getBuyer() != null && getBuyer().getOpenInventory().getTopInventory().hashCode() == inventory.hashCode())
+            getBuyer().openInventory(newInventory);
+        inventory = newInventory;
     }
 
-    private void updateInventoryForSecondPhase(Inventory inventory) {
-        ItemStack redWool = new ItemStack(Material.WOOL, 1, (short) 14);
-        ItemStack greenWool = new ItemStack(Material.WOOL, 1, (short) 5);
-        ItemMeta redWoolMeta = redWool.getItemMeta();
-        ItemMeta greenWoolMeta = greenWool.getItemMeta();
 
-        //TODO add support Lang
-        redWoolMeta.setDisplayName("Cancel trade");
-        greenWoolMeta.setDisplayName("Confirm trade");
-
-        redWool.setItemMeta(redWoolMeta);
-        greenWool.setItemMeta(greenWoolMeta);
-
-        inventory.setItem(8, greenWool);
-        inventory.setItem(7, redWool);
+    private void rollBackPlayer() {
+        Player player = getSeller() != null ? getSeller() : getBuyer();
+        if (inventoryPost != null) {
+            player.getInventory().clear();
+            player.getInventory().setContents(inventoryPost);
+            player.setGameMode(gameModePost);
+        }
+        player.closeInventory();
     }
 
     public void cancelTrade() {
-        player.getInventory().clear();
-        player.getInventory().addItem(inventory.getContents());
-        player.setGameMode(gameModePlayer);
-        status = TradeOfflineSessionStatus.FIRST_PHASE;
+        this.rollBackPlayer();
+        Player player = getSeller() != null ? getSeller() : getBuyer();
+        player.getInventory().addItem(getSellerItems().toArray(new ItemStack[0]));
+        player.closeInventory();
     }
-
 }

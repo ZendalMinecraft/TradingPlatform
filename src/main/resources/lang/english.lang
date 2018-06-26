@@ -29,3 +29,10 @@ storage.item.getAllItems.caption=Get all items.
 
 trade.offline.onMove=Please pick items to trade.
 trade.offline.onInteract=Please pick items to trade.2
+trade.offline.onCommand=For review trade type /trade create
+
+inventory.offlineSession.title=Input your items.
+
+inventory.offlineSession.item.onSetHasItems=I am ready, next step...
+inventory.offlineSession.item.onSelectCreativeItems.confirm=Confirm trade
+inventory.offlineSession.item.onSelectCreativeItems.cancel=Cancel trade
