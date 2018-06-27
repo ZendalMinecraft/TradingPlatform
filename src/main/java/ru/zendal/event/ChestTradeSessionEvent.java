@@ -14,12 +14,12 @@ import ru.zendal.session.TradeOfflineSession;
 import ru.zendal.session.TradeSession;
 import ru.zendal.session.exception.TradeSessionManagerException;
 
-public class ChestEvent implements Listener {
+public class ChestTradeSessionEvent implements Listener {
 
 
     private final TradingPlatform plugin;
 
-    public ChestEvent(TradingPlatform instance) {
+    public ChestTradeSessionEvent(TradingPlatform instance) {
         this.plugin = instance;
     }
 

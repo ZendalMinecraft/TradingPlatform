@@ -1,7 +1,6 @@
 package ru.zendal.session;
 
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 
 /**
  * The interface Session.

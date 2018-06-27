@@ -7,13 +7,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import ru.zendal.session.Session;
 import ru.zendal.session.TradeOfflineSession;
-import ru.zendal.session.TradeSession;
 import ru.zendal.session.storage.connection.builder.MongoConnectionBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO Create MongoConnection
 public class MongoStorageSessions implements StorageSessions {
 
 
@@ -71,7 +69,6 @@ public class MongoStorageSessions implements StorageSessions {
     public List<Session> getAllSessions() {
         return null;
     }
-
 
 
     /**

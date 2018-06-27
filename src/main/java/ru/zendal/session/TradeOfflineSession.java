@@ -2,10 +2,14 @@ package ru.zendal.session;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import ru.zendal.session.inventory.CreateOffline;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import ru.zendal.session.inventory.CreateOfflineTradeHolderInventory;
+import ru.zendal.util.ItemBuilder;
 
 
 /**
@@ -27,7 +31,7 @@ public class TradeOfflineSession extends TradeSession {
 
     @Override
     protected void createInventory() {
-        inventory = Bukkit.createInventory(new CreateOffline(), 9 * 6, this.getTitleForInventoryTrade());
+        inventory = Bukkit.createInventory(new CreateOfflineTradeHolderInventory(), 9 * 6, this.getTitleForInventoryTrade());
     }
 
 
@@ -51,9 +55,33 @@ public class TradeOfflineSession extends TradeSession {
     @Override
     protected void checkReadyTrade() {
         super.checkReadyTrade();
-        if (this.isBuyerReady() && this.isSellerReady()) {
-            this.rollBackPlayer();
-        }
+    }
+
+    @Override
+    public void enableTimer(JavaPlugin plugin) {
+        TradeSession self = this;
+        new BukkitRunnable() {
+            private int timerStart = 35;
+            private double couf = 1561/timerStart;
+
+            @Override
+            public void run() {
+                ItemStack  stick =  ItemBuilder.get(Material.DIAMOND_SWORD).setDurability((short) (couf*timerStart)).build();
+                for (int i = 0; i < 6; i++) {
+                    if (i != 1 && i != 4) {
+                        inventory.setItem(9 * i + 4, stick);
+                    }
+                }
+                timerStart--;
+                if (timerStart==-1){
+                    if (isBuyerReady() && isSellerReady()){
+                        callback.processTrade(self);
+                        rollBackPlayer();
+                    }
+                    this.cancel();
+                }
+            }
+        }.runTaskTimer(plugin,10L,1L);
     }
 
     @Override

@@ -5,7 +5,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import ru.zendal.TradeSessionHolderInventory;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import ru.zendal.session.inventory.TradeSessionHolderInventory;
+import ru.zendal.util.ItemBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +18,7 @@ public class TradeSession implements Session {
     /**
      * Callback after all Player set Status Ready
      */
-    private final TradeSessionCallback callback;
+    protected final TradeSessionCallback callback;
     protected Inventory inventory;
 
     private Player seller;
@@ -114,7 +117,7 @@ public class TradeSession implements Session {
         inventory.setItem(9 * 5 + 4, stick);
     }
 
-    protected void createInventory(){
+    protected void createInventory() {
         inventory = Bukkit.createInventory(new TradeSessionHolderInventory(), 9 * 6, this.getTitleForInventoryTrade());
     }
 
@@ -139,8 +142,6 @@ public class TradeSession implements Session {
         inventory = newInventory;
     }
 
-    //TODO add block Trade
-
     public List<ItemStack> getBuyerItems() {
         List<ItemStack> items = new ArrayList<>();
         int slot = 5;
@@ -162,12 +163,39 @@ public class TradeSession implements Session {
      */
     protected void checkReadyTrade() {
 
+        this.changeVisualStatusTrade();
+        this.changeTitleInventory(this.getTitleForInventoryTrade());
         if (!(this.buyerReady && this.sellerReady)) {
-            this.changeVisualStatusTrade();
-            this.changeTitleInventory(this.getTitleForInventoryTrade());
             return;
         }
         this.callback.onReady(this);
+    }
+
+
+    public void enableTimer(JavaPlugin plugin) {
+        TradeSession self = this;
+        new BukkitRunnable() {
+            private int timerStart = 35;
+            private double couf = 1561/timerStart;
+
+            @Override
+            public void run() {
+                ItemStack  stick =  ItemBuilder.get(Material.DIAMOND_SWORD).setDurability((short) (couf*timerStart)).build();
+               // ItemStack stick = new ItemStack(Material.STICK, timerStart);
+                for (int i = 0; i < 6; i++) {
+                    if (i != 1 && i != 4) {
+                        inventory.setItem(9 * i + 4, stick);
+                    }
+                }
+                timerStart--;
+                if (timerStart==-1){
+                   if (isBuyerReady() && isSellerReady()){
+                       callback.processTrade(self);
+                   }
+                    this.cancel();
+                }
+            }
+        }.runTaskTimer(plugin,10L,1L);
     }
 
     /**

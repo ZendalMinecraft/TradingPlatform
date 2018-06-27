@@ -62,7 +62,7 @@ public class TradingPlatformConfig {
 
     private void initLanguage() {
         String langName = this.yamlConfig.getString("settings.lang");
-        languageConfig = new LanguageConfig(this.getLanguageFileByName(langName),this.plugin.getLogger());
+        languageConfig = new LanguageConfig(this.getLanguageFileByName(langName), this.plugin.getLogger());
     }
 
     /**

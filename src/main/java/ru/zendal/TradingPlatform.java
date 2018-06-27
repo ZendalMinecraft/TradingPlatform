@@ -5,7 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import ru.zendal.command.CommandProcessor;
 import ru.zendal.config.AdaptiveMessage;
 import ru.zendal.config.TradingPlatformConfig;
-import ru.zendal.event.ChestEvent;
+import ru.zendal.event.ChestTradeSessionEvent;
 import ru.zendal.event.ChestStorageEvent;
 import ru.zendal.event.PlayerOfflineSessionEvent;
 import ru.zendal.session.TradeSessionManager;
@@ -24,7 +24,7 @@ public class TradingPlatform extends JavaPlugin {
         this.enableConfig();
         tradeSessionManager = new TradeSessionManager(new MongoStorageSessions(
                 new MongoConnectionBuilder()
-        ), tradingPlatformConfig.getLanguageConfig());
+        ),this, tradingPlatformConfig.getLanguageConfig());
         this.initListeners();
         this.getCommand("trade").setExecutor(new CommandProcessor(this));
     }
@@ -32,7 +32,7 @@ public class TradingPlatform extends JavaPlugin {
 
     private void initListeners() {
         PluginManager pluginManager = this.getServer().getPluginManager();
-        pluginManager.registerEvents(new ChestEvent(this), this);
+        pluginManager.registerEvents(new ChestTradeSessionEvent(this), this);
         pluginManager.registerEvents(new ChestStorageEvent(this), this);
         pluginManager.registerEvents(new PlayerOfflineSessionEvent(this), this);
     }

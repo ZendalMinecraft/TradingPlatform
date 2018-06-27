@@ -6,9 +6,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import ru.zendal.TradingPlatform;
 import ru.zendal.config.LanguageConfig;
 import ru.zendal.session.exception.TradeSessionManagerException;
-import ru.zendal.session.inventory.CreateOffline;
+import ru.zendal.session.inventory.CreateOfflineTradeHolderInventory;
 import ru.zendal.session.inventory.StorageHolderInventory;
 import ru.zendal.session.storage.StorageSessions;
 
@@ -21,6 +22,8 @@ public class TradeSessionManager {
 
     private final LanguageConfig languageConfig;
     private final StorageSessions storage;
+    private final TradingPlatform plugin;
+    private final TradeSessionCallback tradeCallback;
 
     /**
      * Storage simple trade sessions
@@ -43,9 +46,23 @@ public class TradeSessionManager {
     private HashMap<String, TradeOfflineSession> allOfflineSessions = new HashMap<>();
 
 
-    public TradeSessionManager(StorageSessions storageSessions, LanguageConfig config) {
+    public TradeSessionManager(StorageSessions storageSessions, TradingPlatform plugin, LanguageConfig config) {
         this.languageConfig = config;
         this.storage = storageSessions;
+        this.plugin = plugin;
+        this.tradeCallback = new TradeSessionCallback() {
+            @Override
+            public void onReady(Session tradeSession) {
+                if (tradeSession instanceof TradeSession) {
+                    ((TradeSession) tradeSession).enableTimer(plugin);
+                }
+            }
+
+            @Override
+            public void processTrade(Session tradeSession) {
+                processTradeSession(tradeSession);
+            }
+        };
     }
 
     /**
@@ -55,7 +72,7 @@ public class TradeSessionManager {
      * @param buyer  Player buyer - who accept trade
      */
     public void createSession(Player seller, Player buyer) {
-        sessionList.add(new TradeSession(seller, buyer, this::onReady));
+        sessionList.add(new TradeSession(seller, buyer, tradeCallback));
     }
 
     /**
@@ -64,15 +81,11 @@ public class TradeSessionManager {
      * @param player Player (Session creator)
      */
     public void createOfflineSession(Player player) {
-        offlineSessionList.add(new TradeOfflineSession(player, this::onReady));
+        offlineSessionList.add(new TradeOfflineSession(player, tradeCallback));
     }
 
-    /**
-     * Callback function for process Trade
-     *
-     * @param tradeSession Session
-     */
-    private void onReady(Session tradeSession) {
+
+    private void processTradeSession(Session tradeSession) {
         if (tradeSession instanceof TradeOfflineSession) {
             this.processOfflineTrade((TradeOfflineSession) tradeSession);
         } else if (tradeSession instanceof TradeSession) {
@@ -221,7 +234,7 @@ public class TradeSessionManager {
     }
 
     public Session getSessionByInventory(Inventory inventory) throws TradeSessionManagerException {
-        if (inventory.getHolder() instanceof CreateOffline) {
+        if (inventory.getHolder() instanceof CreateOfflineTradeHolderInventory) {
             for (TradeOfflineSession session : offlineSessionList) {
                 if (session.getInventory().hashCode() == inventory.hashCode()) {
                     return session;

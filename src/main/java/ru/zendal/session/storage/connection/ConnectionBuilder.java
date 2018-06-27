@@ -4,6 +4,7 @@ public interface ConnectionBuilder<T> {
 
     /**
      * Get connection
+     *
      * @return
      */
     T build();
