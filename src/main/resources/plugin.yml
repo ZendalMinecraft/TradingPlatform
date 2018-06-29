@@ -5,3 +5,4 @@ commands:
   trade:
     usage: /trade
     description: Test
+softdepend: [Vault]

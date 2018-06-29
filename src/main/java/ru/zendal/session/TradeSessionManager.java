@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import ru.zendal.TradingPlatform;
 import ru.zendal.config.LanguageConfig;
+import ru.zendal.session.economy.Economy;
 import ru.zendal.session.exception.TradeSessionManagerException;
 import ru.zendal.session.inventory.CreateOfflineTradeHolderInventory;
 import ru.zendal.session.inventory.StorageHolderInventory;
@@ -24,6 +25,7 @@ public class TradeSessionManager {
     private final StorageSessions storage;
     private final TradingPlatform plugin;
     private final TradeSessionCallback tradeCallback;
+    private final Economy economy;
 
     /**
      * Storage simple trade sessions
@@ -46,10 +48,11 @@ public class TradeSessionManager {
     private HashMap<String, TradeOfflineSession> allOfflineSessions = new HashMap<>();
 
 
-    public TradeSessionManager(StorageSessions storageSessions, TradingPlatform plugin, LanguageConfig config) {
+    public TradeSessionManager(StorageSessions storageSessions, Economy economy, TradingPlatform plugin, LanguageConfig config) {
         this.languageConfig = config;
         this.storage = storageSessions;
         this.plugin = plugin;
+        this.economy = economy;
         this.tradeCallback = new TradeSessionCallback() {
             @Override
             public void onReady(Session tradeSession) {
@@ -72,7 +75,7 @@ public class TradeSessionManager {
      * @param buyer  Player buyer - who accept trade
      */
     public void createSession(Player seller, Player buyer) {
-        sessionList.add(new TradeSession(seller, buyer, tradeCallback));
+        sessionList.add(new TradeSession(this.economy,seller, buyer, tradeCallback));
     }
 
     /**

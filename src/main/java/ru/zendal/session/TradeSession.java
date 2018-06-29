@@ -7,6 +7,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import ru.zendal.session.economy.Economy;
 import ru.zendal.session.inventory.TradeSessionHolderInventory;
 import ru.zendal.util.ItemBuilder;
 
@@ -19,17 +20,21 @@ public class TradeSession implements Session {
      * Callback after all Player set Status Ready
      */
     protected final TradeSessionCallback callback;
+    private final Economy economy;
     protected Inventory inventory;
 
     private Player seller;
 
     private Player buyer;
 
+    private double moneySeller = 0.0;
+
     protected boolean sellerReady = false;
     private boolean buyerReady = false;
 
 
-    public TradeSession(Player seller, Player buyer, TradeSessionCallback callback) {
+    public TradeSession(Economy economy, Player seller, Player buyer, TradeSessionCallback callback) {
+        this.economy = economy;
         this.seller = seller;
         this.buyer = buyer;
         this.callback = callback;
@@ -100,9 +105,11 @@ public class TradeSession implements Session {
     private void initInventory() {
         this.createInventory();
         ItemStack stick = new ItemStack(Material.STICK);
-        for (int i = 0; i < 6; i++) {
-            inventory.setItem(9 * i + 4, stick);
-        }
+        inventory.setItem(9 * 0 + 4, stick);
+        inventory.setItem(Session.INDEX_SLOT_ECONOMY_CONTROL,
+                ItemBuilder.get(Material.GOLD_NUGGET).setDisplayName("Добавить денег")
+                        .build());
+        inventory.setItem(9 * 3 + 4, ItemBuilder.get(Material.IRON_NUGGET).build());
 
         ItemStack glass = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 14);
 
@@ -121,6 +128,18 @@ public class TradeSession implements Session {
         inventory = Bukkit.createInventory(new TradeSessionHolderInventory(), 9 * 6, this.getTitleForInventoryTrade());
     }
 
+
+    public double addMoneySeller(double moneySeller) {
+        if (economy.hasMoney(getSeller(), this.moneySeller + moneySeller)) {
+            this.moneySeller += moneySeller;
+        }
+        return this.moneySeller;
+    }
+
+    public double reduceMoneySeller(double moneySeller) {
+        this.moneySeller = this.moneySeller - moneySeller < 0 ? 0 : this.moneySeller - moneySeller;
+        return this.moneySeller;
+    }
 
     /**
      * Change title inventory for users

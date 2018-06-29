@@ -7,6 +7,8 @@ import org.bukkit.entity.Player;
  */
 public interface Session {
 
+    public static int INDEX_SLOT_ECONOMY_CONTROL = 22;
+
     /**
      * Gets seller.
      *

@@ -24,7 +24,7 @@ public class TradeOfflineSession extends TradeSession {
 
 
     public TradeOfflineSession(Player seller, TradeSessionCallback callback) {
-        super(seller, null, callback);
+        super(null,seller, null, callback);
         getSeller().openInventory(getInventory());
     }
 

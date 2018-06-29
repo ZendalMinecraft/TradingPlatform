@@ -1,5 +1,6 @@
 package ru.zendal.event;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -7,12 +8,15 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
-import ru.zendal.session.inventory.TradeSessionHolderInventory;
+import org.bukkit.inventory.ItemStack;
 import ru.zendal.TradingPlatform;
 import ru.zendal.session.Session;
 import ru.zendal.session.TradeOfflineSession;
 import ru.zendal.session.TradeSession;
 import ru.zendal.session.exception.TradeSessionManagerException;
+import ru.zendal.session.inventory.ControlEconomyHolderInventory;
+import ru.zendal.session.inventory.TradeSessionHolderInventory;
+import ru.zendal.util.ItemBuilder;
 
 public class ChestTradeSessionEvent implements Listener {
 
@@ -37,7 +41,6 @@ public class ChestTradeSessionEvent implements Listener {
                 event.setCancelled(true);
                 return;
             }
-
             if (!event.getClickedInventory().getName().equalsIgnoreCase("container.inventory")) {
                 Session session;
                 try {
@@ -47,10 +50,12 @@ public class ChestTradeSessionEvent implements Listener {
                     event.setCancelled(true);
                     return;
                 }
-                if (this.isServiceSlot(event.getSlot())) {
+                if (event.getSlot() == Session.INDEX_SLOT_ECONOMY_CONTROL) {
+                    event.setCancelled(true);
+                    this.openEconomyControllEvent((Player) event.getWhoClicked(), session);
+                } else if (this.isServiceSlot(event.getSlot())) {
                     event.setCancelled(true);
                     this.changeSessionStatus(event, session);
-                    return;
                 } else {
                     if (this.canInteractWithSlot(event.getSlot(), (Player) event.getWhoClicked(), session)) {
                         event.setCancelled(true);
@@ -58,6 +63,35 @@ public class ChestTradeSessionEvent implements Listener {
                 }
             }
         }
+    }
+
+
+    private void openEconomyControllEvent(Player player, Session session) {
+        Inventory inventory = Bukkit.createInventory(new ControlEconomyHolderInventory(session), 9 * 4, "EconomyConrtoll");
+        ItemStack glass = ItemBuilder.get(Material.STAINED_GLASS_PANE).setDurability((short) 15).build();
+        for (int indexSlot = 0; indexSlot < inventory.getSize(); indexSlot++) {
+            inventory.setItem(indexSlot, glass);
+        }
+
+
+        //TODO Optimize
+        ItemBuilder goldNugget = ItemBuilder.get(Material.GOLD_NUGGET);
+        ItemBuilder ironNugget = ItemBuilder.get(Material.IRON_NUGGET);
+
+        inventory.setItem(11, goldNugget.setDisplayName("+1").build());
+        inventory.setItem(12, goldNugget.setDisplayName("+5").build());
+        inventory.setItem(13, goldNugget.setDisplayName("+10").build());
+        inventory.setItem(14, goldNugget.setDisplayName("+100").build());
+        inventory.setItem(15, goldNugget.setDisplayName("+1000").build());
+
+
+        inventory.setItem(20, ironNugget.setDisplayName("-1").build());
+        inventory.setItem(21, ironNugget.setDisplayName("-5").build());
+        inventory.setItem(22, ironNugget.setDisplayName("-10").build());
+        inventory.setItem(23, ironNugget.setDisplayName("-100").build());
+        inventory.setItem(24, ironNugget.setDisplayName("-1000").build());
+
+        player.openInventory(inventory);
     }
 
     /**
