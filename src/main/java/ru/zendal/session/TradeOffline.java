@@ -17,44 +17,116 @@ import ru.zendal.util.ItemBuilder;
 
 import java.util.List;
 
+/**
+ * This type session used
+ */
 public class TradeOffline {
 
-
+    /**
+     * Player who create this trade
+     *
+     * @see Player
+     */
     private final Player player;
 
+    /**
+     * Items owner trade
+     *
+     * @see ItemStack
+     */
     private final List<ItemStack> has;
+
+    /**
+     * Items which wants to trade
+     *
+     * @see ItemStack
+     */
     private final List<ItemStack> wants;
+
+    /**
+     * Unique ID trade
+     */
     private final String uniqueId;
 
+    /**
+     * Inventory for accept trade
+     *
+     * @see Inventory
+     */
     private Inventory inventory;
 
-    public TradeOffline(String uniqueId,Player player, List<ItemStack> has, List<ItemStack> wants) {
-        this.uniqueId =uniqueId;
+    /**
+     * Constructor Trade Offline
+     *
+     * @param uniqueId Unique ID
+     * @param player   Player who create this trade
+     * @param has      Items owner trade
+     * @param wants    items which wants to trade
+     * @see ItemStack
+     * @see Player
+     */
+    public TradeOffline(String uniqueId, Player player, List<ItemStack> has, List<ItemStack> wants) {
+        this.uniqueId = uniqueId;
         this.player = player;
         this.has = has;
         this.wants = wants;
     }
 
+    /**
+     * Get owner trade
+     *
+     * @return owner trade
+     * @see Player
+     */
     public Player getPlayer() {
         return player;
     }
 
+    /**
+     * Get list items owner trade
+     *
+     * @return Items owner trade
+     */
     public List<ItemStack> getHas() {
         return has;
     }
 
+    /**
+     * Get list items which wants to trade
+     *
+     * @return items which wants to trade
+     */
     public List<ItemStack> getWants() {
         return wants;
     }
 
-
-    public Inventory getInventory() {
+    /**
+     * Get inventory for accept trade
+     *
+     * @return Inventory for accept trade
+     */
+    public synchronized Inventory getInventory() {
         if (inventory == null) {
             inventory = this.generateInventory();
         }
         return inventory;
     }
 
+    /**
+     * Get unique ID trade
+     *
+     * @return Unique ID trade
+     */
+    public String getUniqueId() {
+        return uniqueId;
+    }
+
+    /**
+     * Generate Inventory for trade
+     *
+     * @return Inventory to trade
+     * @see Inventory
+     */
     private Inventory generateInventory() {
         Inventory inventory = Bukkit.createInventory(new ViewOfflineTradeHolderInventory(), 54);
         this.addedItemsToInventory(inventory);
@@ -73,6 +145,12 @@ public class TradeOffline {
         return inventory;
     }
 
+    /**
+     * Add items to trade into Inventory
+     *
+     * @param inventory Inventory
+     * @see Inventory
+     */
     private void addedItemsToInventory(Inventory inventory) {
         int indexSlot = 0;
         for (ItemStack itemStack : has) {
@@ -92,11 +170,15 @@ public class TradeOffline {
         }
     }
 
-    public static TradeOffline factory(String uniqueId,TradeOfflineSession session) {
-        return new TradeOffline(uniqueId,session.getBuyer(), session.getSellerItems(), session.getBuyerItems());
-    }
-
-    public String getUniqueId() {
-        return uniqueId;
+    /**
+     * Factory for create TradeOffline by TradeOfflineSession
+     *
+     * @param uniqueId Unique ID trade
+     * @param session  TradeOfflineSession
+     * @return instance TradeOffline
+     * @see TradeOfflineSession
+     */
+    public static TradeOffline factory(String uniqueId, TradeOfflineSession session) {
+        return new TradeOffline(uniqueId, session.getBuyer(), session.getSellerItems(), session.getBuyerItems());
     }
 }

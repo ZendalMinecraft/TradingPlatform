@@ -14,12 +14,12 @@ import ru.zendal.session.storage.connection.builder.NitriteConnectionBuilder;
 
 import java.util.List;
 
-public class NitriteStorageSessions implements StorageSessions{
+public class NitriteStorageSessions implements StorageSessions {
 
 
     private final NitriteCollection builder;
 
-    public NitriteStorageSessions(NitriteConnectionBuilder builder){
+    public NitriteStorageSessions(NitriteConnectionBuilder builder) {
         this.builder = builder.build().getCollection("TradingPlatform");
     }
 

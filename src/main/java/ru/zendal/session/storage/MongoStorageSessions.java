@@ -25,14 +25,40 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+/**
+ * NoSQL Storage (MongoDB)
+ */
 public class MongoStorageSessions implements StorageSessions {
 
-
+    /**
+     * Object Mongo DataBase
+     *
+     * @see MongoDatabase
+     */
     private final MongoDatabase dataBase;
+
+    /**
+     * Builder Mongo Connection
+     *
+     * @see MongoConnectionBuilder
+     */
     private final MongoConnectionBuilder builder;
+
+    /**
+     * Logger
+     *
+     * @see Logger
+     */
     private final Logger logger;
 
-
+    /**
+     * Constructor
+     *
+     * @param builder Builder Mongo connection
+     * @param logger  Logger
+     * @see Logger
+     * @see MongoConnectionBuilder
+     */
     public MongoStorageSessions(MongoConnectionBuilder builder, Logger logger) {
         this.builder = builder;
         this.logger = logger;
@@ -40,7 +66,9 @@ public class MongoStorageSessions implements StorageSessions {
         this.initCollections();
     }
 
-
+    /**
+     * Initialize collections
+     */
     private void initCollections() {
         if (!hasCollection("trades")) {
             dataBase.createCollection("trades");
@@ -73,6 +101,13 @@ public class MongoStorageSessions implements StorageSessions {
 
     }
 
+    /**
+     * Send TradeOfflineSession to mongo Storage
+     *
+     * @param session TradeOfflineSession
+     * @return Unique ID record
+     * @see TradeOfflineSession
+     */
     private String processOfflineSession(TradeOfflineSession session) {
         MongoCollection<Document> trades = dataBase.getCollection("trades");
         Document data = new Document();
@@ -144,6 +179,13 @@ public class MongoStorageSessions implements StorageSessions {
     }
 
 
+    /**
+     * Convert List BSON Documents to List ItemStack
+     *
+     * @param list List BSON Document
+     * @return List ItemStack
+     * @see ItemStack
+     */
     private List<ItemStack> getListItemStackByListDocument(List<Document> list) {
         List<ItemStack> itemStacks = new ArrayList<>();
         for (Document document : list) {
@@ -152,6 +194,13 @@ public class MongoStorageSessions implements StorageSessions {
         return itemStacks;
     }
 
+    /**
+     * Convert Document BSON to ItemStack
+     *
+     * @param document BSON Document
+     * @return ItemStack
+     * @see ItemStack
+     */
     private ItemStack convertDocumentToItemStack(Document document) {
         int durabilityInteger = document.getInteger("durability");
         short durability = (short) durabilityInteger;

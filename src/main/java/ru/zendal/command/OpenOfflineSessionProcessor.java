@@ -7,12 +7,9 @@
 
 package ru.zendal.command;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import ru.zendal.config.LanguageConfig;
 import ru.zendal.session.TradeOffline;
 import ru.zendal.session.TradeSessionManager;

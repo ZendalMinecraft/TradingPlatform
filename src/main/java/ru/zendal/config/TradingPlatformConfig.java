@@ -10,10 +10,7 @@ package ru.zendal.config;
 import org.bukkit.configuration.file.YamlConfiguration;
 import ru.zendal.TradingPlatform;
 import ru.zendal.config.exception.ConfigException;
-import ru.zendal.session.storage.MongoStorageSessions;
 import ru.zendal.session.storage.StorageSessions;
-import ru.zendal.session.storage.connection.ConnectionBuilder;
-import ru.zendal.session.storage.connection.builder.MongoConnectionBuilder;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -57,7 +54,9 @@ public class TradingPlatformConfig {
         this.processConfig();
     }
 
-
+    /**
+     * Init config files
+     */
     private void setup() {
         try {
             this.checkFolder();
@@ -155,11 +154,11 @@ public class TradingPlatformConfig {
 
     public StorageSessions getStorageByConfig() throws ConfigException {
         String typeStorageString = yamlConfig.getString("storage.type");
-        if (typeStorageString.equalsIgnoreCase("mongo")){
+        if (typeStorageString.equalsIgnoreCase("mongo")) {
            /* return  new MongoStorageSessions(
                     new MongoConnectionBuilder().setHost();
             )*/
-        }else{
+        } else {
             throw new ConfigException("Undefined type config");
         }
         return null;

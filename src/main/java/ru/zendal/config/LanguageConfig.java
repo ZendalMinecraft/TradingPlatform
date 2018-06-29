@@ -39,6 +39,9 @@ public class LanguageConfig {
         this.processFile();
     }
 
+    /**
+     * Process language file
+     */
     private void processFile() {
         try {
             boolean multiLine = false;
@@ -47,6 +50,7 @@ public class LanguageConfig {
             List<String> lines = Files.readLines(this.langFile, Charset.forName("UTF-8"));
             for (String line : lines) {
                 String[] message = line.split("=");
+                //Is multiLine mode
                 if (multiLine) {
                     if (line.length() == 0) {
                         buffer.append("\n");

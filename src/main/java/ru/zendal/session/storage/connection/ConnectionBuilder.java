@@ -18,6 +18,7 @@ public interface ConnectionBuilder<T> {
 
     /**
      * Has connected
+     *
      * @return {@code true} if has connected else {@code false}
      */
     boolean hasConnected();

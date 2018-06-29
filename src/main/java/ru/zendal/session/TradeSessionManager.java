@@ -25,6 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The type Trade session manager.
+ */
 public class TradeSessionManager {
 
     private final LanguageConfig languageConfig;
@@ -52,14 +55,16 @@ public class TradeSessionManager {
      */
     private HashMap<String, TradeOffline> activeOfflineTrade = new HashMap<>();
 
-
+    /**
+     * Constructor for Trade Session Manager
+     *
+     * @param storageSessions Storage where manager can store data
+     * @param plugin          Instance Plugin
+     * @param config          Config language Pack
+     */
     public TradeSessionManager(StorageSessions storageSessions, TradingPlatform plugin, LanguageConfig config) {
         this.languageConfig = config;
         this.storage = storageSessions;
-        for (TradeOffline tradeOffline:storage.getAllSessions()){
-            activeOfflineTrade.put(tradeOffline.getUniqueId(),tradeOffline);
-
-        }
         this.plugin = plugin;
         this.tradeCallback = new TradeSessionCallback() {
             @Override
@@ -74,6 +79,18 @@ public class TradeSessionManager {
                 processTradeSession(tradeSession);
             }
         };
+        this.initAllTradeOfflineSessions();
+    }
+
+    /**
+     * Init all trade offline sessions from Storage
+     *
+     * @see TradeOffline
+     */
+    private void initAllTradeOfflineSessions() {
+        for (TradeOffline tradeOffline : storage.getAllSessions()) {
+            activeOfflineTrade.put(tradeOffline.getUniqueId(), tradeOffline);
+        }
     }
 
     /**
@@ -118,7 +135,7 @@ public class TradeSessionManager {
     private void processOfflineTrade(TradeOfflineSession session) {
         try {
             String uniqueId = storage.saveSession(session);
-            activeOfflineTrade.put(uniqueId, TradeOffline.factory(uniqueId,session));
+            activeOfflineTrade.put(uniqueId, TradeOffline.factory(uniqueId, session));
             languageConfig.getMessage("trade.offline.process").
                     setCustomMessage(1, uniqueId).sendMessage(session.getBuyer());
         } catch (Exception exception) {
@@ -352,7 +369,7 @@ public class TradeSessionManager {
 
     public TradeOffline getTradeOfflineByInventory(Inventory inventory) throws TradeSessionManagerException {
         for (Map.Entry<String, TradeOffline> entry : activeOfflineTrade.entrySet()) {
-            if (entry.getValue().getInventory().hashCode()==inventory.hashCode()) {
+            if (entry.getValue().getInventory().hashCode() == inventory.hashCode()) {
                 return entry.getValue();
             }
         }

@@ -9,7 +9,6 @@ package ru.zendal.session.storage.connection.builder;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
-import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.event.ServerHeartbeatFailedEvent;
@@ -17,8 +16,6 @@ import com.mongodb.event.ServerHeartbeatStartedEvent;
 import com.mongodb.event.ServerHeartbeatSucceededEvent;
 import com.mongodb.event.ServerMonitorListener;
 import ru.zendal.session.storage.connection.ConnectionBuilder;
-
-import java.util.Collections;
 
 public class MongoConnectionBuilder implements ConnectionBuilder<MongoDatabase> {
 

@@ -14,12 +14,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
-import ru.zendal.session.inventory.TradeSessionHolderInventory;
 import ru.zendal.TradingPlatform;
 import ru.zendal.session.Session;
 import ru.zendal.session.TradeOfflineSession;
 import ru.zendal.session.TradeSession;
 import ru.zendal.session.exception.TradeSessionManagerException;
+import ru.zendal.session.inventory.TradeSessionHolderInventory;
 
 public class ChestTradeSessionEvent implements Listener {
 
