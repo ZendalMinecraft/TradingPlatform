@@ -159,7 +159,10 @@ public class TradeSession implements Session {
     }
 
     /**
+     * Check ready trade
+     * If trade ready call Callback function OnReady
      *
+     * @see TradeSessionCallback
      */
     protected void checkReadyTrade() {
 
@@ -171,31 +174,40 @@ public class TradeSession implements Session {
         this.callback.onReady(this);
     }
 
-
+    /**
+     * Start timer before process Trade
+     *
+     * @param plugin Instance Plugin
+     */
     public void enableTimer(JavaPlugin plugin) {
-        TradeSession self = this;
         new BukkitRunnable() {
             private int timerStart = 35;
-            private double couf = 1561/timerStart;
+            private double coefficient = 1561 / timerStart;
 
             @Override
             public void run() {
-                ItemStack  stick =  ItemBuilder.get(Material.DIAMOND_SWORD).setDurability((short) (couf*timerStart)).build();
-               // ItemStack stick = new ItemStack(Material.STICK, timerStart);
+                ItemStack stick = ItemBuilder.get(Material.DIAMOND_SWORD).setDurability((short) (coefficient * timerStart)).build();
                 for (int i = 0; i < 6; i++) {
                     if (i != 1 && i != 4) {
                         inventory.setItem(9 * i + 4, stick);
                     }
                 }
                 timerStart--;
-                if (timerStart==-1){
-                   if (isBuyerReady() && isSellerReady()){
-                       callback.processTrade(self);
-                   }
+                if (timerStart == -1) {
+                    onTimerEnd();
                     this.cancel();
                 }
             }
-        }.runTaskTimer(plugin,10L,1L);
+        }.runTaskTimer(plugin, 10L, 1L);
+    }
+
+    /**
+     * Operation after timer end work
+     */
+    protected void onTimerEnd() {
+        if (isBuyerReady() && isSellerReady()) {
+            callback.processTrade(this);
+        }
     }
 
     /**

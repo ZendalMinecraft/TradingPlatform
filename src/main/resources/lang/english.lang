@@ -36,3 +36,4 @@ inventory.offlineSession.title=Input your items.
 inventory.offlineSession.item.onSetHasItems=I am ready, next step...
 inventory.offlineSession.item.onSelectCreativeItems.confirm=Confirm trade
 inventory.offlineSession.item.onSelectCreativeItems.cancel=Cancel trade
+

@@ -58,30 +58,11 @@ public class TradeOfflineSession extends TradeSession {
     }
 
     @Override
-    public void enableTimer(JavaPlugin plugin) {
-        TradeSession self = this;
-        new BukkitRunnable() {
-            private int timerStart = 35;
-            private double couf = 1561/timerStart;
-
-            @Override
-            public void run() {
-                ItemStack  stick =  ItemBuilder.get(Material.DIAMOND_SWORD).setDurability((short) (couf*timerStart)).build();
-                for (int i = 0; i < 6; i++) {
-                    if (i != 1 && i != 4) {
-                        inventory.setItem(9 * i + 4, stick);
-                    }
-                }
-                timerStart--;
-                if (timerStart==-1){
-                    if (isBuyerReady() && isSellerReady()){
-                        callback.processTrade(self);
-                        rollBackPlayer();
-                    }
-                    this.cancel();
-                }
-            }
-        }.runTaskTimer(plugin,10L,1L);
+    protected void onTimerEnd() {
+        if (isBuyerReady() && isSellerReady()){
+            callback.processTrade(this);
+            rollBackPlayer();
+        }
     }
 
     @Override
