@@ -1,14 +1,28 @@
 package ru.zendal.session.storage.connection.builder;
 
-import com.mongodb.client.MongoClient;
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.event.ServerHeartbeatFailedEvent;
+import com.mongodb.event.ServerHeartbeatStartedEvent;
+import com.mongodb.event.ServerHeartbeatSucceededEvent;
+import com.mongodb.event.ServerMonitorListener;
 import ru.zendal.session.storage.connection.ConnectionBuilder;
 
-public class MongoConnectionBuilder implements ConnectionBuilder<MongoClient> {
+import java.util.Collections;
 
+public class MongoConnectionBuilder implements ConnectionBuilder<MongoDatabase> {
+
+    private String name;
+    private String password;
+    private String dataBaseName = "TradingPlatform";
 
     private int port;
     private String host;
+
+    private boolean hasConnected = false;
 
     public MongoConnectionBuilder() {
         this.host = "localhost";
@@ -24,7 +38,37 @@ public class MongoConnectionBuilder implements ConnectionBuilder<MongoClient> {
     }
 
     @Override
-    public MongoClient build() {
-        return MongoClients.create("mongodb://" + host + ":" + port);
+    public MongoDatabase build() {
+        if (name == null || password == null) {
+            return this.buildWithOutCredential();
+        }
+
+        return null;
+    }
+
+    public boolean hasConnected() {
+        return hasConnected;
+    }
+
+    private MongoDatabase buildWithOutCredential() {
+        ConnectionString connectionString = new ConnectionString("mongodb://" + host + ":" + port);
+        MongoClientSettings settings = MongoClientSettings.builder().applyToServerSettings(builder -> builder.addServerMonitorListener(new ServerMonitorListener() {
+            @Override
+            public void serverHearbeatStarted(ServerHeartbeatStartedEvent event) {
+                hasConnected = false;
+            }
+
+            @Override
+            public void serverHeartbeatSucceeded(ServerHeartbeatSucceededEvent event) {
+                hasConnected = true;
+            }
+
+            @Override
+            public void serverHeartbeatFailed(ServerHeartbeatFailedEvent event) {
+                hasConnected = false;
+            }
+        })).applyConnectionString(connectionString).build();
+
+        return MongoClients.create(settings).getDatabase(dataBaseName);
     }
 }

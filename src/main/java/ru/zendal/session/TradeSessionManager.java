@@ -43,12 +43,16 @@ public class TradeSessionManager {
     /**
      * Storage all active offline sessions
      */
-    private HashMap<String, TradeOfflineSession> allOfflineSessions = new HashMap<>();
+    private HashMap<String, TradeOffline> activeOfflineTrade = new HashMap<>();
 
 
     public TradeSessionManager(StorageSessions storageSessions, TradingPlatform plugin, LanguageConfig config) {
         this.languageConfig = config;
         this.storage = storageSessions;
+        for (TradeOffline tradeOffline:storage.getAllSessions()){
+            activeOfflineTrade.put(tradeOffline.getUniqueId(),tradeOffline);
+
+        }
         this.plugin = plugin;
         this.tradeCallback = new TradeSessionCallback() {
             @Override
@@ -81,7 +85,11 @@ public class TradeSessionManager {
      * @param player Player (Session creator)
      */
     public void createOfflineSession(Player player) {
-        offlineSessionList.add(new TradeOfflineSession(player, tradeCallback));
+        if (!storage.isAvailable()) {
+            languageConfig.getMessage("trade.offline.unavailable").sendMessage(player);
+        } else {
+            offlineSessionList.add(new TradeOfflineSession(player, tradeCallback));
+        }
     }
 
 
@@ -101,10 +109,16 @@ public class TradeSessionManager {
      * @see TradeOfflineSession
      */
     private void processOfflineTrade(TradeOfflineSession session) {
+        try {
+            String uniqueId = storage.saveSession(session);
+            activeOfflineTrade.put(uniqueId, TradeOffline.factory(uniqueId,session));
+            languageConfig.getMessage("trade.offline.process").
+                    setCustomMessage(1, uniqueId).sendMessage(session.getBuyer());
+        } catch (Exception exception) {
+            languageConfig.getMessage("trade.offline.unavailable").sendMessage(session.getBuyer());
+            session.cancelTrade();
+        }
         this.offlineSessionList.remove(session);
-        String uniqueId = storage.saveSession(session);
-        // allOfflineSessions2.put(uniqueId, offlineSession);
-        //TODO do...
     }
 
     /**
@@ -318,5 +332,23 @@ public class TradeSessionManager {
             }
         }
         throw new TradeSessionManagerException("Undefined offline session");
+    }
+
+    public TradeOffline getTradeOfflineById(String id) throws TradeSessionManagerException {
+        for (Map.Entry<String, TradeOffline> entry : activeOfflineTrade.entrySet()) {
+            if (entry.getKey().equals(id)) {
+                return entry.getValue();
+            }
+        }
+        throw new TradeSessionManagerException("Undefined Trade offline by id");
+    }
+
+    public TradeOffline getTradeOfflineByInventory(Inventory inventory) throws TradeSessionManagerException {
+        for (Map.Entry<String, TradeOffline> entry : activeOfflineTrade.entrySet()) {
+            if (entry.getValue().getInventory().hashCode()==inventory.hashCode()) {
+                return entry.getValue();
+            }
+        }
+        throw new TradeSessionManagerException("Undefined Trade offline by id");
     }
 }

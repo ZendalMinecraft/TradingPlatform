@@ -1,10 +1,20 @@
 package ru.zendal.session.storage;
 
 import ru.zendal.session.Session;
+import ru.zendal.session.TradeOffline;
 
 import java.util.List;
 
 public interface StorageSessions {
+
+
+    /**
+     * Get last connection status
+     *
+     * @return {@code true} if connection exists else {@code false}
+     */
+    boolean isAvailable();
+
 
     /**
      * Save  session into Storage
@@ -19,6 +29,6 @@ public interface StorageSessions {
      *
      * @return List Sessions
      */
-    List<Session> getAllSessions();
+    List<TradeOffline> getAllSessions();
 
 }

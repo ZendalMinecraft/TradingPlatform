@@ -42,6 +42,11 @@ public class CommandProcessor implements CommandExecutor {
                 this.plugin.getSessionManager(),
                 this.plugin.getTradingPlatformConfig().getLanguageConfig()
         ));
+
+        processors.add(new OpenOfflineSessionProcessor(
+                this.plugin.getSessionManager(),
+                this.plugin.getTradingPlatformConfig().getLanguageConfig()
+        ));
     }
 
     @Override

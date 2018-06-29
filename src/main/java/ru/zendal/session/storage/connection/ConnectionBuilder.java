@@ -8,4 +8,10 @@ public interface ConnectionBuilder<T> {
      * @return
      */
     T build();
+
+    /**
+     * Has connected
+     * @return {@code true} if has connected else {@code false}
+     */
+    boolean hasConnected();
 }

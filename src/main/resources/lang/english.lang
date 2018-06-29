@@ -37,3 +37,10 @@ inventory.offlineSession.item.onSetHasItems=I am ready, next step...
 inventory.offlineSession.item.onSelectCreativeItems.confirm=Confirm trade
 inventory.offlineSession.item.onSelectCreativeItems.cancel=Cancel trade
 
+
+trade.offline.unavailable=Sorry now u can't create Offline Session.
+
+trade.offline.process=You can open your reffer use /trade open %1%
+
+trade.offline.notPickId=Please use command /trade open <UNIQ_ID>
+trade.offline.udefinedId=Trade with id %1% is undefined;

@@ -5,12 +5,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 import ru.zendal.command.CommandProcessor;
 import ru.zendal.config.AdaptiveMessage;
 import ru.zendal.config.TradingPlatformConfig;
+import ru.zendal.event.ChestTradeOfflineEvent;
 import ru.zendal.event.ChestTradeSessionEvent;
 import ru.zendal.event.ChestStorageEvent;
 import ru.zendal.event.PlayerOfflineSessionEvent;
 import ru.zendal.session.TradeSessionManager;
 import ru.zendal.session.storage.MongoStorageSessions;
+import ru.zendal.session.storage.NitriteStorageSessions;
 import ru.zendal.session.storage.connection.builder.MongoConnectionBuilder;
+import ru.zendal.session.storage.connection.builder.NitriteConnectionBuilder;
 
 public class TradingPlatform extends JavaPlugin {
 
@@ -22,8 +25,9 @@ public class TradingPlatform extends JavaPlugin {
     @Override
     public void onEnable() {
         this.enableConfig();
+        //new NitriteStorageSessions(new NitriteConnectionBuilder());
         tradeSessionManager = new TradeSessionManager(new MongoStorageSessions(
-                new MongoConnectionBuilder()
+                new MongoConnectionBuilder(),getLogger()
         ),this, tradingPlatformConfig.getLanguageConfig());
         this.initListeners();
         this.getCommand("trade").setExecutor(new CommandProcessor(this));
@@ -35,6 +39,7 @@ public class TradingPlatform extends JavaPlugin {
         pluginManager.registerEvents(new ChestTradeSessionEvent(this), this);
         pluginManager.registerEvents(new ChestStorageEvent(this), this);
         pluginManager.registerEvents(new PlayerOfflineSessionEvent(this), this);
+        pluginManager.registerEvents(new ChestTradeOfflineEvent(this), this);
     }
 
     @Override

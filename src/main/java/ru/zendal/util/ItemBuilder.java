@@ -1,6 +1,7 @@
 package ru.zendal.util;
 
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -35,6 +36,16 @@ public class ItemBuilder {
 
     public ItemBuilder setItemLore(List<String> loreLine) {
         itemMeta.setLore(loreLine);
+        return this;
+    }
+
+    public ItemBuilder setEnchantment(String nameEnchantment, int level, boolean ignoreLevelRestriction) {
+        itemMeta.addEnchant(Enchantment.getByName(nameEnchantment), level, ignoreLevelRestriction);
+        return this;
+    }
+
+    public ItemBuilder setEnchantment(Enchantment enchantment, int level, boolean ignoreLevelRestriction) {
+        itemMeta.addEnchant(enchantment, level, ignoreLevelRestriction);
         return this;
     }
 
