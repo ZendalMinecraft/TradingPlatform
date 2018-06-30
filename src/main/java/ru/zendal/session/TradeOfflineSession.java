@@ -20,12 +20,29 @@ import ru.zendal.session.inventory.CreateOfflineTradeHolderInventory;
  */
 public class TradeOfflineSession extends TradeSession {
 
-
+    /**
+     * Initial gamemode
+     *
+     * @see GameMode
+     */
     private GameMode gameModePost;
 
+    /**
+     * Initial items
+     *
+     * @see ItemStack
+     */
     private ItemStack[] inventoryPost;
 
 
+    /**
+     * Constructor TradeOfflineSession
+     *
+     * @param seller   Player created trade
+     * @param callback Callback's
+     * @see Player
+     * @see TradeSessionCallback
+     */
     public TradeOfflineSession(Player seller, TradeSessionCallback callback) {
         super(seller, null, callback);
         getSeller().openInventory(getInventory());
@@ -48,6 +65,9 @@ public class TradeOfflineSession extends TradeSession {
         return this;
     }
 
+    /**
+     * Give player creative mode
+     */
     private void givePlayerCreative() {
         inventoryPost = getSeller().getInventory().getContents();
         gameModePost = getSeller().getGameMode();
@@ -114,6 +134,9 @@ public class TradeOfflineSession extends TradeSession {
         player.closeInventory();
     }
 
+    /**
+     * Cancel trade
+     */
     public void cancelTrade() {
         this.rollBackPlayer();
         Player player = getSeller() != null ? getSeller() : getBuyer();

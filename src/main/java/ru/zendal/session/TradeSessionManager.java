@@ -9,6 +9,7 @@ package ru.zendal.session;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -297,11 +298,10 @@ public class TradeSessionManager {
         throw new TradeSessionManagerException("UndefinedSession");
     }
 
-    private void addNotFitItemsIntoStorageInventory(Map<Integer, ItemStack> items, Player player) {
+    private void addNotFitItemsIntoStorageInventory(Map<Integer, ItemStack> items, OfflinePlayer player) {
         if (items.size() == 0) {
             return;
         }
-        languageConfig.getMessage("trade.confirm.tooManyItems").sendMessage(player);
         Inventory inventory = storageInventories.get(player.getUniqueId().toString());
         if (inventory == null) {
             inventory = this.createStorageInventory(player);
@@ -311,10 +311,13 @@ public class TradeSessionManager {
         items.forEach((index, item) -> {
             finalInventory.addItem(item);
         });
+        if (player.isOnline()) {
+            languageConfig.getMessage("trade.confirm.tooManyItems").sendMessage(player.getPlayer());
+        }
     }
 
-    private Inventory createStorageInventory(Player player) {
-        Inventory inventory = Bukkit.createInventory(new StorageHolderInventory(), 54, "Storage " + player.getDisplayName());
+    private Inventory createStorageInventory(OfflinePlayer player) {
+        Inventory inventory = Bukkit.createInventory(new StorageHolderInventory(), 54, "Storage " + player.getName());
         ItemStack itemGetAllItems = new ItemStack(Material.TORCH);
         ItemMeta meta = itemGetAllItems.getItemMeta();
         meta.setDisplayName(this.languageConfig.getMessage("storage.item.getAllItems.caption").toString());

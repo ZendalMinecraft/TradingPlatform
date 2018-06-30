@@ -7,13 +7,18 @@
 
 package ru.zendal.event;
 
+import org.bukkit.Bukkit;
+import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
+import org.bukkit.event.server.BroadcastMessageEvent;
 import ru.zendal.TradingPlatform;
 import ru.zendal.session.TradeOfflineSession;
 import ru.zendal.session.exception.TradeSessionManagerException;
+
+import javax.validation.MessageInterpolator;
 
 public class PlayerOfflineSessionEvent implements Listener {
 
@@ -64,17 +69,18 @@ public class PlayerOfflineSessionEvent implements Listener {
 
     /**
      * Disable achievement if user has Offline Trade
-     * TODO Not work....
      *
      * @param event Event
      */
     @EventHandler
-    public void onAchievementUnlock(PlayerAchievementAwardedEvent event) {
+    public void onAchievementUnlock(PlayerAdvancementDoneEvent event) {
         Player player = event.getPlayer();
         if (this.needCancelEvent(player)) {
-            event.setCancelled(true);
+            player.getAdvancementProgress(event.getAdvancement())
+                    .revokeCriteria(event.getAdvancement().getCriteria().toArray(new String[0])[0]);
         }
     }
+
 
     private boolean needCancelEvent(Player player) {
         try {

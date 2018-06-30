@@ -12,7 +12,7 @@ import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 import ru.zendal.session.Session;
 import ru.zendal.session.TradeOffline;
@@ -122,12 +122,17 @@ public class MongoStorageSessions implements StorageSessions {
     public List<TradeOffline> getAllSessions() {
         List<TradeOffline> response = new ArrayList<>();
         for (Document data : dataBase.getCollection("trades").find()) {
-            response.add(new TradeOffline(
-                    data.get("_id").toString(),
-                    (Player) Bukkit.getOfflinePlayer(UUID.fromString(data.getString("uuidPlayer"))),
-                    this.getListItemStackByListDocument((List<Document>) data.get("playerItems")),
-                    this.getListItemStackByListDocument((List<Document>) data.get("itemsWant"))
-            ));
+            OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(data.getString("uuidPlayer")));
+            try {
+                response.add(new TradeOffline(
+                        data.get("_id").toString(),
+                        player,
+                        this.getListItemStackByListDocument((List<Document>) data.get("playerItems")),
+                        this.getListItemStackByListDocument((List<Document>) data.get("itemsWant"))
+                ));
+            } catch (Exception e) {
+                logger.warning("Some problems with trade: " + player.getName() + " " + data.get("_id").toString());
+            }
 
         }
         return response;

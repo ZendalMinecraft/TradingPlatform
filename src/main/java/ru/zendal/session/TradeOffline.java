@@ -9,6 +9,7 @@ package ru.zendal.session;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -23,11 +24,11 @@ import java.util.List;
 public class TradeOffline {
 
     /**
-     * Player who create this trade
+     * Player who create this trade (Offline)
      *
-     * @see Player
+     * @see OfflinePlayer
      */
-    private final Player player;
+    private final OfflinePlayer player;
 
     /**
      * Items owner trade
@@ -65,7 +66,7 @@ public class TradeOffline {
      * @see ItemStack
      * @see Player
      */
-    public TradeOffline(String uniqueId, Player player, List<ItemStack> has, List<ItemStack> wants) {
+    public TradeOffline(String uniqueId, OfflinePlayer player, List<ItemStack> has, List<ItemStack> wants) {
         this.uniqueId = uniqueId;
         this.player = player;
         this.has = has;
@@ -76,9 +77,9 @@ public class TradeOffline {
      * Get owner trade
      *
      * @return owner trade
-     * @see Player
+     * @see OfflinePlayer
      */
-    public Player getPlayer() {
+    public OfflinePlayer getOfflinePlayer() {
         return player;
     }
 
