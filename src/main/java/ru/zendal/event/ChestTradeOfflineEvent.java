@@ -83,6 +83,7 @@ public class ChestTradeOfflineEvent implements Listener {
             player.getInventory().clear();
             player.getInventory().setContents(itemsHas.toArray(new ItemStack[0]));
             player.getInventory().addItem(tradeOffline.getHas().toArray(new ItemStack[0]));
+            player.closeInventory();
         }
     }
 
@@ -91,6 +92,8 @@ public class ChestTradeOfflineEvent implements Listener {
         for (ItemStack itemStack : itemStacks) {
             if (itemStack != null) {
                 newStack.add(itemStack.clone());
+            } else {
+                newStack.add(itemStack);
             }
         }
         return newStack;

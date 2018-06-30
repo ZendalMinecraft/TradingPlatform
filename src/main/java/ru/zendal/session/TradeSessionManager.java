@@ -153,8 +153,6 @@ public class TradeSessionManager {
      * @see TradeSession
      */
     private void processTrade(TradeSession session) {
-        //TODO Added check offline player
-        //TODO Если у пользователя полный инвентарь, то предметы не добавляются
         this.addNotFitItemsIntoStorageInventory(
                 session.getSeller().getInventory().addItem(
                         session.getBuyerItems().toArray(new ItemStack[0])),
@@ -332,6 +330,8 @@ public class TradeSessionManager {
         tradeSession.getBuyer().getInventory().addItem(tradeSession.getBuyerItems().toArray(new ItemStack[0]));
         tradeSession.getBuyer().closeInventory();
         tradeSession.getSeller().closeInventory();
+        tradeSession.setReadyBuyer(false);
+        tradeSession.setReadySeller(false);
         try {
             this.removeSession(tradeSession);
         } catch (TradeSessionManagerException e) {

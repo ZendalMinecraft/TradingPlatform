@@ -69,10 +69,12 @@ public class TradeOfflineSession extends TradeSession {
      * Give player creative mode
      */
     private void givePlayerCreative() {
-        inventoryPost = getSeller().getInventory().getContents();
-        gameModePost = getSeller().getGameMode();
-        getSeller().setGameMode(GameMode.CREATIVE);
-        getSeller().getInventory().clear();
+        if (getSeller() != null) {
+            inventoryPost = getSeller().getInventory().getContents();
+            gameModePost = getSeller().getGameMode();
+            getSeller().setGameMode(GameMode.CREATIVE);
+            getSeller().getInventory().clear();
+        }
     }
 
     @Override
@@ -95,8 +97,9 @@ public class TradeOfflineSession extends TradeSession {
 
         StringBuilder subTitleInventory = new StringBuilder("Creative");
         subTitleInventory.append("(").append(this.isBuyerReady() ? "✔" : "×").append(")");
-
-        int countSpace = 36 - titleInventory.length() - subTitleInventory.length();
+        int countSpace = 36 - titleInventory.length() - subTitleInventory.length() +
+                this.getCountServiceSymbols(titleInventory.toString()) * 2 +
+                this.getCountServiceSymbols(subTitleInventory.toString()) * 2;
         while (--countSpace > 0) {
             titleInventory.append(" ");
         }
@@ -141,6 +144,9 @@ public class TradeOfflineSession extends TradeSession {
         this.rollBackPlayer();
         Player player = getSeller() != null ? getSeller() : getBuyer();
         player.getInventory().addItem(getSellerItems().toArray(new ItemStack[0]));
+        setReadySeller(false);
+        setReadyBuyer(false);
         player.closeInventory();
+        player.updateInventory();
     }
 }

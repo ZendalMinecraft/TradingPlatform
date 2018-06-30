@@ -189,23 +189,44 @@ public class TradeSession implements Session {
     public void enableTimer(JavaPlugin plugin) {
         new BukkitRunnable() {
             private int timerStart = 35;
-            private double coefficient = 1561 / timerStart;
 
             @Override
             public void run() {
-                ItemStack stick = ItemBuilder.get(Material.DIAMOND_SWORD).setDurability((short) (coefficient * timerStart)).build();
-                for (int i = 0; i < 6; i++) {
-                    if (i != 1 && i != 4) {
-                        inventory.setItem(9 * i + 4, stick);
-                    }
-                }
-                timerStart--;
-                if (timerStart == -1) {
-                    onTimerEnd();
+                if (!isBuyerReady() || !isSellerReady()) {
+                    setDefaultStickLine();
                     this.cancel();
+                } else {
+                    setTimerItemsLine(timerStart);
+                    timerStart--;
+                    if (timerStart == -1) {
+                        onTimerEnd();
+                        this.cancel();
+                    }
                 }
             }
         }.runTaskTimer(plugin, 10L, 1L);
+    }
+
+    /**
+     * Set default stick item's
+     */
+    private void setDefaultStickLine() {
+        ItemStack stick = ItemBuilder.get(Material.STICK).build();
+        for (int i = 0; i < 6; i++) {
+            if (i != 1 && i != 4) {
+                inventory.setItem(9 * i + 4, stick);
+            }
+        }
+    }
+
+    private void setTimerItemsLine(int time) {
+        double coefficient = 44.6;
+        ItemStack stick = ItemBuilder.get(Material.DIAMOND_SWORD).setDurability((short) (coefficient * time)).build();
+        for (int i = 0; i < 6; i++) {
+            if (i != 1 && i != 4) {
+                inventory.setItem(9 * i + 4, stick);
+            }
+        }
     }
 
     /**
@@ -260,12 +281,31 @@ public class TradeSession implements Session {
         StringBuilder subTitleInventory = new StringBuilder(buyer.getDisplayName());
         subTitleInventory.append("(").append(this.buyerReady ? "✔" : "×").append(")");
 
-        int countSpace = 36 - titleInventory.length() - subTitleInventory.length();
+        int countSpace = 36 - titleInventory.length() - subTitleInventory.length() +
+                this.getCountServiceSymbols(titleInventory.toString()) * 2 +
+                this.getCountServiceSymbols(subTitleInventory.toString()) * 2;
         while (--countSpace > 0) {
             titleInventory.append(" ");
         }
         titleInventory.append(subTitleInventory);
         return titleInventory.toString();
+    }
+
+    /**
+     * Get count Service Symbol
+     * this symbols user don't see
+     *
+     * @param string String
+     * @return count Service Symbol
+     */
+    protected int getCountServiceSymbols(String string) {
+        int countServiceSymbol = 0;
+        for (int i = 0; i < string.length(); i++) {
+            if (string.charAt(i) == '§') {
+                countServiceSymbol++;
+            }
+        }
+        return countServiceSymbol;
     }
 
 }
