@@ -20,8 +20,6 @@ import ru.zendal.session.TradeSessionManager;
 import ru.zendal.session.exception.TradeSessionManagerException;
 import ru.zendal.session.inventory.ViewOfflineTradeHolderInventory;
 
-import java.util.List;
-
 public class ChestTradeOfflineEvent implements Listener {
 
     private final TradeSessionManager sessionManager;
@@ -61,12 +59,10 @@ public class ChestTradeOfflineEvent implements Listener {
 
         if (!response.hasMissingItems()) {
             try {
+                sessionManager.removeTradeOffline(tradeOffline);
                 player.getInventory().clear();
                 player.getInventory().setContents(response.getNewContent());
-                player.getInventory().addItem(tradeOffline.getHas().toArray(new ItemStack[0]));
-                player.updateInventory();
-                player.closeInventory();
-                sessionManager.removeTradeOffline(tradeOffline);
+                sessionManager.processTradeOffline(player, tradeOffline);
             } catch (TradeSessionManagerException e) {
                 languageConfig.getMessage("trade.offline.alreadyFinished").sendMessage(player);
             }

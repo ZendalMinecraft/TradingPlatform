@@ -117,6 +117,25 @@ public class TradeSessionManager {
         }
     }
 
+    public void processTradeOffline(Player whoTrading, TradeOffline tradeOffline) {
+        this.addNotFitItemsIntoStorageInventory(
+                whoTrading.getInventory().addItem(tradeOffline.getHas().toArray(new ItemStack[0])),
+                whoTrading
+        );
+        whoTrading.updateInventory();
+        whoTrading.closeInventory();
+        Map<Integer, ItemStack> itemsForStorage = new HashMap<>();
+        int index = 0;
+        for (ItemStack itemStack : tradeOffline.getWants()) {
+            itemsForStorage.put(index, itemStack);
+            index++;
+        }
+        this.addNotFitItemsIntoStorageInventory(
+                itemsForStorage,
+                tradeOffline.getOfflinePlayer()
+        );
+    }
+
 
     private void processTradeSession(Session tradeSession) {
         if (tradeSession instanceof TradeOfflineSession) {
@@ -381,7 +400,7 @@ public class TradeSessionManager {
 
     public void removeTradeOffline(TradeOffline tradeOffline) throws TradeSessionManagerException {
         this.storage.removeTradeOffline(tradeOffline);
-        if (!this.activeOfflineTrade.remove(tradeOffline.getUniqueId(),tradeOffline)){
+        if (!this.activeOfflineTrade.remove(tradeOffline.getUniqueId(), tradeOffline)) {
             throw new TradeSessionManagerException("Undefined tradeOffline");
         }
     }
