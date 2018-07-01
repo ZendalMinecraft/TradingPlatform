@@ -38,4 +38,9 @@ public class NitriteStorageSessions implements StorageSessions {
     public List<TradeOffline> getAllSessions() {
         return null;
     }
+
+    @Override
+    public void removeTradeOffline(TradeOffline tradeOffline) {
+
+    }
 }

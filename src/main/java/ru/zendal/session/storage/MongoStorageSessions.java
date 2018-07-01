@@ -10,6 +10,7 @@ package ru.zendal.session.storage;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -24,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
+
+import static com.mongodb.client.model.Filters.eq;
 
 /**
  * NoSQL Storage (MongoDB)
@@ -52,6 +55,11 @@ public class MongoStorageSessions implements StorageSessions {
     private final Logger logger;
 
     /**
+     * Collection trades
+     */
+    private final MongoCollection<Document> tradesCollection;
+
+    /**
      * Constructor
      *
      * @param builder Builder Mongo connection
@@ -64,6 +72,7 @@ public class MongoStorageSessions implements StorageSessions {
         this.logger = logger;
         dataBase = builder.build();
         this.initCollections();
+        tradesCollection = dataBase.getCollection("trades");
     }
 
     /**
@@ -109,19 +118,18 @@ public class MongoStorageSessions implements StorageSessions {
      * @see TradeOfflineSession
      */
     private String processOfflineSession(TradeOfflineSession session) {
-        MongoCollection<Document> trades = dataBase.getCollection("trades");
         Document data = new Document();
         data.append("uuidPlayer", session.getBuyer().getUniqueId().toString());
         data.append("playerItems", this.getListDocumentByArrayItemStack(session.getSellerItems().toArray(new ItemStack[0])));
         data.append("itemsWant", this.getListDocumentByArrayItemStack(session.getBuyerItems().toArray(new ItemStack[0])));
-        trades.insertOne(data);
+        tradesCollection.insertOne(data);
         return data.get("_id").toString();
     }
 
     @Override
     public List<TradeOffline> getAllSessions() {
         List<TradeOffline> response = new ArrayList<>();
-        for (Document data : dataBase.getCollection("trades").find()) {
+        for (Document data : tradesCollection.find()) {
             OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(data.getString("uuidPlayer")));
             try {
                 response.add(new TradeOffline(
@@ -142,6 +150,13 @@ public class MongoStorageSessions implements StorageSessions {
     @Override
     public boolean isAvailable() {
         return builder.hasConnected();
+    }
+
+    @Override
+    public void removeTradeOffline(TradeOffline tradeOffline) {
+        tradesCollection.deleteOne(
+                eq("_id", new ObjectId(tradeOffline.getUniqueId()))
+        );
     }
 
     /**

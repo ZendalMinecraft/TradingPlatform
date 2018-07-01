@@ -38,4 +38,5 @@ public interface StorageSessions {
      */
     List<TradeOffline> getAllSessions();
 
+    void removeTradeOffline(TradeOffline tradeOffline);
 }

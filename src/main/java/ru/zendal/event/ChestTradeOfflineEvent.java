@@ -7,29 +7,29 @@
 
 package ru.zendal.event;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import ru.zendal.TradingPlatform;
+import ru.zendal.config.LanguageConfig;
 import ru.zendal.session.TradeOffline;
+import ru.zendal.session.TradeOfflineConfirmResponse;
+import ru.zendal.session.TradeSessionManager;
 import ru.zendal.session.exception.TradeSessionManagerException;
 import ru.zendal.session.inventory.ViewOfflineTradeHolderInventory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ChestTradeOfflineEvent implements Listener {
 
+    private final TradeSessionManager sessionManager;
+    private final LanguageConfig languageConfig;
 
-    private final TradingPlatform tradingPlatform;
-
-    public ChestTradeOfflineEvent(TradingPlatform tradingPlatform) {
-        this.tradingPlatform = tradingPlatform;
+    public ChestTradeOfflineEvent(TradeSessionManager sessionManager, LanguageConfig languageConfig) {
+        this.sessionManager = sessionManager;
+        this.languageConfig = languageConfig;
     }
 
     @EventHandler
@@ -43,60 +43,50 @@ public class ChestTradeOfflineEvent implements Listener {
             event.setCancelled(true);
             if (event.getSlot() == 9 + 4) {
                 try {
-                    this.process(player, tradingPlatform.getSessionManager().getTradeOfflineByInventory(inventory));
+                    this.process(player, sessionManager.getTradeOfflineByInventory(inventory));
                 } catch (TradeSessionManagerException e) {
-                    e.printStackTrace();
+                    player.closeInventory();
+                    languageConfig.getMessage("trade.offline.alreadyFinished").sendMessage(player);
+                }
+            } else {
+                if (event.getSlot() == 9 * 4 + 4) {
+                    player.closeInventory();
                 }
             }
         }
     }
 
     private void process(Player player, TradeOffline tradeOffline) {
-        List<ItemStack> itemsNeed = this.cloneListItemStack(tradeOffline.getWants());
-        List<ItemStack> itemsHas = this.cloneListItemStack(Arrays.asList(player.getInventory().getContents().clone()));
+        TradeOfflineConfirmResponse response = tradeOffline.confirmTrade(player);
 
-        for (ItemStack itemStackNeed : itemsNeed) {
-            for (ItemStack itemStackHas : itemsHas) {
-                if (itemStackHas != null) {
-                    if (itemStackHas.getType() == itemStackNeed.getType() && itemStackHas.getAmount() != 0) {
-                        if (itemStackNeed.getAmount() < itemStackHas.getAmount()) {
-                            itemStackHas.setAmount(itemStackHas.getAmount() - itemStackNeed.getAmount());
-                            itemStackNeed.setAmount(0);
-                        } else {
-                            itemStackNeed.setAmount(itemStackNeed.getAmount() - itemStackHas.getAmount());
-                            itemStackHas.setAmount(0);
-                        }
-                    }
-                }
+        if (!response.hasMissingItems()) {
+            try {
+                player.getInventory().clear();
+                player.getInventory().setContents(response.getNewContent());
+                player.getInventory().addItem(tradeOffline.getHas().toArray(new ItemStack[0]));
+                player.updateInventory();
+                player.closeInventory();
+                sessionManager.removeTradeOffline(tradeOffline);
+            } catch (TradeSessionManagerException e) {
+                languageConfig.getMessage("trade.offline.alreadyFinished").sendMessage(player);
             }
-        }
-        boolean good = true;
-        for (ItemStack itemStackNeed : itemsNeed) {
-            Bukkit.broadcastMessage(itemStackNeed.toString());
-            if (itemStackNeed.getAmount() > 0) {
-                good = false;
-                player.sendMessage(itemStackNeed.getType() + "x" + itemStackNeed.getAmount());
-            }
-        }
-        if (good) {
-            Bukkit.broadcastMessage("Yes");
-            player.getInventory().clear();
-            player.getInventory().setContents(itemsHas.toArray(new ItemStack[0]));
-            player.getInventory().addItem(tradeOffline.getHas().toArray(new ItemStack[0]));
+        } else {
             player.closeInventory();
+            player.sendMessage("Вам не хватает:");
+            response.getListMissingItems().forEach(itemStack -> {
+                player.sendMessage(itemStackToString(itemStack));
+            });
         }
     }
 
-    private List<ItemStack> cloneListItemStack(List<ItemStack> itemStacks) {
-        List<ItemStack> newStack = new ArrayList<>();
-        for (ItemStack itemStack : itemStacks) {
-            if (itemStack != null) {
-                newStack.add(itemStack.clone());
-            } else {
-                newStack.add(itemStack);
-            }
-        }
-        return newStack;
+    private String itemStackToString(ItemStack itemStack) {
+        StringBuilder description = new StringBuilder();
+        description.append(itemStack.getType().name()).append("x").append(itemStack.getAmount());
+        description.append(" With enchants:");
+        itemStack.getEnchantments().forEach((enchantment, level) -> {
+            description.append(enchantment.getName()).append(" ").append(level).append(" ");
+        });
+        return description.toString();
     }
 
 }

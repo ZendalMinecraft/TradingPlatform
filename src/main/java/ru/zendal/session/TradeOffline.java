@@ -10,13 +10,17 @@ package ru.zendal.session;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import ru.zendal.session.inventory.ViewOfflineTradeHolderInventory;
 import ru.zendal.util.ItemBuilder;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This type session used
@@ -123,6 +127,84 @@ public class TradeOffline {
     }
 
     /**
+     * Confirm this trade
+     *
+     * @param player Player who accept this trade
+     * @return A list of missing items. List can be empty.
+     * @see Player
+     */
+    public TradeOfflineConfirmResponse confirmTrade(Player player) {
+        List<ItemStack> listMissingItems = new ArrayList<>();
+
+        List<ItemStack> needItems = this.cloneListItemStack(this.getWants());
+        List<ItemStack> hasItems = this.cloneListItemStack(
+                Arrays.asList(player.getInventory().getContents().clone())
+        );
+
+        for (ItemStack needItemStack : needItems) {
+            for (ItemStack hasItemStack : hasItems) {
+                if (hasItemStack != null) {
+                    this.subtractItemStack(needItemStack, hasItemStack);
+                }
+            }
+        }
+
+
+        for (ItemStack item : needItems) {
+            if (item.getAmount() > 0) {
+                listMissingItems.add(item);
+            }
+        }
+        return new TradeOfflineConfirmResponse(listMissingItems, hasItems);
+    }
+
+    /**
+     * Subtract itemsStack
+     *
+     * @param minuend  Minuend ItemStack
+     * @param deducted Deducted ItemStack
+     * @see ItemStack
+     */
+    private void subtractItemStack(ItemStack minuend, ItemStack deducted) {
+        if (!isEqualsItemStack(minuend, deducted) || deducted.getAmount() == 0) {
+            return;
+        }
+        if (minuend.getAmount() < deducted.getAmount()) {
+            deducted.setAmount(deducted.getAmount() - minuend.getAmount());
+            minuend.setAmount(0);
+        } else {
+            minuend.setAmount(minuend.getAmount() - deducted.getAmount());
+            deducted.setAmount(0);
+        }
+    }
+
+    /**
+     * Equals two ItemStack
+     *
+     * @param firstItemStack  First ItemStack to equals
+     * @param secondItemStack Second ItemStack to equals
+     * @return {@code true} if ItemStacks equal else {@code false}
+     * @see ItemStack
+     */
+    private boolean isEqualsItemStack(ItemStack firstItemStack, ItemStack secondItemStack) {
+        if (firstItemStack.getType() != secondItemStack.getType()) {
+            return false;
+        }
+
+        if (firstItemStack.getData().getData() != secondItemStack.getData().getData()) {
+            return false;
+        }
+
+        for (Map.Entry<Enchantment, Integer> entry : firstItemStack.getEnchantments().entrySet()) {
+            Integer levelEnchantment = secondItemStack.getEnchantments().get(entry.getKey());
+            if (levelEnchantment == null || !levelEnchantment.equals(entry.getValue())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Generate Inventory for trade
      *
      * @return Inventory to trade
@@ -169,6 +251,20 @@ public class TradeOffline {
             }
             indexSlot++;
         }
+    }
+
+
+    private List<ItemStack> cloneListItemStack(List<ItemStack> itemStackList) {
+        List<ItemStack> newStack = new ArrayList<>();
+        for (ItemStack itemStack : itemStackList) {
+            if (itemStack != null) {
+                newStack.add(itemStack.clone());
+            } else {
+                //This need for correct set Contents
+                newStack.add(null);
+            }
+        }
+        return newStack;
     }
 
     /**

@@ -378,4 +378,11 @@ public class TradeSessionManager {
         }
         throw new TradeSessionManagerException("Undefined Trade offline by id");
     }
+
+    public void removeTradeOffline(TradeOffline tradeOffline) throws TradeSessionManagerException {
+        this.storage.removeTradeOffline(tradeOffline);
+        if (!this.activeOfflineTrade.remove(tradeOffline.getUniqueId(),tradeOffline)){
+            throw new TradeSessionManagerException("Undefined tradeOffline");
+        }
+    }
 }

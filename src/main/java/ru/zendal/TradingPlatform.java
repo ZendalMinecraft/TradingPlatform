@@ -44,7 +44,7 @@ public class TradingPlatform extends JavaPlugin {
         pluginManager.registerEvents(new ChestTradeSessionEvent(this), this);
         pluginManager.registerEvents(new ChestStorageEvent(this), this);
         pluginManager.registerEvents(new PlayerOfflineSessionEvent(this), this);
-        pluginManager.registerEvents(new ChestTradeOfflineEvent(this), this);
+        pluginManager.registerEvents(new ChestTradeOfflineEvent(getSessionManager(),getTradingPlatformConfig().getLanguageConfig()), this);
     }
 
     @Override
