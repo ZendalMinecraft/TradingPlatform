@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) Alexander <gasfull98@gmail.com> Chapchuk
+ * Project name: TradingPlatform
+ *
+ * Licensed under the MIT License. See LICENSE file in the project root for license information.
+ */
+
 package ru.zendal.session;
 
 import org.bukkit.Bukkit;
@@ -5,24 +12,27 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import ru.zendal.TradeSessionHolderInventory;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import ru.zendal.session.inventory.TradeSessionHolderInventory;
+import ru.zendal.util.ItemBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TradeSession {
+public class TradeSession implements Session {
 
     /**
      * Callback after all Player set Status Ready
      */
-    private final TradeSessionCallback callback;
-    private Inventory inventory;
+    protected final TradeSessionCallback callback;
+    protected Inventory inventory;
 
-    private final Player seller;
+    private Player seller;
 
-    private final Player buyer;
+    private Player buyer;
 
-    private boolean sellerReady = false;
+    protected boolean sellerReady = false;
     private boolean buyerReady = false;
 
 
@@ -32,7 +42,6 @@ public class TradeSession {
         this.callback = callback;
         this.initInventory();
     }
-
 
     public Inventory getInventory() {
         return inventory;
@@ -83,11 +92,20 @@ public class TradeSession {
         return items;
     }
 
+    protected void setSeller(Player seller) {
+        this.seller = seller;
+    }
+
+
+    protected void setBuyer(Player buyer) {
+        this.buyer = buyer;
+    }
+
     /**
      * Initialize inventory for trade between players
      */
     private void initInventory() {
-        inventory = Bukkit.createInventory(new TradeSessionHolderInventory(), 9 * 6, this.getTitleForInventoryTrade());
+        this.createInventory();
         ItemStack stick = new ItemStack(Material.STICK);
         for (int i = 0; i < 6; i++) {
             inventory.setItem(9 * i + 4, stick);
@@ -106,10 +124,15 @@ public class TradeSession {
         inventory.setItem(9 * 5 + 4, stick);
     }
 
+    protected void createInventory() {
+        inventory = Bukkit.createInventory(new TradeSessionHolderInventory(), 9 * 6, this.getTitleForInventoryTrade());
+    }
+
+
     /**
      * Change title inventory for users
      */
-    private void changeTitleInventory(String title) {
+    protected void changeTitleInventory(String title) {
         Inventory newInventory = Bukkit.createInventory(inventory.getHolder(), inventory.getSize(), title);
         for (int index = 0; index < inventory.getSize(); index++) {
             ItemStack itemStack = inventory.getItem(index);
@@ -117,12 +140,14 @@ public class TradeSession {
                 newInventory.setItem(index, itemStack);
             }
         }
-        inventory = newInventory;
-        buyer.openInventory(newInventory);
-        seller.openInventory(newInventory);
-    }
 
-    //TODO add block Trade
+        if (buyer.getOpenInventory().getTopInventory().hashCode() == inventory.hashCode())
+            buyer.openInventory(newInventory);
+        if (seller.getOpenInventory().getTopInventory().hashCode() == inventory.hashCode())
+            seller.openInventory(newInventory);
+
+        inventory = newInventory;
+    }
 
     public List<ItemStack> getBuyerItems() {
         List<ItemStack> items = new ArrayList<>();
@@ -141,15 +166,76 @@ public class TradeSession {
     }
 
     /**
+     * Check ready trade
+     * If trade ready call Callback function OnReady
      *
+     * @see TradeSessionCallback
      */
-    private void checkReadyTrade() {
+    protected void checkReadyTrade() {
+
+        this.changeVisualStatusTrade();
+        this.changeTitleInventory(this.getTitleForInventoryTrade());
         if (!(this.buyerReady && this.sellerReady)) {
-            this.changeVisualStatusTrade();
-            this.changeTitleInventory(this.getTitleForInventoryTrade());
             return;
         }
         this.callback.onReady(this);
+    }
+
+    /**
+     * Start timer before process Trade
+     *
+     * @param plugin Instance Plugin
+     */
+    public void enableTimer(JavaPlugin plugin) {
+        new BukkitRunnable() {
+            private int timerStart = 35;
+
+            @Override
+            public void run() {
+                if (!isBuyerReady() || !isSellerReady()) {
+                    setDefaultStickLine();
+                    this.cancel();
+                } else {
+                    setTimerItemsLine(timerStart);
+                    timerStart--;
+                    if (timerStart == -1) {
+                        onTimerEnd();
+                        this.cancel();
+                    }
+                }
+            }
+        }.runTaskTimer(plugin, 10L, 1L);
+    }
+
+    /**
+     * Set default stick item's
+     */
+    private void setDefaultStickLine() {
+        ItemStack stick = ItemBuilder.get(Material.STICK).build();
+        for (int i = 0; i < 6; i++) {
+            if (i != 1 && i != 4) {
+                inventory.setItem(9 * i + 4, stick);
+            }
+        }
+    }
+
+    private void setTimerItemsLine(int time) {
+        double coefficient = 44.6;
+        ItemStack stick = ItemBuilder.get(Material.DIAMOND_SWORD).setDurability((short) (coefficient * time)).build();
+        for (int i = 0; i < 6; i++) {
+            if (i != 1 && i != 4) {
+                inventory.setItem(9 * i + 4, stick);
+            }
+        }
+    }
+
+    /**
+     * Operation after timer end work
+     */
+    protected void onTimerEnd() {
+        if (isBuyerReady() && isSellerReady()) {
+            callback.processTrade(this);
+        }
     }
 
     /**
@@ -188,19 +274,38 @@ public class TradeSession {
      *
      * @return Title
      */
-    private String getTitleForInventoryTrade() {
+    protected String getTitleForInventoryTrade() {
         StringBuilder titleInventory = new StringBuilder();
         titleInventory.append(seller.getDisplayName()).append("(").append(this.sellerReady ? "✔" : "×").append(")");
 
         StringBuilder subTitleInventory = new StringBuilder(buyer.getDisplayName());
         subTitleInventory.append("(").append(this.buyerReady ? "✔" : "×").append(")");
 
-        int countSpace = 36 - titleInventory.length() - subTitleInventory.length();
+        int countSpace = 36 - titleInventory.length() - subTitleInventory.length() +
+                this.getCountServiceSymbols(titleInventory.toString()) * 2 +
+                this.getCountServiceSymbols(subTitleInventory.toString()) * 2;
         while (--countSpace > 0) {
             titleInventory.append(" ");
         }
         titleInventory.append(subTitleInventory);
         return titleInventory.toString();
+    }
+
+    /**
+     * Get count Service Symbol
+     * this symbols user don't see
+     *
+     * @param string String
+     * @return count Service Symbol
+     */
+    protected int getCountServiceSymbols(String string) {
+        int countServiceSymbol = 0;
+        for (int i = 0; i < string.length(); i++) {
+            if (string.charAt(i) == '§') {
+                countServiceSymbol++;
+            }
+        }
+        return countServiceSymbol;
     }
 
 }

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) Alexander <gasfull98@gmail.com> Chapchuk
+ * Project name: TradingPlatform
+ *
+ * Licensed under the MIT License. See LICENSE file in the project root for license information.
+ */
+
 package ru.zendal.event;
 
 import org.bukkit.Material;
@@ -6,19 +13,20 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.inventory.Inventory;
-import ru.zendal.TradeSessionHolderInventory;
 import ru.zendal.TradingPlatform;
+import ru.zendal.session.Session;
+import ru.zendal.session.TradeOfflineSession;
 import ru.zendal.session.TradeSession;
 import ru.zendal.session.exception.TradeSessionManagerException;
+import ru.zendal.session.inventory.TradeSessionHolderInventory;
 
-public class ChestEvent implements Listener {
+public class ChestTradeSessionEvent implements Listener {
 
 
     private final TradingPlatform plugin;
 
-    public ChestEvent(TradingPlatform instance) {
+    public ChestTradeSessionEvent(TradingPlatform instance) {
         this.plugin = instance;
     }
 
@@ -38,11 +46,12 @@ public class ChestEvent implements Listener {
             }
 
             if (!event.getClickedInventory().getName().equalsIgnoreCase("container.inventory")) {
-                TradeSession session;
+                Session session;
                 try {
                     session = plugin.getSessionManager().getSessionByInventory(inventory);
                 } catch (TradeSessionManagerException e) {
                     e.printStackTrace();
+                    event.setCancelled(true);
                     return;
                 }
                 if (this.isServiceSlot(event.getSlot())) {
@@ -50,7 +59,7 @@ public class ChestEvent implements Listener {
                     this.changeSessionStatus(event, session);
                     return;
                 } else {
-                    if (this.canInteractWithSlot(event.getSlot(), (Player) event.getWhoClicked(),session)){
+                    if (this.canInteractWithSlot(event.getSlot(), (Player) event.getWhoClicked(), session)) {
                         event.setCancelled(true);
                     }
                 }
@@ -66,11 +75,11 @@ public class ChestEvent implements Listener {
      * @see InventoryClickEvent
      * @see TradeSession
      */
-    private void changeSessionStatus(InventoryClickEvent event, TradeSession session) {
+    private void changeSessionStatus(InventoryClickEvent event, Session session) {
         if (event.getCurrentItem().getType() == Material.WOOL) {
             byte data = event.getCurrentItem().getData().getData();
             if (data == 14) {
-                this.plugin.getSessionManager().cancelSession(session);
+                this.cancelSession(session);
             } else if (data == 5) {
                 if (session.getSeller() == event.getWhoClicked()) {
                     session.setReadySeller(!session.isSellerReady());
@@ -79,6 +88,14 @@ public class ChestEvent implements Listener {
                 }
 
             }
+        }
+    }
+
+    private void cancelSession(Session session) {
+        if (session instanceof TradeOfflineSession) {
+            this.plugin.getSessionManager().cancelOfflineSession((TradeOfflineSession) session);
+        } else if (session instanceof TradeSession) {
+            this.plugin.getSessionManager().cancelSession((TradeSession) session);
         }
     }
 
@@ -97,9 +114,8 @@ public class ChestEvent implements Listener {
                     return;
                 }
                 try {
-                    TradeSession session = plugin.getSessionManager().getSessionByInventory(event.getInventory());
-
-                    if (this.canInteractWithSlot(data, (Player) event.getWhoClicked(),session)){
+                    Session session = plugin.getSessionManager().getSessionByInventory(event.getInventory());
+                    if (this.canInteractWithSlot(data, (Player) event.getWhoClicked(), session)) {
                         event.setCancelled(true);
                     }
                 } catch (TradeSessionManagerException e) {
@@ -110,7 +126,7 @@ public class ChestEvent implements Listener {
     }
 
 
-    private boolean canInteractWithSlot(int indexSlot,Player whoClicked, TradeSession session){
+    private boolean canInteractWithSlot(int indexSlot, Player whoClicked, Session session) {
         //Check foreign slot (Buyer)
         if (isSellerSlot(indexSlot) && session.getSeller() != whoClicked) {
             return true;

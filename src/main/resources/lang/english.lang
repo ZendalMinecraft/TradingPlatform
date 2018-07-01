@@ -19,3 +19,29 @@ trade.to.success=Request trade send to %buyer%.
 
 
 trade.inventory.shift=Sorry you can't move items with use shift, sorry.
+
+trade.storage.clear=Your storage clear.
+
+trade.confirm.tooManyItems=Some things didn't fit in your inventory so they were added to the storage /trade storage
+
+
+storage.item.getAllItems.caption=Get all items.
+
+trade.offline.onMove=Please pick items to trade.
+trade.offline.onInteract=Please pick items to trade.2
+trade.offline.onCommand=For review trade type /trade create
+
+inventory.offlineSession.title=Input your items.
+
+inventory.offlineSession.item.onSetHasItems=I am ready, next step...
+inventory.offlineSession.item.onSelectCreativeItems.confirm=Confirm trade
+inventory.offlineSession.item.onSelectCreativeItems.cancel=Cancel trade
+
+
+trade.offline.unavailable=Sorry now u can't create Offline Session.
+
+trade.offline.process=You can open your reffer use /trade open %1%
+
+trade.offline.notPickId=Please use command /trade open <UNIQ_ID>
+trade.offline.udefinedId=Trade with id %1% is undefined
+trade.offline.alreadyFinished=This trade already finish.

@@ -1,7 +1,16 @@
+/*
+ * Copyright (c) Alexander <gasfull98@gmail.com> Chapchuk
+ * Project name: TradingPlatform
+ *
+ * Licensed under the MIT License. See LICENSE file in the project root for license information.
+ */
+
 package ru.zendal.config;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 import ru.zendal.TradingPlatform;
+import ru.zendal.config.exception.ConfigException;
+import ru.zendal.session.storage.StorageSessions;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -45,7 +54,9 @@ public class TradingPlatformConfig {
         this.processConfig();
     }
 
-
+    /**
+     * Init config files
+     */
     private void setup() {
         try {
             this.checkFolder();
@@ -62,7 +73,7 @@ public class TradingPlatformConfig {
 
     private void initLanguage() {
         String langName = this.yamlConfig.getString("settings.lang");
-        languageConfig = new LanguageConfig(this.getLanguageFileByName(langName),this.plugin.getLogger());
+        languageConfig = new LanguageConfig(this.getLanguageFileByName(langName), this.plugin.getLogger());
     }
 
     /**
@@ -139,5 +150,20 @@ public class TradingPlatformConfig {
     public LanguageConfig getLanguageConfig() {
         return this.languageConfig;
     }
+
+
+    public StorageSessions getStorageByConfig() throws ConfigException {
+        String typeStorageString = yamlConfig.getString("storage.type");
+        if (typeStorageString.equalsIgnoreCase("mongo")) {
+           /* return  new MongoStorageSessions(
+                    new MongoConnectionBuilder().setHost();
+            )*/
+        } else {
+            throw new ConfigException("Undefined type config");
+        }
+        return null;
+    }
+
+    //private ConnectionBuilder getBuilder
 
 }

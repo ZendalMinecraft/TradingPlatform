@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) Alexander <gasfull98@gmail.com> Chapchuk
+ * Project name: TradingPlatform
+ *
+ * Licensed under the MIT License. See LICENSE file in the project root for license information.
+ */
+
 package ru.zendal.config;
 
 import com.google.common.io.Files;
@@ -32,6 +39,9 @@ public class LanguageConfig {
         this.processFile();
     }
 
+    /**
+     * Process language file
+     */
     private void processFile() {
         try {
             boolean multiLine = false;
@@ -40,6 +50,7 @@ public class LanguageConfig {
             List<String> lines = Files.readLines(this.langFile, Charset.forName("UTF-8"));
             for (String line : lines) {
                 String[] message = line.split("=");
+                //Is multiLine mode
                 if (multiLine) {
                     if (line.length() == 0) {
                         buffer.append("\n");

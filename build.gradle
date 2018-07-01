@@ -21,6 +21,8 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
+    compile 'org.mongodb:mongodb-driver-sync:3.7.1'
+    compile 'org.dizitart:nitrite:3.0.0'
 }
 
 import org.apache.tools.ant.filters.ReplaceTokens
@@ -30,9 +32,18 @@ processResources {
         filter ReplaceTokens, tokens: [version: version]
     }
 }
+
+jar {
+    manifest {
+        attributes(
+                "Main-Class": "ru.zendal.TradingPlatform"
+        )
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
 task finalize << {
    ant.move(file: "/Users/bigtows/Projects/TradingPlatform/build/libs/TradingPlatform-"+version+".jar", tofile: "/Volumes/LaCie/Spigot/server/plugins/TradingPlatform.jar")
-
 }
 
 build.finalizedBy(finalize)
