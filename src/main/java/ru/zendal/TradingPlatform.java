@@ -30,7 +30,6 @@ public class TradingPlatform extends JavaPlugin {
     @Override
     public void onEnable() {
         this.enableConfig();
-        //new NitriteStorageSessions(new NitriteConnectionBuilder());
         tradeSessionManager = new TradeSessionManager(new MongoStorageSessions(
                 new MongoConnectionBuilder(), getLogger()
         ), this, tradingPlatformConfig.getLanguageConfig());
