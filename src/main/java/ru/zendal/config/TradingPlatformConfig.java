@@ -104,6 +104,7 @@ public class TradingPlatformConfig {
             FileOutputStream fileOutputStream = null;
             try {
                 inputStream = this.plugin.getResource(langPath);
+                langFile.getParentFile().mkdirs();
                 fileOutputStream = new FileOutputStream(langFile);
                 //TODO mb remove readAllBytes, for support Java 8
                 fileOutputStream.write(inputStream.readAllBytes());
@@ -129,8 +130,8 @@ public class TradingPlatformConfig {
 
     private void initConfigFile() throws IOException {
         File file = new File(this.plugin.getDataFolder(), "config.yml");
-        this.yamlConfig = YamlConfiguration.loadConfiguration(file);
         if (file.exists()) {
+            this.yamlConfig = YamlConfiguration.loadConfiguration(file);
             return;
         }
         if (!file.createNewFile()) {
@@ -139,6 +140,8 @@ public class TradingPlatformConfig {
         }
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         fileOutputStream.write(this.plugin.getResource("config.yml").readAllBytes());
+        fileOutputStream.close();
+        this.yamlConfig = YamlConfiguration.loadConfiguration(file);
     }
 
 

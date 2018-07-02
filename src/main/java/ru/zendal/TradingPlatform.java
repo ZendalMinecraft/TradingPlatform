@@ -7,8 +7,10 @@
 
 package ru.zendal;
 
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.JavaPluginLoader;
 import ru.zendal.command.CommandProcessor;
 import ru.zendal.config.AdaptiveMessage;
 import ru.zendal.config.TradingPlatformConfig;
@@ -19,13 +21,27 @@ import ru.zendal.event.PlayerOfflineSessionEvent;
 import ru.zendal.session.TradeSessionManager;
 import ru.zendal.session.storage.MongoStorageSessions;
 import ru.zendal.session.storage.connection.builder.MongoConnectionBuilder;
+import ru.zendal.util.SchedulerBuilder;
+
+import java.io.File;
 
 public class TradingPlatform extends JavaPlugin {
 
 
     private TradeSessionManager tradeSessionManager;
     private TradingPlatformConfig tradingPlatformConfig;
+    private SchedulerBuilder schedulerBuilder = new SchedulerBuilder(this);
 
+
+    public TradingPlatform()
+    {
+        super();
+    }
+
+    protected TradingPlatform(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file)
+    {
+        super(loader, description, dataFolder, file);
+    }
 
     @Override
     public void onEnable() {
@@ -69,4 +85,5 @@ public class TradingPlatform extends JavaPlugin {
     public TradingPlatformConfig getTradingPlatformConfig() {
         return tradingPlatformConfig;
     }
+
 }

@@ -39,6 +39,10 @@ public class LanguageConfig {
         this.processFile();
     }
 
+    public LanguageConfig(Logger logger) {
+        this.logger = logger;
+    }
+
     /**
      * Process language file
      */
@@ -88,6 +92,11 @@ public class LanguageConfig {
      * @return the message
      */
     public AdaptiveMessage getMessage(String pathMessage) {
-        return new AdaptiveMessage(metaData.get(pathMessage));
+
+        if (langFile!=null) {
+            return new AdaptiveMessage(metaData.get(pathMessage));
+        }else{
+            return new AdaptiveMessage("is Test mode!");
+        }
     }
 }

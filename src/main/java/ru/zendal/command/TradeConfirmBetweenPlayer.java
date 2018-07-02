@@ -31,7 +31,7 @@ public class TradeConfirmBetweenPlayer implements ArgsCommandProcessor {
     @Override
     public boolean process(Command command, CommandSender sender, String[] args) {
         Player buyer = (Player) sender;
-        int countSessions = this.tradeSessionManager.getCountSessionsBuyer((Player) buyer);
+        int countSessions = this.tradeSessionManager.getCountSessionsBuyer(buyer);
         if (countSessions == 0) {
             this.languageConfig.getMessage("trade.confirm.notHaveSession").sendMessage(buyer);
             return true;

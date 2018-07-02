@@ -89,8 +89,13 @@ public class TradeSessionManager {
      * @see TradeOffline
      */
     private void initAllTradeOfflineSessions() {
-        for (TradeOffline tradeOffline : storage.getAllSessions()) {
-            activeOfflineTrade.put(tradeOffline.getUniqueId(), tradeOffline);
+        if (storage.isAvailable()) {
+            for (TradeOffline tradeOffline : storage.getAllSessions()) {
+                activeOfflineTrade.put(tradeOffline.getUniqueId(), tradeOffline);
+            }
+        }else{
+            plugin.getLogger().warning("Storage: "+storage.getClass()+" is unavailable");
+            //Enbale timer
         }
     }
 

@@ -278,8 +278,8 @@ public class TradeSession implements Session {
         StringBuilder titleInventory = new StringBuilder();
         titleInventory.append(seller.getDisplayName()).append("(").append(this.sellerReady ? "✔" : "×").append(")");
 
-        StringBuilder subTitleInventory = new StringBuilder(buyer.getDisplayName());
-        subTitleInventory.append("(").append(this.buyerReady ? "✔" : "×").append(")");
+        StringBuilder subTitleInventory = new StringBuilder();
+        subTitleInventory.append(buyer.getDisplayName()).append("(").append(this.buyerReady ? "✔" : "×").append(")");
 
         int countSpace = 36 - titleInventory.length() - subTitleInventory.length() +
                 this.getCountServiceSymbols(titleInventory.toString()) * 2 +

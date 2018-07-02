@@ -20,4 +20,4 @@ storage:
     #port at DB
     port: 27017
 settings:
-  lang: english
+    lang: english

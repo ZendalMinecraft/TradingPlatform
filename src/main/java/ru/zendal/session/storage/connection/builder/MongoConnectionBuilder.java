@@ -9,13 +9,17 @@ package ru.zendal.session.storage.connection.builder;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoTimeoutException;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.connection.ClusterSettings;
 import com.mongodb.event.ServerHeartbeatFailedEvent;
 import com.mongodb.event.ServerHeartbeatStartedEvent;
 import com.mongodb.event.ServerHeartbeatSucceededEvent;
 import com.mongodb.event.ServerMonitorListener;
 import ru.zendal.session.storage.connection.ConnectionBuilder;
+
+import java.util.concurrent.TimeUnit;
 
 public class MongoConnectionBuilder implements ConnectionBuilder<MongoDatabase> {
 
@@ -56,6 +60,7 @@ public class MongoConnectionBuilder implements ConnectionBuilder<MongoDatabase> 
 
     private MongoDatabase buildWithOutCredential() {
         ConnectionString connectionString = new ConnectionString("mongodb://" + host + ":" + port);
+        ClusterSettings clusterSettings = ClusterSettings.builder().serverSelectionTimeout(5, TimeUnit.SECONDS).build();
         MongoClientSettings settings = MongoClientSettings.builder().applyToServerSettings(builder -> builder.addServerMonitorListener(new ServerMonitorListener() {
             @Override
             public void serverHearbeatStarted(ServerHeartbeatStartedEvent event) {
@@ -71,7 +76,14 @@ public class MongoConnectionBuilder implements ConnectionBuilder<MongoDatabase> 
             public void serverHeartbeatFailed(ServerHeartbeatFailedEvent event) {
                 hasConnected = false;
             }
-        })).applyConnectionString(connectionString).build();
+        })).applyConnectionString(connectionString).
+                applyToClusterSettings(builder -> builder.applySettings(clusterSettings)).build();
+
+        try {
+            MongoClients.create(settings).listDatabaseNames().first();
+        } catch (MongoTimeoutException e) {
+            hasConnected = false;
+        }
 
         return MongoClients.create(settings).getDatabase(dataBaseName);
     }
