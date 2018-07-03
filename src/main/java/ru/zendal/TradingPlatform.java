@@ -7,6 +7,7 @@
 
 package ru.zendal;
 
+import io.scalecube.socketio.SocketIOServer;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -21,6 +22,8 @@ import ru.zendal.event.PlayerOfflineSessionEvent;
 import ru.zendal.session.TradeSessionManager;
 import ru.zendal.session.storage.MongoStorageSessions;
 import ru.zendal.session.storage.connection.builder.MongoConnectionBuilder;
+import ru.zendal.socket.SocketIO;
+import ru.zendal.socket.SocketServer;
 import ru.zendal.util.SchedulerBuilder;
 
 import java.io.File;
@@ -32,14 +35,13 @@ public class TradingPlatform extends JavaPlugin {
     private TradingPlatformConfig tradingPlatformConfig;
     private SchedulerBuilder schedulerBuilder = new SchedulerBuilder(this);
 
+    private SocketServer socketServer;
 
-    public TradingPlatform()
-    {
+    public TradingPlatform() {
         super();
     }
 
-    protected TradingPlatform(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file)
-    {
+    protected TradingPlatform(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
         super(loader, description, dataFolder, file);
     }
 
@@ -51,6 +53,9 @@ public class TradingPlatform extends JavaPlugin {
         ), this, tradingPlatformConfig.getLanguageConfig());
         this.initListeners();
         this.getCommand("trade").setExecutor(new CommandProcessor(this));
+
+        socketServer = new SocketIO(tradingPlatformConfig.getSocketBundle(), tradeSessionManager);
+        socketServer.start();
     }
 
 
@@ -59,12 +64,13 @@ public class TradingPlatform extends JavaPlugin {
         pluginManager.registerEvents(new ChestTradeSessionEvent(this), this);
         pluginManager.registerEvents(new ChestStorageEvent(this), this);
         pluginManager.registerEvents(new PlayerOfflineSessionEvent(this), this);
-        pluginManager.registerEvents(new ChestTradeOfflineEvent(getSessionManager(),getTradingPlatformConfig().getLanguageConfig()), this);
+        pluginManager.registerEvents(new ChestTradeOfflineEvent(getSessionManager(), getTradingPlatformConfig().getLanguageConfig()), this);
     }
 
     @Override
     public void onDisable() {
         this.getSessionManager().cancelAllSession();
+        socketServer.stop();
     }
 
     private void enableConfig() {

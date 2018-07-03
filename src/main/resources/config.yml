@@ -21,3 +21,7 @@ storage:
     port: 27017
 settings:
     lang: english
+
+socket:
+    port: 2424
+    host: localhost

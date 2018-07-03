@@ -95,7 +95,7 @@ public class TradeSessionManager {
             }
         }else{
             plugin.getLogger().warning("Storage: "+storage.getClass()+" is unavailable");
-            //Enbale timer
+            //Enable timer to try reconnect
         }
     }
 
@@ -120,6 +120,12 @@ public class TradeSessionManager {
         } else {
             offlineSessionList.add(new TradeOfflineSession(player, tradeCallback));
         }
+    }
+
+    public List<TradeOffline> getAllTradeOffline(){
+        List<TradeOffline> tradeOffices = new ArrayList<>();
+        activeOfflineTrade.forEach((s, tradeOffline) -> tradeOffices.add(tradeOffline));
+        return tradeOffices;
     }
 
     public void processTradeOffline(Player whoTrading, TradeOffline tradeOffline) {
@@ -265,6 +271,7 @@ public class TradeSessionManager {
         }
         return tradeSessions;
     }
+
 
     public Inventory getInventorySabotageForPlayer(Player player) throws TradeSessionManagerException {
         Inventory inventory = this.storageInventories.get(player.getUniqueId().toString());

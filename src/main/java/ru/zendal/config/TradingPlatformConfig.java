@@ -9,6 +9,7 @@ package ru.zendal.config;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 import ru.zendal.TradingPlatform;
+import ru.zendal.config.bundle.SocketConfigBundle;
 import ru.zendal.config.exception.ConfigException;
 import ru.zendal.session.storage.StorageSessions;
 
@@ -41,6 +42,12 @@ public class TradingPlatformConfig {
      * Instance language config
      */
     private LanguageConfig languageConfig;
+
+
+    /**
+     * Socket configuration data
+     */
+    private SocketConfigBundle socketBundle;
 
 
     /**
@@ -165,6 +172,23 @@ public class TradingPlatformConfig {
             throw new ConfigException("Undefined type config");
         }
         return null;
+    }
+
+    /**
+     * Return socket Bundle
+     *
+     * @return Socket configuration data
+     */
+    public SocketConfigBundle getSocketBundle() {
+
+        if (socketBundle == null) {
+            socketBundle = new SocketConfigBundle();
+            if (yamlConfig.contains("socket.host"))
+                socketBundle.setHost(yamlConfig.getString("socket.host"));
+            if (yamlConfig.contains("socket.port"))
+                socketBundle.setPort(yamlConfig.getInt("socket.port"));
+        }
+        return socketBundle;
     }
 
     //private ConnectionBuilder getBuilder
