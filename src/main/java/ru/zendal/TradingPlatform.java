@@ -7,7 +7,6 @@
 
 package ru.zendal;
 
-import io.scalecube.socketio.SocketIOServer;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -37,12 +36,11 @@ public class TradingPlatform extends JavaPlugin {
 
     private SocketServer socketServer;
 
+    /**
+     * Default constructor
+     */
     public TradingPlatform() {
         super();
-    }
-
-    protected TradingPlatform(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
-        super(loader, description, dataFolder, file);
     }
 
     @Override
@@ -65,6 +63,7 @@ public class TradingPlatform extends JavaPlugin {
         pluginManager.registerEvents(new ChestStorageEvent(this), this);
         pluginManager.registerEvents(new PlayerOfflineSessionEvent(this), this);
         pluginManager.registerEvents(new ChestTradeOfflineEvent(getSessionManager(), getTradingPlatformConfig().getLanguageConfig()), this);
+
     }
 
     @Override
@@ -90,6 +89,18 @@ public class TradingPlatform extends JavaPlugin {
 
     public TradingPlatformConfig getTradingPlatformConfig() {
         return tradingPlatformConfig;
+    }
+
+    /**
+     * Constructor for MockBukkit
+     *
+     * @param loader      Java plugin loader
+     * @param description plguin description
+     * @param dataFolder  data folder
+     * @param file        File
+     */
+    protected TradingPlatform(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
+        super(loader, description, dataFolder, file);
     }
 
 }

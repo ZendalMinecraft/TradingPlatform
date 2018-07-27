@@ -51,6 +51,7 @@ public class SocketIO implements SocketServer {
         server.setListener(new SocketIOListener() {
             @Override
             public void onConnect(Session session) {
+                System.out.println(session.getLocalPort());
             }
 
             @Override

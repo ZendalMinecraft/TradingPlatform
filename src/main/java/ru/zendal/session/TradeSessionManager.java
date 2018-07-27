@@ -7,6 +7,7 @@
 
 package ru.zendal.session;
 
+import net.md_5.bungee.api.chat.ClickEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -93,8 +94,8 @@ public class TradeSessionManager {
             for (TradeOffline tradeOffline : storage.getAllSessions()) {
                 activeOfflineTrade.put(tradeOffline.getUniqueId(), tradeOffline);
             }
-        }else{
-            plugin.getLogger().warning("Storage: "+storage.getClass()+" is unavailable");
+        } else {
+            plugin.getLogger().warning("Storage: " + storage.getClass() + " is unavailable");
             //Enable timer to try reconnect
         }
     }
@@ -122,7 +123,7 @@ public class TradeSessionManager {
         }
     }
 
-    public List<TradeOffline> getAllTradeOffline(){
+    public List<TradeOffline> getAllTradeOffline() {
         List<TradeOffline> tradeOffices = new ArrayList<>();
         activeOfflineTrade.forEach((s, tradeOffline) -> tradeOffices.add(tradeOffline));
         return tradeOffices;
@@ -167,8 +168,14 @@ public class TradeSessionManager {
         try {
             String uniqueId = storage.saveSession(session);
             activeOfflineTrade.put(uniqueId, TradeOffline.factory(uniqueId, session));
+
+
             languageConfig.getMessage("trade.offline.process").
-                    setCustomMessage(1, uniqueId).sendMessage(session.getBuyer());
+                    setCustomMessage(1, uniqueId).
+                    getMetaData().addHoverText("Example Text").
+                    setClickEvent(ClickEvent.Action.RUN_COMMAND, "/trade open " + uniqueId).
+                    sendMessage(session.getBuyer());
+
         } catch (Exception exception) {
             languageConfig.getMessage("trade.offline.unavailable").sendMessage(session.getBuyer());
             session.cancelTrade();

@@ -10,6 +10,7 @@ package ru.zendal.command;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import ru.zendal.TradingPlatform;
 
 import java.util.ArrayList;
@@ -67,7 +68,9 @@ public class CommandProcessor implements CommandExecutor {
                 return processor.process(command, sender, args);
             }
         }
-
-        return false;
+        this.plugin.getTradingPlatformConfig().
+                getLanguageConfig().getMessage("trade.help.message").
+                sendMessage((Player) sender);
+        return true;
     }
 }
