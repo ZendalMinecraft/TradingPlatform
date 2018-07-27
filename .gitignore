@@ -5,6 +5,14 @@
 
 \.gradle/
 
-\build/
+build/classes/
+build/libs/
+build/reports/
+build/resources/
+build/text-results/
+build/tmp/
+
+
+
 TradingPlatform\.iml
 \out/
