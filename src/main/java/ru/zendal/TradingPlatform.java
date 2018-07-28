@@ -52,7 +52,7 @@ public class TradingPlatform extends JavaPlugin {
         this.initListeners();
         this.getCommand("trade").setExecutor(new CommandProcessor(this));
 
-        socketServer = new SocketIO(tradingPlatformConfig.getSocketBundle(), tradeSessionManager);
+        socketServer = new SocketIO(tradingPlatformConfig.getSocketBundle(), tradeSessionManager,getLogger());
         socketServer.start();
     }
 

@@ -9,7 +9,6 @@ package ru.zendal.socket;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.scalecube.socketio.ServerConfiguration;
 import io.scalecube.socketio.Session;
 import io.scalecube.socketio.SocketIOListener;
 import io.scalecube.socketio.SocketIOServer;
@@ -21,6 +20,7 @@ import ru.zendal.socket.exception.SocketIOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class SocketIO implements SocketServer {
 
@@ -29,11 +29,15 @@ public class SocketIO implements SocketServer {
 
     private final TradeSessionManager platform;
     private Charset charset;
+    private final Logger logger;
 
-    public SocketIO(SocketConfigBundle socketConfigBundle, TradeSessionManager tradingPlatform) {
+    public SocketIO(SocketConfigBundle socketConfigBundle,
+                    TradeSessionManager tradingPlatform,
+                    Logger logger) {
         this.initServer(socketConfigBundle);
         this.prepareServer();
         platform = tradingPlatform;
+        this.logger = logger;
     }
 
     /**
@@ -53,23 +57,29 @@ public class SocketIO implements SocketServer {
         server.setListener(new SocketIOListener() {
             @Override
             public void onConnect(Session session) {
-                System.out.println(session.getLocalPort());
+                storageSessions.add(session);
+                logger.fine("New connection: "
+                        + session.getRemoteAddress().toString()
+                        + ":" + session.getLocalPort()
+                );
             }
 
             @Override
             public void onMessage(Session session, ByteBuf message) {
                 try {
-                    session.send(Unpooled.copiedBuffer(processMessage(session, message).toCharArray(), charset));
+                    session.send(convertStringToByteBuff(processMessage(session, message), charset));
                 } catch (SocketIOException e) {
-                    session.send(
-                            Unpooled.copiedBuffer(e.getMessage().toCharArray(), charset)
-                    );
+                    session.send(convertStringToByteBuff(e.getMessage(), charset));
                 }
             }
 
             @Override
             public void onDisconnect(Session session) {
                 storageSessions.remove(session);
+                logger.fine("Close  connection: "
+                        + session.getRemoteAddress().toString()
+                        + ":" + session.getLocalPort()
+                );
             }
         });
     }
@@ -129,5 +139,16 @@ public class SocketIO implements SocketServer {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    /**
+     * Convert String to ByteBuff
+     *
+     * @param data    String data
+     * @param charset Charset data
+     * @return ByteBuf
+     */
+    private ByteBuf convertStringToByteBuff(String data, Charset charset) {
+        return Unpooled.copiedBuffer(data.toCharArray(), charset);
     }
 }
