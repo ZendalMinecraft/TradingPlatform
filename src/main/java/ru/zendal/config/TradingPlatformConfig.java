@@ -13,10 +13,7 @@ import ru.zendal.config.bundle.SocketConfigBundle;
 import ru.zendal.config.exception.ConfigException;
 import ru.zendal.session.storage.StorageSessions;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.Scanner;
 
 /**
@@ -111,10 +108,10 @@ public class TradingPlatformConfig {
             try {
                 inputStream = this.plugin.getResource(langPath);
                 langFile.getParentFile().mkdirs();
+
                 PrintWriter writer = new PrintWriter(langFile);
-                Scanner s = new Scanner(inputStream).useDelimiter("\\A");
-                String result = s.hasNext() ? s.next() : "";
-                writer.print(result);
+                writer.print(this.getStringByInputStream(this.plugin.getResource("config.yml")));
+                writer.close();
             } finally {
                 try {
                     if (inputStream != null) {
@@ -143,9 +140,8 @@ public class TradingPlatformConfig {
             return;
         }
         PrintWriter writer = new PrintWriter(file);
-        Scanner s = new Scanner(this.plugin.getResource("config.yml")).useDelimiter("\\A");
-        String result = s.hasNext() ? s.next() : "";
-        writer.print(result);
+        writer.print(this.getStringByInputStream(this.plugin.getResource("config.yml")));
+        writer.close();
         this.yamlConfig = YamlConfiguration.loadConfiguration(file);
     }
 
@@ -191,6 +187,17 @@ public class TradingPlatformConfig {
 
         }
         return socketBundle;
+    }
+
+
+    private String getStringByInputStream(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = inputStream.read(buffer)) != -1) {
+            result.write(buffer, 0, length);
+        }
+        return result.toString("UTF-8");
     }
 
     //private ConnectionBuilder getBuilder
