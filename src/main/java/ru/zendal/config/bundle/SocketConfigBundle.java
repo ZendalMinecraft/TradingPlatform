@@ -11,10 +11,7 @@ package ru.zendal.config.bundle;
  * Bundle configuration data for prepare Socket Server
  */
 public class SocketConfigBundle {
-    /**
-     * Listener host
-     */
-    private String host = "localhost";
+
     /**
      * Charset incoming message
      */
@@ -24,16 +21,6 @@ public class SocketConfigBundle {
      * Listener port
      */
     private int port = 2424;
-
-    /**
-     * Setup listener host
-     * @param host listener host
-     * @return bundle
-     */
-    public SocketConfigBundle setHost(String host) {
-        this.host = host;
-        return this;
-    }
 
     /**
      * Setup listener port
@@ -56,13 +43,6 @@ public class SocketConfigBundle {
         return this;
     }
 
-    /**
-     * Get listener host
-     * @return listener host
-     */
-    public String getHost() {
-        return host;
-    }
 
     /**
      * Get listener port

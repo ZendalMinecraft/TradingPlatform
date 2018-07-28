@@ -38,7 +38,6 @@ public class SocketIO implements SocketServer {
 
     /**
      * Init server
-     * TODO add host,Charset
      *
      * @param socketConfigBundle Configuration data
      */

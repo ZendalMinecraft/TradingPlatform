@@ -182,9 +182,6 @@ public class TradingPlatformConfig {
 
         if (socketBundle == null) {
             socketBundle = new SocketConfigBundle();
-            if (yamlConfig.contains("socket.host")) {
-                socketBundle.setHost(yamlConfig.getString("socket.host"));
-            }
             if (yamlConfig.contains("socket.port")) {
                 socketBundle.setPort(yamlConfig.getInt("socket.port"));
             }
