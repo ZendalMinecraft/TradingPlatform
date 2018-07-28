@@ -20,8 +20,11 @@ storage:
     #port at DB
     port: 27017
 settings:
+    #Supported language:
+    #   russia
+    #   english
     lang: english
 
 socket:
     port: 2424
-    host: localhost
+    charset: UTF-8

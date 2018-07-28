@@ -14,9 +14,10 @@ import ru.zendal.config.exception.ConfigException;
 import ru.zendal.session.storage.StorageSessions;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.Scanner;
 
 /**
  * Class for access to Config file plugin
@@ -107,20 +108,17 @@ public class TradingPlatformConfig {
                 continue;
             }
             InputStream inputStream = null;
-            FileOutputStream fileOutputStream = null;
             try {
                 inputStream = this.plugin.getResource(langPath);
                 langFile.getParentFile().mkdirs();
-                fileOutputStream = new FileOutputStream(langFile);
-                //TODO mb remove readAllBytes, for support Java 8
-                fileOutputStream.write(inputStream.readAllBytes());
+                PrintWriter writer = new PrintWriter(langFile);
+                Scanner s = new Scanner(inputStream).useDelimiter("\\A");
+                String result = s.hasNext() ? s.next() : "";
+                writer.print(result);
             } finally {
                 try {
                     if (inputStream != null) {
                         inputStream.close();
-                    }
-                    if (fileOutputStream != null) {
-                        fileOutputStream.close();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -144,9 +142,10 @@ public class TradingPlatformConfig {
             this.plugin.getLogger().warning("Failed create config file");
             return;
         }
-        FileOutputStream fileOutputStream = new FileOutputStream(file);
-        fileOutputStream.write(this.plugin.getResource("config.yml").readAllBytes());
-        fileOutputStream.close();
+        PrintWriter writer = new PrintWriter(file);
+        Scanner s = new Scanner(this.plugin.getResource("config.yml")).useDelimiter("\\A");
+        String result = s.hasNext() ? s.next() : "";
+        writer.print(result);
         this.yamlConfig = YamlConfiguration.loadConfiguration(file);
     }
 
@@ -186,7 +185,7 @@ public class TradingPlatformConfig {
                 socketBundle.setPort(yamlConfig.getInt("socket.port"));
             }
 
-            if (yamlConfig.contains("socket.charset")){
+            if (yamlConfig.contains("socket.charset")) {
                 socketBundle.setCharset(yamlConfig.getString("socket.charset"));
             }
 
