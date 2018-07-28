@@ -13,6 +13,9 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 
+/**
+ * @deprecated
+ */
 public class MetaDataMessage {
 
 
