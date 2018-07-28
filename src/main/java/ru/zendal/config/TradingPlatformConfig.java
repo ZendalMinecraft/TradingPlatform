@@ -99,7 +99,6 @@ public class TradingPlatformConfig {
         }
     }
 
-
     private void checkAllLanguage() throws IOException {
         for (String lang : this.availableLanguage) {
             String langPath = "lang/" + lang + ".lang";
@@ -183,10 +182,17 @@ public class TradingPlatformConfig {
 
         if (socketBundle == null) {
             socketBundle = new SocketConfigBundle();
-            if (yamlConfig.contains("socket.host"))
+            if (yamlConfig.contains("socket.host")) {
                 socketBundle.setHost(yamlConfig.getString("socket.host"));
-            if (yamlConfig.contains("socket.port"))
+            }
+            if (yamlConfig.contains("socket.port")) {
                 socketBundle.setPort(yamlConfig.getInt("socket.port"));
+            }
+
+            if (yamlConfig.contains("socket.charset")){
+                socketBundle.setCharset(yamlConfig.getString("socket.charset"));
+            }
+
         }
         return socketBundle;
     }

@@ -9,6 +9,7 @@ package ru.zendal.socket;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.scalecube.socketio.ServerConfiguration;
 import io.scalecube.socketio.Session;
 import io.scalecube.socketio.SocketIOListener;
 import io.scalecube.socketio.SocketIOServer;
@@ -27,6 +28,7 @@ public class SocketIO implements SocketServer {
     private List<Session> storageSessions = new ArrayList<>();
 
     private final TradeSessionManager platform;
+    private Charset charset;
 
     public SocketIO(SocketConfigBundle socketConfigBundle, TradeSessionManager tradingPlatform) {
         this.initServer(socketConfigBundle);
@@ -41,6 +43,7 @@ public class SocketIO implements SocketServer {
      * @param socketConfigBundle Configuration data
      */
     private void initServer(SocketConfigBundle socketConfigBundle) {
+        charset = Charset.forName(socketConfigBundle.getCharset());
         server = SocketIOServer.newInstance(socketConfigBundle.getPort());
     }
 
@@ -57,10 +60,10 @@ public class SocketIO implements SocketServer {
             @Override
             public void onMessage(Session session, ByteBuf message) {
                 try {
-                    session.send(Unpooled.copiedBuffer(processMessage(session, message).toCharArray(), Charset.forName("UTF-8")));
+                    session.send(Unpooled.copiedBuffer(processMessage(session, message).toCharArray(), charset));
                 } catch (SocketIOException e) {
                     session.send(
-                            Unpooled.copiedBuffer(e.getMessage().toCharArray(), Charset.forName("UTF-8"))
+                            Unpooled.copiedBuffer(e.getMessage().toCharArray(), charset)
                     );
                 }
             }
@@ -79,7 +82,7 @@ public class SocketIO implements SocketServer {
      * @param message Byte buf message
      */
     private String processMessage(Session session, ByteBuf message) throws SocketIOException {
-        String text = message.toString(Charset.forName("UTF-8"));
+        String text = message.toString(charset);
         Document jsonDocument = Document.parse(text);
         String command = jsonDocument.getString("command");
         if (command == null) {

@@ -25,3 +25,4 @@ settings:
 socket:
     port: 2424
     host: localhost
+    charset: UTF-8
