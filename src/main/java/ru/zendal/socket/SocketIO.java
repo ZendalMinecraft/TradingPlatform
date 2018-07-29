@@ -15,7 +15,9 @@ import io.scalecube.socketio.SocketIOServer;
 import org.bson.Document;
 import ru.zendal.config.bundle.SocketConfigBundle;
 import ru.zendal.session.TradeSessionManager;
-import ru.zendal.socket.exception.SocketIOException;
+import ru.zendal.socket.command.Command;
+import ru.zendal.socket.command.GetAllOfflineTradesCommand;
+import ru.zendal.socket.exception.CommandProcessSocketIOException;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -24,20 +26,22 @@ import java.util.logging.Logger;
 
 public class SocketIO implements SocketServer {
 
+    private final TradeSessionManager sessionManager;
     private SocketIOServer server;
     private List<Session> storageSessions = new ArrayList<>();
 
-    private final TradeSessionManager platform;
     private Charset charset;
     private final Logger logger;
 
+    private List<Command> serverCommandList = new ArrayList<>();
+
     public SocketIO(SocketConfigBundle socketConfigBundle,
-                    TradeSessionManager tradingPlatform,
+                    TradeSessionManager sessionManager,
                     Logger logger) {
+        this.sessionManager = sessionManager;
+        this.logger = logger;
         this.initServer(socketConfigBundle);
         this.prepareServer();
-        platform = tradingPlatform;
-        this.logger = logger;
     }
 
     /**
@@ -48,6 +52,7 @@ public class SocketIO implements SocketServer {
     private void initServer(SocketConfigBundle socketConfigBundle) {
         charset = Charset.forName(socketConfigBundle.getCharset());
         server = SocketIOServer.newInstance(socketConfigBundle.getPort());
+        serverCommandList.add(new GetAllOfflineTradesCommand(this.sessionManager));
     }
 
     /**
@@ -66,10 +71,16 @@ public class SocketIO implements SocketServer {
 
             @Override
             public void onMessage(Session session, ByteBuf message) {
+                Document response = new Document();
                 try {
-                    session.send(convertStringToByteBuff(processMessage(session, message), charset));
-                } catch (SocketIOException e) {
-                    session.send(convertStringToByteBuff(e.getMessage(), charset));
+                    Document data = processMessage(session, message);
+                    response.put("code", 0);
+                    response.put("response", data);
+                    session.send(convertStringToByteBuff(response.toJson(), charset));
+                } catch (CommandProcessSocketIOException e) {
+                    response.put("code", e.getErrorCode());
+                    response.put("errorMessage", e.getMessage());
+                    session.send(convertStringToByteBuff(response.toJson(), charset));
                 }
             }
 
@@ -90,35 +101,28 @@ public class SocketIO implements SocketServer {
      * @param session Session
      * @param message Byte buf message
      */
-    private String processMessage(Session session, ByteBuf message) throws SocketIOException {
+    private Document processMessage(Session session, ByteBuf message) throws CommandProcessSocketIOException {
+
         String text = message.toString(charset);
         Document jsonDocument = Document.parse(text);
-        String command = jsonDocument.getString("command");
-        if (command == null) {
-            throw new SocketIOException("Missing required key 'command'");
+        String commandName = jsonDocument.getString("command");
+        if (commandName == null) {
+            throw new CommandProcessSocketIOException(
+                    "Missing required key 'command'",
+                    CommandProcessSocketIOException.CODE_MISSING_REQUIRED_KEY
+            );
         }
-        if (command.equalsIgnoreCase("auth")) {
 
-        } else if (command.equalsIgnoreCase("getAllOfflineTrades")) {
-            return this.getAllOfflineTrades();
+        for (Command command : serverCommandList) {
+            if (command.canProcess(jsonDocument)) {
+                return command.process(jsonDocument);
+            }
         }
-        return "";
-    }
 
-    private String getAllOfflineTrades() {
-        Document response = new Document();
-        List<Document> documents = new ArrayList<>();
-        platform.getAllTradeOffline().forEach(tradeOffline -> {
-            Document collection = new Document();
-            collection.put("name", tradeOffline.getOfflinePlayer().getName());
-            documents.add(collection);
-        });
-        response.put("data", documents);
-        return response.toJson();
-    }
-
-    private void processCommand() {
-
+        throw new CommandProcessSocketIOException(
+                "Undefined command",
+                CommandProcessSocketIOException.CODE_UNDEFINED_COMMAND
+        );
     }
 
     @Override

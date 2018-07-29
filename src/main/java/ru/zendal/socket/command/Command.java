@@ -8,12 +8,26 @@
 package ru.zendal.socket.command;
 
 import org.bson.Document;
+import ru.zendal.socket.command.exception.ProcessCommandException;
 
+/**
+ * Command Server Interface
+ */
 public interface Command {
 
 
-    public Document process(Document incomingDocument);
+    /**
+     * Process command
+     * @param incomingDocument
+     * @return
+     * @throws ProcessCommandException
+     */
+    Document process(Document incomingDocument) throws ProcessCommandException;
 
-
-    public boolean canProcess(Document incomingDocument);
+    /**
+     * Can be this
+     * @param incomingDocument
+     * @return
+     */
+    boolean canProcess(Document incomingDocument);
 }

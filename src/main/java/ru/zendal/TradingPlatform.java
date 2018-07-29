@@ -14,6 +14,7 @@ import org.bukkit.plugin.java.JavaPluginLoader;
 import ru.zendal.command.CommandProcessor;
 import ru.zendal.config.AdaptiveMessage;
 import ru.zendal.config.TradingPlatformConfig;
+import ru.zendal.config.bundle.SocketConfigBundle;
 import ru.zendal.event.ChestStorageEvent;
 import ru.zendal.event.ChestTradeOfflineEvent;
 import ru.zendal.event.ChestTradeSessionEvent;
@@ -51,12 +52,13 @@ public class TradingPlatform extends JavaPlugin {
         ), this, tradingPlatformConfig.getLanguageConfig());
         this.initListeners();
         this.getCommand("trade").setExecutor(new CommandProcessor(this));
-
-        socketServer = new SocketIO(tradingPlatformConfig.getSocketBundle(), tradeSessionManager,getLogger());
-        socketServer.start();
+        this.initSocketServer();
     }
 
 
+    /**
+     * Init listeners events
+     */
     private void initListeners() {
         PluginManager pluginManager = this.getServer().getPluginManager();
         pluginManager.registerEvents(new ChestTradeSessionEvent(this), this);
@@ -65,6 +67,20 @@ public class TradingPlatform extends JavaPlugin {
         pluginManager.registerEvents(new ChestTradeOfflineEvent(getSessionManager(), getTradingPlatformConfig().getLanguageConfig()), this);
 
     }
+
+    /**
+     * Init socket server
+     */
+    private void initSocketServer(){
+        SocketConfigBundle configBundle = tradingPlatformConfig.getSocketBundle();
+        socketServer = new SocketIO(configBundle, tradeSessionManager,getLogger());
+        if (!socketServer.start()){
+            this.getLogger().warning("Can't start SocketServer. Configuration: "+
+                    configBundle.toString());
+        }
+
+    }
+
 
     @Override
     public void onDisable() {

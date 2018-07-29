@@ -42,8 +42,9 @@ public class GetAllOfflineTradesCommand implements Command {
             offlineTradeDocument.put("trader",traderCollection);
 
 
+
             //Put items
-            offlineTradeDocument.put("id",tradeOffline.getHas());
+            offlineTradeDocument.put("hasItems",tradeOffline.getHas());
             documents.add(offlineTradeDocument);
         });
         response.put("data", documents);

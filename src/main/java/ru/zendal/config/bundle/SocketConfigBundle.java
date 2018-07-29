@@ -24,6 +24,7 @@ public class SocketConfigBundle {
 
     /**
      * Setup listener port
+     *
      * @param port listener port
      * @return bundle
      */
@@ -46,6 +47,7 @@ public class SocketConfigBundle {
 
     /**
      * Get listener port
+     *
      * @return listener port
      */
     public int getPort() {
@@ -54,9 +56,16 @@ public class SocketConfigBundle {
 
     /**
      * Get incoming message charset
+     *
      * @return incoming message charset
      */
     public String getCharset() {
         return charset;
+    }
+
+
+    @Override
+    public String toString() {
+        return "{Port:" + port + ", Charset:" + charset + "}";
     }
 }
