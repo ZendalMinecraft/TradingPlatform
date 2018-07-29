@@ -7,32 +7,30 @@
 
 package ru.zendal.event;
 
-import org.bukkit.Bukkit;
-import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
-import org.bukkit.event.server.BroadcastMessageEvent;
-import ru.zendal.TradingPlatform;
+import ru.zendal.config.LanguageConfig;
 import ru.zendal.session.TradeOfflineSession;
+import ru.zendal.session.TradeSessionManager;
 import ru.zendal.session.exception.TradeSessionManagerException;
-
-import javax.validation.MessageInterpolator;
 
 public class PlayerOfflineSessionEvent implements Listener {
 
-    private final TradingPlatform plugin;
+    private final TradeSessionManager sessionManager;
+    private final LanguageConfig languageConfig;
 
-    public PlayerOfflineSessionEvent(TradingPlatform tradingPlatform) {
-        this.plugin = tradingPlatform;
+    public PlayerOfflineSessionEvent(TradeSessionManager sessionManager, LanguageConfig languageConfig) {
+        this.sessionManager = sessionManager;
+        this.languageConfig = languageConfig;
     }
 
     @EventHandler
     public void onMoveInOfflineModeSession(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         if (this.needCancelEvent(player)) {
-            this.plugin.getAdaptiveMessage("trade.offline.onMove").sendMessage(player);
+            languageConfig.getMessage("trade.offline.onMove").sendMessage(player);
             event.setCancelled(true);
         }
     }
@@ -42,7 +40,7 @@ public class PlayerOfflineSessionEvent implements Listener {
         Player player = event.getPlayer();
         if (this.needCancelEvent(player)) {
             event.setCancelled(true);
-            this.plugin.getAdaptiveMessage("trade.offline.onInteract").sendMessage(player);
+            languageConfig.getMessage("trade.offline.onInteract").sendMessage(player);
         }
     }
 
@@ -50,7 +48,7 @@ public class PlayerOfflineSessionEvent implements Listener {
     public void onDropItem(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
         if (this.needCancelEvent(player)) {
-            this.plugin.getAdaptiveMessage("trade.offline.onInteract").sendMessage(player);
+            languageConfig.getMessage("trade.offline.onInteract").sendMessage(player);
             event.setCancelled(true);
         }
     }
@@ -61,7 +59,7 @@ public class PlayerOfflineSessionEvent implements Listener {
         Player player = event.getPlayer();
         if (this.needCancelEvent(player)) {
             if (!event.getMessage().equalsIgnoreCase("/trade create")) {
-                this.plugin.getAdaptiveMessage("trade.offline.onCommand").sendMessage(player);
+                languageConfig.getMessage("trade.offline.onCommand").sendMessage(player);
                 event.setCancelled(true);
             }
         }
@@ -81,10 +79,15 @@ public class PlayerOfflineSessionEvent implements Listener {
         }
     }
 
-
+    /**
+     * This play now in trade session mode
+     *
+     * @param player Player
+     * @return In trade mode
+     */
     private boolean needCancelEvent(Player player) {
         try {
-            TradeOfflineSession session = this.plugin.getSessionManager().getOfflineSessionByPlayer(player);
+            TradeOfflineSession session = sessionManager.getOfflineSessionByPlayer(player);
             return session.getBuyer() != null;
         } catch (TradeSessionManagerException ignore) {
             return false;

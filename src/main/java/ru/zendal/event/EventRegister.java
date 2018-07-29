@@ -30,9 +30,9 @@ public class EventRegister {
             throw new EventRegisterException("Sorry EventRegister, don't support this type Java Plugin");
         }
 
-        dependencyList.add(((TradingPlatform) javaPlugin).getSessionManager());
 
-        dependencyList.add(((TradingPlatform) javaPlugin).getTradingPlatformConfig().getLanguageConfig());
+
+
 
         pluginManager = javaPlugin.getServer().getPluginManager();
     }

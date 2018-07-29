@@ -44,7 +44,7 @@ public class SocketIO implements SocketServer {
     private final Logger logger;
 
     /**
-     *
+     * Adapter Listener
      */
     private AdapterServerListener adapterServerListener;
 

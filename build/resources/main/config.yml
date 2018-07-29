@@ -26,5 +26,6 @@ settings:
     lang: english
 
 socket:
+    enable: false
     port: 2424
     charset: UTF-8
