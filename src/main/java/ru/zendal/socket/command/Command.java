@@ -18,6 +18,7 @@ public interface Command {
 
     /**
      * Process command
+     *
      * @param incomingDocument
      * @return
      * @throws ProcessCommandException
@@ -26,6 +27,7 @@ public interface Command {
 
     /**
      * Can be this
+     *
      * @param incomingDocument
      * @return
      */

@@ -8,7 +8,6 @@
 package ru.zendal.session.listener;
 
 import ru.zendal.session.TradeOffline;
-import ru.zendal.session.TradeOfflineSession;
 
 public interface TradeSessionListener {
 
