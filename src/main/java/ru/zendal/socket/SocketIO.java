@@ -131,6 +131,7 @@ public class SocketIO implements SocketServer {
             server.start();
             return true;
         } catch (Exception e) {
+            logger.warning(e.getMessage());
             return false;
         }
     }
@@ -141,6 +142,7 @@ public class SocketIO implements SocketServer {
             server.stop();
             return true;
         } catch (Exception e) {
+            logger.warning(e.getMessage());
             return false;
         }
     }
