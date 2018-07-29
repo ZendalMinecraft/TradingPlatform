@@ -15,45 +15,17 @@ import ru.zendal.util.ItemBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Extended version ItemStack with support Document BSON
+ */
 public class ExtendedItemStack extends ItemStack {
 
-
-    public ExtendedItemStack() {
-
-    }
-
-    public ExtendedItemStack(int type) {
-        super(type);
-    }
-
-    public ExtendedItemStack(Material type) {
-        super(type);
-    }
-
-    public ExtendedItemStack(int type, int amount) {
-        super(type, amount);
-    }
-
-    public ExtendedItemStack(Material type, int amount) {
-        super(type, amount);
-    }
-
-    public ExtendedItemStack(int type, int amount, short damage) {
-        super(type, amount, damage);
-    }
-
-    public ExtendedItemStack(Material type, int amount, short damage) {
-        super(type, amount, damage);
-    }
-
-    public ExtendedItemStack(int type, int amount, short damage, Byte data) {
-        super(type, amount, damage, data);
-    }
-
-    public ExtendedItemStack(Material type, int amount, short damage, Byte data) {
-        super(type, amount, damage, data);
-    }
-
+    /**
+     * Constructor
+     *
+     * @param stack ItemStack
+     * @throws IllegalArgumentException on Failed error
+     */
     public ExtendedItemStack(ItemStack stack) throws IllegalArgumentException {
         super(stack);
     }
@@ -73,6 +45,11 @@ public class ExtendedItemStack extends ItemStack {
         return extendedItemStack;
     }
 
+    /**
+     * Convert ItemStack to document BSON
+     *
+     * @return document BSON
+     */
     public Document toDocument() {
         Document itemStackDocument = new Document();
         itemStackDocument.append("idName", this.getType().name());
@@ -89,6 +66,12 @@ public class ExtendedItemStack extends ItemStack {
         return itemStackDocument;
     }
 
+    /**
+     * Create instance Extended ItemStack from Document BSON
+     *
+     * @param document document BSON
+     * @return extended ItemStack
+     */
     public static ExtendedItemStack createByDocument(Document document) {
         int durabilityInteger = document.getInteger("durability");
         short durability = (short) durabilityInteger;

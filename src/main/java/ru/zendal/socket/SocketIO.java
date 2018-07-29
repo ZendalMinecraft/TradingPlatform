@@ -21,6 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * Implementation Socket Server with the help io.scalecube.socketio
+ *
+ * @see SocketIOServer
+ */
 public class SocketIO implements SocketServer {
 
     /**
@@ -37,7 +42,6 @@ public class SocketIO implements SocketServer {
      * Instance logger
      */
     private final Logger logger;
-
 
     /**
      *
