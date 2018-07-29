@@ -10,24 +10,59 @@ package ru.zendal.event;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import ru.zendal.TradingPlatform;
+import ru.zendal.event.exception.CreateListenerException;
+import ru.zendal.event.exception.EventRegisterException;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Parameter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EventRegister {
 
     private final PluginManager pluginManager;
-    private final JavaPlugin plugin;
+
+    private List<Object> dependencyList = new ArrayList<>();
 
     public EventRegister(JavaPlugin javaPlugin) {
-        this.plugin = javaPlugin;
-        this.pluginManager = javaPlugin.getServer().getPluginManager();
+        if (!(javaPlugin instanceof TradingPlatform)){
+            throw new EventRegisterException("Sorry EventRegister, don't support this type Java Plugin");
+        }
 
+        dependencyList.add(((TradingPlatform) javaPlugin).getSessionManager());
+
+        dependencyList.add(((TradingPlatform) javaPlugin).getTradingPlatformConfig().getLanguageConfig());
+
+        pluginManager = javaPlugin.getServer().getPluginManager();
     }
+
+
 
 
     private void initEvents(){
-
+        /*pluginManager.registerEvents(new ChestTradeSessionEvent(plugin), plugin);
+        pluginManager.registerEvents(new ChestStorageEvent(plugin), plugin);
+        pluginManager.registerEvents(new PlayerOfflineSessionEvent(plugin), plugin);
+        pluginManager.registerEvents(new ChestTradeOfflineEvent(getSessionManager(), getTradingPlatformConfig().getLanguageConfig()), plugin);*/
     }
+
+
+    
 
     public void registerEventClass(Listener listener) {
-        this.pluginManager.registerEvents(listener, plugin);
+      /*
+        listene
+        
+        this.pluginManager.registerEvents(listener, plugin);*/
     }
+    
+    
+    public void registerEventClass(Class clazz){
+        Constructor[] constructors = clazz.getConstructors();
+        if (constructors.length<1){
+
+        }
+    }
+
 }
