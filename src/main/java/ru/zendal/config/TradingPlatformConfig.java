@@ -110,7 +110,7 @@ public class TradingPlatformConfig {
                 langFile.getParentFile().mkdirs();
 
                 PrintWriter writer = new PrintWriter(langFile);
-                writer.print(this.getStringByInputStream(this.plugin.getResource("config.yml")));
+                writer.print(this.getStringByInputStream(this.plugin.getResource(langPath)));
                 writer.close();
             } finally {
                 try {

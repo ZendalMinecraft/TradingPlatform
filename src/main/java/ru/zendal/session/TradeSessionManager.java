@@ -20,6 +20,7 @@ import ru.zendal.config.LanguageConfig;
 import ru.zendal.session.exception.TradeSessionManagerException;
 import ru.zendal.session.inventory.CreateOfflineTradeHolderInventory;
 import ru.zendal.session.inventory.StorageHolderInventory;
+import ru.zendal.session.listener.TradeSessionListener;
 import ru.zendal.session.storage.StorageSessions;
 
 import java.util.ArrayList;
@@ -56,6 +57,9 @@ public class TradeSessionManager {
      * Storage all active offline sessions
      */
     private HashMap<String, TradeOffline> activeOfflineTrade = new HashMap<>();
+
+
+    private List<TradeSessionListener> listenersList = new ArrayList<>();
 
     /**
      * Constructor for Trade Session Manager
@@ -167,6 +171,7 @@ public class TradeSessionManager {
     private void processOfflineTrade(TradeOfflineSession session) {
         try {
             String uniqueId = storage.saveSession(session);
+            TradeOffline tradeOffline = TradeOffline.factory(uniqueId, session);
             activeOfflineTrade.put(uniqueId, TradeOffline.factory(uniqueId, session));
 
 
@@ -175,7 +180,10 @@ public class TradeSessionManager {
                     getMetaData().addHoverText("Example Text").
                     setClickEvent(ClickEvent.Action.RUN_COMMAND, "/trade open " + uniqueId).
                     sendMessage(session.getBuyer());
-
+            //Invoke all listeners
+            for (TradeSessionListener listener : listenersList) {
+                listener.onCreateNewOfflineTradeSession(tradeOffline);
+            }
         } catch (Exception exception) {
             languageConfig.getMessage("trade.offline.unavailable").sendMessage(session.getBuyer());
             session.cancelTrade();
@@ -422,5 +430,10 @@ public class TradeSessionManager {
         if (!this.activeOfflineTrade.remove(tradeOffline.getUniqueId(), tradeOffline)) {
             throw new TradeSessionManagerException("Undefined tradeOffline");
         }
+    }
+
+
+    public void addListenerOnCreateNewOfflineTrade(TradeSessionListener listener) {
+        listenersList.add(listener);
     }
 }

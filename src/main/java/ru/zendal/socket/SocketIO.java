@@ -13,7 +13,10 @@ import io.scalecube.socketio.Session;
 import io.scalecube.socketio.SocketIOListener;
 import io.scalecube.socketio.SocketIOServer;
 import org.bson.Document;
+import org.bukkit.inventory.ItemStack;
 import ru.zendal.config.bundle.SocketConfigBundle;
+import ru.zendal.entity.ExtendedItemStack;
+import ru.zendal.session.TradeOffline;
 import ru.zendal.session.TradeSessionManager;
 import ru.zendal.socket.command.Command;
 import ru.zendal.socket.command.GetAllOfflineTradesCommand;
@@ -42,6 +45,48 @@ public class SocketIO implements SocketServer {
         this.logger = logger;
         this.initServer(socketConfigBundle);
         this.prepareServer();
+        sessionManager.addListenerOnCreateNewOfflineTrade(this::processNew);
+    }
+
+    private void processNew(TradeOffline tradeOffline) {
+        Document response = new Document();
+        Document data = new Document();
+        List<Document> documents = new ArrayList<>();
+        Document offlineTradeDocument = new Document();
+
+        //Put data about trade
+        offlineTradeDocument.put("id", tradeOffline.getUniqueId());
+
+        //Put Trader
+        Document traderCollection = new Document();
+        traderCollection.put("name", tradeOffline.getOfflinePlayer().getName());
+        traderCollection.put("uuid", tradeOffline.getOfflinePlayer().getUniqueId().toString());
+        offlineTradeDocument.put("trader", traderCollection);
+
+
+        //Put items
+        offlineTradeDocument.put("hasItems", this.getListDocumentByListItemStack(tradeOffline.getHas()));
+        offlineTradeDocument.put("wantItems", this.getListDocumentByListItemStack(tradeOffline.getWants()));
+        documents.add(offlineTradeDocument);
+
+        data.put("type", "newOfflineTrade");
+        data.put("trade", documents);
+        response.put("code", 0);
+        response.put("response", data);
+
+        for (Session session : storageSessions) {
+            this.sendMessage(session, response);
+        }
+    }
+
+
+    private List<Document> getListDocumentByListItemStack(List<ItemStack> has) {
+        List<Document> documentList = new ArrayList<>();
+
+        for (ItemStack itemStack : has) {
+            documentList.add(new ExtendedItemStack(itemStack).toDocument());
+        }
+        return documentList;
     }
 
     /**
@@ -63,9 +108,8 @@ public class SocketIO implements SocketServer {
             @Override
             public void onConnect(Session session) {
                 storageSessions.add(session);
-                logger.fine("New connection: "
+                logger.info("New connection: "
                         + session.getRemoteAddress().toString()
-                        + ":" + session.getLocalPort()
                 );
             }
 
@@ -76,23 +120,27 @@ public class SocketIO implements SocketServer {
                     Document data = processMessage(session, message);
                     response.put("code", 0);
                     response.put("response", data);
-                    session.send(convertStringToByteBuff(response.toJson(), charset));
+                    sendMessage(session, response);
                 } catch (CommandProcessSocketIOException e) {
                     response.put("code", e.getErrorCode());
                     response.put("errorMessage", e.getMessage());
-                    session.send(convertStringToByteBuff(response.toJson(), charset));
+                    sendMessage(session, response);
                 }
             }
 
             @Override
             public void onDisconnect(Session session) {
                 storageSessions.remove(session);
-                logger.fine("Close  connection: "
+                logger.info("Close  connection: "
                         + session.getRemoteAddress().toString()
-                        + ":" + session.getLocalPort()
                 );
             }
         });
+    }
+
+
+    private void sendMessage(Session session, Document message) {
+        session.send(convertStringToByteBuff(message.toJson(), charset));
     }
 
     /**
