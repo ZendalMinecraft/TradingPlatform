@@ -7,6 +7,7 @@
 
 package ru.zendal;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -46,6 +47,9 @@ public class TradingPlatform extends JavaPlugin {
 
     @Override
     public void onEnable() {
+
+        //System.out.println(Bukkit.getServer().getClass().getPackage().getName().split(".")[3]);
+
         this.enableConfig();
         tradeSessionManager = new TradeSessionManager(new MongoStorageSessions(
                 new MongoConnectionBuilder(), getLogger()
