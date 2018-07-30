@@ -7,12 +7,10 @@
 
 package ru.zendal.event;
 
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
-import org.bukkit.inventory.ItemStack;
 import ru.zendal.config.LanguageConfig;
 import ru.zendal.session.TradeOfflineSession;
 import ru.zendal.session.TradeSessionManager;
@@ -31,7 +29,7 @@ public class PlayerOfflineSessionEvent implements Listener {
     @EventHandler
     public void onMoveInOfflineModeSession(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        if (this.needCancelEvent(player)) {
+        if (this.playerInSecondPhaseTrading(player)) {
             languageConfig.getMessage("trade.offline.onMove").sendMessage(player);
             event.setCancelled(true);
         }
@@ -40,7 +38,7 @@ public class PlayerOfflineSessionEvent implements Listener {
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (this.needCancelEvent(player)) {
+        if (this.playerInSecondPhaseTrading(player)) {
             event.setCancelled(true);
             languageConfig.getMessage("trade.offline.onInteract").sendMessage(player);
         }
@@ -49,7 +47,7 @@ public class PlayerOfflineSessionEvent implements Listener {
     @EventHandler
     public void onDropItem(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
-        if (this.needCancelEvent(player)) {
+        if (this.playerInSecondPhaseTrading(player)) {
             languageConfig.getMessage("trade.offline.onInteract").sendMessage(player);
             event.setCancelled(true);
         }
@@ -59,7 +57,7 @@ public class PlayerOfflineSessionEvent implements Listener {
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
-        if (this.needCancelEvent(player)) {
+        if (this.playerInSecondPhaseTrading(player)) {
             if (!event.getMessage().equalsIgnoreCase("/trade create")) {
                 languageConfig.getMessage("trade.offline.onCommand").sendMessage(player);
                 event.setCancelled(true);
@@ -75,7 +73,7 @@ public class PlayerOfflineSessionEvent implements Listener {
     @EventHandler
     public void onAchievementUnlock(PlayerAdvancementDoneEvent event) {
         Player player = event.getPlayer();
-        if (this.needCancelEvent(player)) {
+        if (this.playerInSecondPhaseTrading(player)) {
             player.getAdvancementProgress(event.getAdvancement())
                     .revokeCriteria(event.getAdvancement().getCriteria().toArray(new String[0])[0]);
         }
@@ -84,7 +82,7 @@ public class PlayerOfflineSessionEvent implements Listener {
     @EventHandler
     public void onLeaveEvent(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        if (this.needCancelEvent(player)) {
+        if (this.isTradeOfflineSessionMode(player)) {
             try {
                 sessionManager.cancelOfflineSessionByPlayer(player);
             } catch (TradeSessionManagerException ignore) {
@@ -94,12 +92,27 @@ public class PlayerOfflineSessionEvent implements Listener {
     }
 
     /**
+     * This play now in trade offline session mode in second phase
+     *
+     * @param player Player
+     * @return In trade mode
+     */
+    private boolean playerInSecondPhaseTrading(Player player) {
+        try {
+            TradeOfflineSession session = sessionManager.getOfflineSessionByPlayer(player);
+            return session.getBuyer() != null;
+        } catch (TradeSessionManagerException ignore) {
+            return false;
+        }
+    }
+
+    /**
      * This play now in trade session mode
      *
      * @param player Player
      * @return In trade mode
      */
-    private boolean needCancelEvent(Player player) {
+    private boolean isTradeOfflineSessionMode(Player player) {
         try {
             TradeOfflineSession session = sessionManager.getOfflineSessionByPlayer(player);
             return session.getBuyer() != null || session.getSeller() != null;

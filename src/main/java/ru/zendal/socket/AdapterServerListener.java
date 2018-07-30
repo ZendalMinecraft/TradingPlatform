@@ -104,7 +104,7 @@ public class AdapterServerListener implements SocketIOListener {
         }
 
         for (Command command : storageCommandProcessors) {
-            if (command.canProcess(jsonDocument)) {
+            if (command.getNameCommand().equalsIgnoreCase(commandName)) {
                 return command.process(jsonDocument);
             }
         }

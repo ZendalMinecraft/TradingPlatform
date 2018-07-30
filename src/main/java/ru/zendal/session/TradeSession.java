@@ -172,7 +172,6 @@ public class TradeSession implements Session {
      * @see TradeSessionCallback
      */
     protected void checkReadyTrade() {
-
         this.changeVisualStatusTrade();
         this.changeTitleInventory(this.getTitleForInventoryTrade());
         if (!(this.buyerReady && this.sellerReady)) {
@@ -189,7 +188,6 @@ public class TradeSession implements Session {
     public void enableTimer(JavaPlugin plugin) {
         new BukkitRunnable() {
             private int timerStart = 35;
-
             @Override
             public void run() {
                 if (!isBuyerReady() || !isSellerReady()) {

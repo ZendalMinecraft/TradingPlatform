@@ -14,6 +14,7 @@ import ru.zendal.config.bundle.SocketConfigBundle;
 import ru.zendal.entity.ExtendedItemStack;
 import ru.zendal.session.TradeOffline;
 import ru.zendal.session.TradeSessionManager;
+import ru.zendal.socket.command.AcceptTradeCommand;
 import ru.zendal.socket.command.GetAllOfflineTradesCommand;
 
 import java.nio.charset.Charset;
@@ -76,6 +77,7 @@ public class SocketIO implements SocketServer {
 
         adapterServerListener = new AdapterServerListener(messageCharset, logger);
         adapterServerListener.addCommandProcessors(new GetAllOfflineTradesCommand(sessionManager));
+        adapterServerListener.addCommandProcessors(new AcceptTradeCommand(sessionManager));
         sessionManager.addListenerOnCreateNewOfflineTrade(this::processCreateNewOfflineTrade);
     }
 

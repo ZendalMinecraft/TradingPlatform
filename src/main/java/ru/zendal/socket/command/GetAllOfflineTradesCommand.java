@@ -65,11 +65,8 @@ public class GetAllOfflineTradesCommand implements Command {
     }
 
     @Override
-    public boolean canProcess(Document incomingDocument) {
-        String nameCommand = incomingDocument.getString("command");
-        if (nameCommand != null) {
-            return nameCommand.equalsIgnoreCase("getAllOfflineTrades");
-        }
-        return false;
+    public String getNameCommand() {
+        return "getAllOfflineTrades";
     }
+
 }
