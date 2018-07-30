@@ -58,10 +58,12 @@ public class TradeOfflineSession extends TradeSession {
     @Override
     public TradeOfflineSession setReadySeller(boolean ready) {
         this.sellerReady = ready;
-        this.checkReadyTrade();
-        this.givePlayerCreative();
-        setBuyer(getSeller());
-        setSeller(null);
+        if (ready) {
+            this.checkReadyTrade();
+            this.givePlayerCreative();
+            setBuyer(getSeller());
+            setSeller(null);
+        }
         return this;
     }
 

@@ -268,8 +268,8 @@ public class TradeSessionManager {
     public TradeSessionManager cancelOfflineSessionByPlayer(Player player) throws TradeSessionManagerException {
         for (TradeOfflineSession session : offlineSessionList) {
             if (session.getBuyer() == player || session.getSeller() == player) {
-                //TODO do...
                 offlineSessionList.remove(session);
+                session.cancelTrade();
                 return this;
             }
         }

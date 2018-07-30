@@ -7,10 +7,12 @@
 
 package ru.zendal.event;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.ItemStack;
 import ru.zendal.config.LanguageConfig;
 import ru.zendal.session.TradeOfflineSession;
 import ru.zendal.session.TradeSessionManager;
@@ -79,6 +81,18 @@ public class PlayerOfflineSessionEvent implements Listener {
         }
     }
 
+    @EventHandler
+    public void onLeaveEvent(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        if (this.needCancelEvent(player)) {
+            try {
+                sessionManager.cancelOfflineSessionByPlayer(player);
+            } catch (TradeSessionManagerException ignore) {
+
+            }
+        }
+    }
+
     /**
      * This play now in trade session mode
      *
@@ -88,7 +102,7 @@ public class PlayerOfflineSessionEvent implements Listener {
     private boolean needCancelEvent(Player player) {
         try {
             TradeOfflineSession session = sessionManager.getOfflineSessionByPlayer(player);
-            return session.getBuyer() != null;
+            return session.getBuyer() != null || session.getSeller() != null;
         } catch (TradeSessionManagerException ignore) {
             return false;
         }

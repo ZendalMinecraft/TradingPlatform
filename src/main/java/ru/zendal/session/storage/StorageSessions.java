@@ -38,5 +38,10 @@ public interface StorageSessions {
      */
     List<TradeOffline> getAllSessions();
 
+    /**
+     * Remove trade offer from storage
+     *
+     * @param tradeOffline Trade offline
+     */
     void removeTradeOffline(TradeOffline tradeOffline);
 }
