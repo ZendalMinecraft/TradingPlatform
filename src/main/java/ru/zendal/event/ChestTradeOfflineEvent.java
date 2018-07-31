@@ -55,6 +55,7 @@ public class ChestTradeOfflineEvent implements Listener {
     }
 
     private void process(Player player, TradeOffline tradeOffline) {
+        //TODO Move to SessionManager
         TradeOfflineConfirmResponse response = tradeOffline.confirmTrade(player);
         if (!response.hasMissingItems()) {
             try {
