@@ -9,13 +9,11 @@ package ru.zendal.config;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 import ru.zendal.TradingPlatform;
+import ru.zendal.config.bundle.SocketConfigBundle;
 import ru.zendal.config.exception.ConfigException;
 import ru.zendal.session.storage.StorageSessions;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * Class for access to Config file plugin
@@ -41,6 +39,12 @@ public class TradingPlatformConfig {
      * Instance language config
      */
     private LanguageConfig languageConfig;
+
+
+    /**
+     * Socket configuration data
+     */
+    private SocketConfigBundle socketBundle;
 
 
     /**
@@ -92,7 +96,6 @@ public class TradingPlatformConfig {
         }
     }
 
-
     private void checkAllLanguage() throws IOException {
         for (String lang : this.availableLanguage) {
             String langPath = "lang/" + lang + ".lang";
@@ -101,20 +104,17 @@ public class TradingPlatformConfig {
                 continue;
             }
             InputStream inputStream = null;
-            FileOutputStream fileOutputStream = null;
             try {
                 inputStream = this.plugin.getResource(langPath);
                 langFile.getParentFile().mkdirs();
-                fileOutputStream = new FileOutputStream(langFile);
-                //TODO mb remove readAllBytes, for support Java 8
-                fileOutputStream.write(inputStream.readAllBytes());
+
+                PrintWriter writer = new PrintWriter(langFile);
+                writer.print(this.getStringByInputStream(this.plugin.getResource(langPath)));
+                writer.close();
             } finally {
                 try {
                     if (inputStream != null) {
                         inputStream.close();
-                    }
-                    if (fileOutputStream != null) {
-                        fileOutputStream.close();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -138,9 +138,9 @@ public class TradingPlatformConfig {
             this.plugin.getLogger().warning("Failed create config file");
             return;
         }
-        FileOutputStream fileOutputStream = new FileOutputStream(file);
-        fileOutputStream.write(this.plugin.getResource("config.yml").readAllBytes());
-        fileOutputStream.close();
+        PrintWriter writer = new PrintWriter(file);
+        writer.print(this.getStringByInputStream(this.plugin.getResource("config.yml")));
+        writer.close();
         this.yamlConfig = YamlConfiguration.loadConfiguration(file);
     }
 
@@ -165,6 +165,41 @@ public class TradingPlatformConfig {
             throw new ConfigException("Undefined type config");
         }
         return null;
+    }
+
+    /**
+     * Return socket Bundle
+     *
+     * @return Socket configuration data
+     */
+    public SocketConfigBundle getSocketBundle() {
+
+        if (socketBundle == null) {
+            socketBundle = new SocketConfigBundle();
+            if (yamlConfig.contains("socket.enable")) {
+                socketBundle.setEnableServer(yamlConfig.getBoolean("socket.enable"));
+            }
+            if (yamlConfig.contains("socket.port")) {
+                socketBundle.setPort(yamlConfig.getInt("socket.port"));
+            }
+
+            if (yamlConfig.contains("socket.charset")) {
+                socketBundle.setCharset(yamlConfig.getString("socket.charset"));
+            }
+
+        }
+        return socketBundle;
+    }
+
+
+    private String getStringByInputStream(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = inputStream.read(buffer)) != -1) {
+            result.write(buffer, 0, length);
+        }
+        return result.toString("UTF-8");
     }
 
     //private ConnectionBuilder getBuilder

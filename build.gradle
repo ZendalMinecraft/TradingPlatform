@@ -3,8 +3,8 @@ apply plugin: 'java'
 group = pluginGroup
 version = pluginVersion
 
-sourceCompatibility = 1.9
-targetCompatibility = 1.9
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -25,6 +25,8 @@ dependencies {
     compile 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
     compile 'org.mongodb:mongodb-driver-sync:3.7.1'
     compile 'org.dizitart:nitrite:3.0.0'
+    compile 'io.scalecube:socketio:2.3.4'
+    compile 'io.netty:netty-buffer:4.1.6.Final'
 
 }
 

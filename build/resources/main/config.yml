@@ -1,0 +1,31 @@
+storage:
+  #Type storage:
+  # Local - file in plugin folder
+  # Mongo - MongoDB NoSQL storage
+  # mysql - MySQL storage
+  type: mongo
+
+  #host where store storage, if your use Local this parameter ignore
+  host: localhost
+
+  #name user at DB
+  user: user
+
+  #password at DB
+  password: password
+
+  #name at DB
+  databaseName: TradingPlatform
+
+  #port at DB
+  port: 27017
+settings:
+  #Supported language:
+  #   russia
+  #   english
+  lang: english
+
+socket:
+  enable: false
+  port: 2424
+  charset: UTF-8
