@@ -8,8 +8,9 @@
 package ru.zendal.service.economy;
 
 import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.economy.EconomyResponse;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import ru.zendal.service.economy.exception.EconomyProviderException;
 
@@ -33,10 +34,24 @@ public class VaultEconomy implements EconomyProvider {
     }
 
     @Override
-    public boolean haveMoney(Player player, double money) {
-        economy.depositPlayer()
+    public boolean haveMoney(OfflinePlayer player, double money) {
         return economy.has(player, money);
     }
 
-    pub
+    @Override
+    public void withdraw(OfflinePlayer player, double amount) throws EconomyProviderException {
+        EconomyResponse economyResponse = economy.withdrawPlayer(player, amount);
+        if (!economyResponse.transactionSuccess()) {
+            throw new EconomyProviderException("Transaction withdraw error: " + economyResponse.errorMessage);
+        }
+    }
+
+    @Override
+    public void deposit(OfflinePlayer player, double amount) throws EconomyProviderException {
+        EconomyResponse economyResponse = economy.depositPlayer(player, amount);
+        if (!economyResponse.transactionSuccess()) {
+            throw new EconomyProviderException("Transaction deposit error: " + economyResponse.errorMessage);
+        }
+    }
+
 }

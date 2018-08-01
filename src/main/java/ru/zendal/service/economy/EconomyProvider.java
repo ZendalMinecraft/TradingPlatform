@@ -7,15 +7,34 @@
 
 package ru.zendal.service.economy;
 
-import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
 import ru.zendal.service.economy.exception.EconomyProviderException;
 
 public interface EconomyProvider {
 
-    public boolean haveMoney(Player player, double money);
+    /**
+     * Check Player balance
+     * @param player Instance offline Player
+     * @param money Need money
+     * @return {@code true} if player has "need money"
+     */
+    boolean haveMoney(OfflinePlayer player, double money);
+
+    /**
+     * Withdraw (-) money
+     * @param player Instance offline Player
+     * @param amount Amount money
+     * @throws EconomyProviderException on Transaction error
+     */
+    void withdraw(OfflinePlayer player, double amount) throws EconomyProviderException;
 
 
-    
-    public void withdraw(Player player,double amount) throws EconomyProviderException;
 
+    /**
+     * Deposit (+) money
+     * @param player Instance offline Player
+     * @param amount Amount money
+     * @throws EconomyProviderException on Transaction error
+     */
+    void deposit(OfflinePlayer player, double amount) throws EconomyProviderException;
 }
