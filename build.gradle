@@ -16,15 +16,21 @@ repositories {
         name = 'sonatype'
         url = 'https://oss.sonatype.org/content/groups/public/'
     }
+    maven {
+        name = 'vault-repo'
+        url = 'http://nexus.hc.to/content/repositories/pub_releases'
+    }
     maven { url 'https://jitpack.io' }
 }
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile 'com.github.seeseemelk:MockBukkit:master-SNAPSHOT'
+
+    compile 'net.milkbowl.vault:VaultAPI:1.6'
+
     compile 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
     compile 'org.mongodb:mongodb-driver-sync:3.7.1'
-    compile 'org.dizitart:nitrite:3.0.0'
     compile 'io.scalecube:socketio:2.3.4'
     compile 'io.netty:netty-buffer:4.1.6.Final'
 
@@ -48,7 +54,7 @@ jar {
 }
 
 task finalize << {
-   ant.move(file: "/Users/bigtows/Projects/TradingPlatform/build/libs/TradingPlatform-"+version+".jar", tofile: "/Volumes/LaCie/Spigot/server/plugins/TradingPlatform.jar")
+    ant.move(file: "/Users/bigtows/Project/TradingPlatform/build/libs/TradingPlatform-"+version+".jar", tofile: "/Users/bigtows/MinecraftServer/server/plugins/TradingPlatform.jar")
 }
 
 build.finalizedBy(finalize)
