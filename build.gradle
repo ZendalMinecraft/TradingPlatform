@@ -28,7 +28,7 @@ dependencies {
     testCompile 'com.github.seeseemelk:MockBukkit:master-SNAPSHOT'
 
     compile 'net.milkbowl.vault:VaultAPI:1.6'
-
+    compile 'org.dizitart:nitrite:3.0.0'
     compile 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
     compile 'org.mongodb:mongodb-driver-sync:3.7.1'
     compile 'io.scalecube:socketio:2.3.4'
@@ -54,7 +54,7 @@ jar {
 }
 
 task finalize << {
-    ant.move(file: "/Users/bigtows/Project/TradingPlatform/build/libs/TradingPlatform-"+version+".jar", tofile: "/Users/bigtows/MinecraftServer/server/plugins/TradingPlatform.jar")
+    ant.move(file: "/Users/bigtows/Project/TradingPlatform/build/libs/TradingPlatform-"+version+".jar", tofile: "/Users/bigtows/MinecraftServer/plugins/TradingPlatform.jar")
 }
 
 build.finalizedBy(finalize)

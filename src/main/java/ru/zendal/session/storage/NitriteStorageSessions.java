@@ -7,6 +7,7 @@
 
 package ru.zendal.session.storage;
 
+import org.dizitart.no2.Document;
 import org.dizitart.no2.NitriteCollection;
 import ru.zendal.session.Session;
 import ru.zendal.session.TradeOffline;
@@ -26,12 +27,15 @@ public class NitriteStorageSessions implements SessionsStorage {
 
     @Override
     public boolean isAvailable() {
-        return false;
+        return true;
     }
 
     @Override
     public String saveSession(Session session) {
-        return null;
+        Document doc = new Document();
+       /* session.ß
+        builder.insert()
+       */ return null;
     }
 
     @Override

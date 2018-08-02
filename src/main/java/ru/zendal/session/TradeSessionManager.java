@@ -387,14 +387,15 @@ public class TradeSessionManager {
 
 
     public void cancelAllSession() {
-        if (sessionList.size() == 0) {
-            return;
-        }
         for (TradeSession tradeSession : sessionList) {
             tradeSession.getSeller().getInventory().addItem(tradeSession.getSellerItems().toArray(new ItemStack[0]));
             tradeSession.getBuyer().getInventory().addItem(tradeSession.getBuyerItems().toArray(new ItemStack[0]));
             tradeSession.getBuyer().closeInventory();
             tradeSession.getSeller().closeInventory();
+        }
+
+        for (TradeOfflineSession offlineSession : offlineSessionList) {
+            offlineSession.cancelTrade();
         }
     }
 

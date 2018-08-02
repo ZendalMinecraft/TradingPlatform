@@ -11,10 +11,13 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import ru.zendal.TradingPlatform;
 import ru.zendal.config.bundle.SocketConfigBundle;
 import ru.zendal.config.exception.ConfigException;
+import ru.zendal.session.storage.MongoStorageSessions;
 import ru.zendal.session.storage.PacifierStorage;
 import ru.zendal.session.storage.SessionsStorage;
+import ru.zendal.session.storage.connection.builder.MongoConnectionBuilder;
 
 import java.io.*;
+import java.util.logging.Logger;
 
 /**
  * Class for access to Config file plugin
@@ -25,6 +28,11 @@ public class TradingPlatformConfig {
      * Instance plugin file
      */
     private final TradingPlatform plugin;
+
+    /**
+     * Logger
+     */
+    private final Logger logger;
 
     /**
      * Available language for restore from plugin
@@ -57,6 +65,7 @@ public class TradingPlatformConfig {
      */
     public TradingPlatformConfig(TradingPlatform plugin) {
         this.plugin = plugin;
+        this.logger = plugin.getLogger();
         this.setup();
         this.processConfig();
     }
@@ -199,16 +208,47 @@ public class TradingPlatformConfig {
 
     public SessionsStorage getSessionsStorage() {
         if (sessionsStorage == null) {
-            if (!yamlConfig.contains("storage.type") || !TypeStorage.hasTypeStorage(yamlConfig.getString("storage.type"))) {
-                return new PacifierStorage();
+            this.initSessionsStorage();
+        }
+        return sessionsStorage;
+    }
+
+
+    private SessionsStorage initSessionsStorage() {
+        if (!yamlConfig.contains("storage.type") || !TypeStorage.hasTypeStorage(yamlConfig.getString("storage.type"))) {
+            sessionsStorage = new PacifierStorage();
+        } else {
+            switch (TypeStorage.fromName(yamlConfig.getString("storage.type"))) {
+                case MONGO_DB:
+                    sessionsStorage = this.getMongoStorage();
             }
         }
-    }
-
-
-    private SessionsStorage initSessionsStorage(){
+        return  null;
 
     }
+
+
+    /**
+     * Get Mongo storage
+     *
+     * @return MongoDB Storage
+     */
+    private SessionsStorage getMongoStorage() {
+        MongoConnectionBuilder builder = new MongoConnectionBuilder();
+        if (yamlConfig.contains("storage.setting.host")) {
+            builder.setHost(yamlConfig.getString("storage.setting.host"));
+        }
+
+        if (yamlConfig.contains("storage.setting.port")) {
+            builder.setPort(yamlConfig.getInt("storage.setting.port"));
+        }
+        return new MongoStorageSessions(builder, logger);
+    }
+
+    /*private SessionsStorage getLocalStorage(){
+
+    }*/
+
     /**
      * Check is valid type storage
      *
