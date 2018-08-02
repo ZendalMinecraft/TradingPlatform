@@ -199,16 +199,15 @@ public class TradingPlatformConfig {
 
     public SessionsStorage getSessionsStorage() {
         if (sessionsStorage == null) {
-            if (!yamlConfig.contains("storage.type") || !this.isInvalidTypeStorage(yamlConfig.getString("storage.type"))) {
+            if (!yamlConfig.contains("storage.type") || !TypeStorage.hasTypeStorage(yamlConfig.getString("storage.type"))) {
                 return new PacifierStorage();
             }
-
         }
     }
 
 
     private SessionsStorage initSessionsStorage(){
-        
+
     }
     /**
      * Check is valid type storage
