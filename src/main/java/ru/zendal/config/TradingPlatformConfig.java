@@ -11,7 +11,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import ru.zendal.TradingPlatform;
 import ru.zendal.config.bundle.SocketConfigBundle;
 import ru.zendal.config.exception.ConfigException;
-import ru.zendal.session.storage.StorageSessions;
+import ru.zendal.session.storage.PacifierStorage;
+import ru.zendal.session.storage.SessionsStorage;
 
 import java.io.*;
 
@@ -46,6 +47,8 @@ public class TradingPlatformConfig {
      */
     private SocketConfigBundle socketBundle;
 
+
+    private SessionsStorage sessionsStorage;
 
     /**
      * Instantiates a new Trading platform config.
@@ -155,7 +158,7 @@ public class TradingPlatformConfig {
     }
 
 
-    public StorageSessions getStorageByConfig() throws ConfigException {
+    public SessionsStorage getStorageByConfig() throws ConfigException {
         String typeStorageString = yamlConfig.getString("storage.type");
         if (typeStorageString.equalsIgnoreCase("mongo")) {
            /* return  new MongoStorageSessions(
@@ -175,23 +178,62 @@ public class TradingPlatformConfig {
     public SocketConfigBundle getSocketBundle() {
 
         if (socketBundle == null) {
-            socketBundle = new SocketConfigBundle();
-            if (yamlConfig.contains("socket.enable")) {
-                socketBundle.setEnableServer(yamlConfig.getBoolean("socket.enable"));
-            }
-            if (yamlConfig.contains("socket.port")) {
-                socketBundle.setPort(yamlConfig.getInt("socket.port"));
-            }
-
-            if (yamlConfig.contains("socket.charset")) {
-                socketBundle.setCharset(yamlConfig.getString("socket.charset"));
-            }
-
+            this.initSocketBundle();
         }
         return socketBundle;
     }
 
+    private void initSocketBundle() {
+        socketBundle = new SocketConfigBundle();
+        if (yamlConfig.contains("socket.enable")) {
+            socketBundle.setEnableServer(yamlConfig.getBoolean("socket.enable"));
+        }
+        if (yamlConfig.contains("socket.port")) {
+            socketBundle.setPort(yamlConfig.getInt("socket.port"));
+        }
 
+        if (yamlConfig.contains("socket.charset")) {
+            socketBundle.setCharset(yamlConfig.getString("socket.charset"));
+        }
+    }
+
+    public SessionsStorage getSessionsStorage() {
+        if (sessionsStorage == null) {
+            if (!yamlConfig.contains("storage.type") || !this.isInvalidTypeStorage(yamlConfig.getString("storage.type"))) {
+                return new PacifierStorage();
+            }
+
+        }
+    }
+
+
+    private SessionsStorage initSessionsStorage(){
+        
+    }
+    /**
+     * Check is valid type storage
+     *
+     * @param nameType Name type storage
+     * @return {@code true} if valid
+     */
+    private boolean isInvalidTypeStorage(String nameType) {
+        switch (nameType.toLowerCase()) {
+            case "mongo":
+            case "mysql":
+            case "local":
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Get text By InputStream
+     *
+     * @param inputStream Input Stream
+     * @return Text
+     * @throws IOException on Error read
+     */
     private String getStringByInputStream(InputStream inputStream) throws IOException {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
@@ -201,7 +243,5 @@ public class TradingPlatformConfig {
         }
         return result.toString("UTF-8");
     }
-
-    //private ConnectionBuilder getBuilder
 
 }

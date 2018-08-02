@@ -21,7 +21,7 @@ import ru.zendal.session.exception.TradeSessionManagerException;
 import ru.zendal.session.inventory.CreateOfflineTradeHolderInventory;
 import ru.zendal.session.inventory.StorageHolderInventory;
 import ru.zendal.session.listener.TradeSessionListener;
-import ru.zendal.session.storage.StorageSessions;
+import ru.zendal.session.storage.SessionsStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +34,7 @@ import java.util.Map;
 public class TradeSessionManager {
 
     private final LanguageConfig languageConfig;
-    private final StorageSessions storage;
+    private final SessionsStorage storage;
     private final TradingPlatform plugin;
     private final TradeSessionCallback tradeCallback;
 
@@ -68,7 +68,7 @@ public class TradeSessionManager {
      * @param plugin          Instance Plugin
      * @param config          Config language Pack
      */
-    public TradeSessionManager(StorageSessions storageSessions, TradingPlatform plugin, LanguageConfig config) {
+    public TradeSessionManager(SessionsStorage storageSessions, TradingPlatform plugin, LanguageConfig config) {
         this.languageConfig = config;
         this.storage = storageSessions;
         this.plugin = plugin;

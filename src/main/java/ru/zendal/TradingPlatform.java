@@ -46,8 +46,6 @@ public class TradingPlatform extends JavaPlugin {
     @Override
     public void onEnable() {
 
-        //System.out.println(Bukkit.getServer().getClass().getPackage().getName().split(".")[3]);
-
         this.enableConfig();
         tradeSessionManager = new TradeSessionManager(new MongoStorageSessions(
                 new MongoConnectionBuilder(), getLogger()
