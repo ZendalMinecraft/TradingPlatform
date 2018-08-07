@@ -14,7 +14,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import ru.zendal.session.inventory.ViewOfflineTradeHolderInventory;
+import ru.zendal.session.inventory.holder.ViewOfflineTradeHolderInventory;
 import ru.zendal.util.ItemBuilder;
 
 import java.util.ArrayList;

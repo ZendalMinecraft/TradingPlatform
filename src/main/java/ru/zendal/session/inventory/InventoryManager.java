@@ -8,12 +8,8 @@
 package ru.zendal.session.inventory;
 
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 
-public class TradeSessionHolderInventory implements InventoryHolder {
+public interface InventoryManager {
 
-    @Override
-    public Inventory getInventory() {
-        return null;
-    }
+    public Inventory getInventory();
 }

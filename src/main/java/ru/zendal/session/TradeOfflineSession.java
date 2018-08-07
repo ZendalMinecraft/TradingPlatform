@@ -9,10 +9,14 @@ package ru.zendal.session;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import ru.zendal.session.inventory.CreateOfflineTradeHolderInventory;
+import ru.zendal.session.inventory.holder.CreateOfflineTradeHolderInventory;
+import ru.zendal.util.ItemBuilder;
+
+import java.util.Arrays;
 
 
 /**
@@ -124,6 +128,18 @@ public class TradeOfflineSession extends TradeSession {
         if (getBuyer() != null && getBuyer().getOpenInventory().getTopInventory().hashCode() == inventory.hashCode())
             getBuyer().openInventory(newInventory);
         inventory = newInventory;
+    }
+
+
+    @Override
+    protected ItemBuilder getVisualDisplayBet() {
+        ItemBuilder itemBuilder = ItemBuilder.get(Material.GOLD_NUGGET);
+        itemBuilder.setDisplayName("Amount");
+        itemBuilder.setItemLore(Arrays.asList(
+                "Bet Your bet: " + getBetSeller(),
+                "Bet Creative: " + getBetBuyer())
+        );
+        return itemBuilder;
     }
 
     /**

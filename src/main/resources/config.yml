@@ -5,26 +5,34 @@ storage:
   # mysql - MySQL storage
   type: mongo
 
-  #host where store storage, if your use Local this parameter ignore
-  host: localhost
+  setting:
+    #host where store storage, if your use Local this parameter ignore
+    host: localhost
 
-  #name user at DB
-  user: user
+    #name user at DB
+    user: user
 
-  #password at DB
-  password: password
+    #password at DB
+    password: password
 
-  #name at DB
-  databaseName: TradingPlatform
+    #name at DB
+    databaseName: TradingPlatform
 
-  #port at DB
-  port: 27017
+    #port at DB
+    port: 27017
 settings:
   #Supported language:
   #   russia
   #   english
   lang: english
+  betSpread:
+  - 1
+  - 10
+  - 100
+  - 1000
+  - 10000
 
+#Setup Socket settings
 socket:
   enable: false
   port: 2424

@@ -7,35 +7,20 @@
 
 package ru.zendal.session.storage;
 
-import org.dizitart.no2.Document;
-import org.dizitart.no2.NitriteCollection;
 import ru.zendal.session.Session;
 import ru.zendal.session.TradeOffline;
-import ru.zendal.session.storage.connection.builder.NitriteConnectionBuilder;
 
 import java.util.List;
 
-public class NitriteStorageSessions implements SessionsStorage {
-
-
-    private final NitriteCollection builder;
-
-    public NitriteStorageSessions(NitriteConnectionBuilder builder) {
-        this.builder = builder.build().getCollection("TradingPlatform");
-    }
-
-
+public class PacifierStorage implements SessionsStorage {
     @Override
     public boolean isAvailable() {
-        return true;
+        return false;
     }
 
     @Override
     public String saveSession(Session session) {
-        Document doc = new Document();
-       /* session.ß
-        builder.insert()
-       */ return null;
+        return "NOT_VALID_ID_SESSION";
     }
 
     @Override
