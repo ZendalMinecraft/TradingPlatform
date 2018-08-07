@@ -14,10 +14,9 @@ import org.bukkit.plugin.java.JavaPluginLoader;
 import ru.zendal.command.CommandProcessor;
 import ru.zendal.config.TradingPlatformConfig;
 import ru.zendal.config.bundle.SocketConfigBundle;
-import ru.zendal.event.ChestStorageEvent;
-import ru.zendal.event.ChestTradeOfflineEvent;
-import ru.zendal.event.ChestTradeSessionEvent;
-import ru.zendal.event.PlayerOfflineSessionEvent;
+import ru.zendal.event.*;
+import ru.zendal.service.economy.EconomyProvider;
+import ru.zendal.service.economy.VaultEconomy;
 import ru.zendal.session.TradeSessionManager;
 import ru.zendal.session.storage.MongoStorageSessions;
 import ru.zendal.session.storage.connection.builder.MongoConnectionBuilder;
@@ -36,6 +35,8 @@ public class TradingPlatform extends JavaPlugin {
 
     private SocketServer socketServer;
 
+    private EconomyProvider economyProvider;
+
     /**
      * Default constructor
      */
@@ -47,9 +48,11 @@ public class TradingPlatform extends JavaPlugin {
     public void onEnable() {
 
         this.enableConfig();
+        //TODO Возможно такая ситуация, когда Economy Provider недоступен УЧТИ
         tradeSessionManager = new TradeSessionManager(new MongoStorageSessions(
                 new MongoConnectionBuilder(), getLogger()
         ), this, tradingPlatformConfig.getLanguageConfig());
+        this.initService();
         this.initListeners();
         this.getCommand("trade").setExecutor(new CommandProcessor(
                 tradeSessionManager,
@@ -67,7 +70,9 @@ public class TradingPlatform extends JavaPlugin {
 
         pluginManager.registerEvents(
                 new ChestTradeSessionEvent(
-                        tradeSessionManager, tradingPlatformConfig.getLanguageConfig()
+                        tradeSessionManager,
+                        tradingPlatformConfig.getLanguageConfig(),
+                        tradingPlatformConfig.getBetSpread()
                 ), this);
 
         pluginManager.registerEvents(
@@ -82,6 +87,9 @@ public class TradingPlatform extends JavaPlugin {
                 new ChestTradeOfflineEvent(
                         tradeSessionManager, tradingPlatformConfig.getLanguageConfig()
                 ), this);
+
+        pluginManager.registerEvents(new InventoryBetPickEvent(economyProvider),
+                this);
 
     }
 
@@ -100,6 +108,10 @@ public class TradingPlatform extends JavaPlugin {
         }
     }
 
+
+    private void initService() {
+        economyProvider = new VaultEconomy(getServer());
+    }
 
     @Override
     public void onDisable() {

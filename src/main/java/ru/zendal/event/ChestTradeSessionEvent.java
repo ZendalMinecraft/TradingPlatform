@@ -20,10 +20,14 @@ import ru.zendal.session.TradeOfflineSession;
 import ru.zendal.session.TradeSession;
 import ru.zendal.session.TradeSessionManager;
 import ru.zendal.session.exception.TradeSessionManagerException;
+import ru.zendal.session.inventory.PickBetInventoryManager;
 import ru.zendal.session.inventory.TradeSessionHolderInventory;
+import ru.zendal.util.ItemBuilder;
+
+import java.util.List;
 
 /**
- * Event
+ * Event for trading all type Sessions
  */
 public class ChestTradeSessionEvent implements Listener {
 
@@ -36,9 +40,13 @@ public class ChestTradeSessionEvent implements Listener {
      */
     private final LanguageConfig languageConfig;
 
-    public ChestTradeSessionEvent(TradeSessionManager manager, LanguageConfig languageConfig) {
+
+    private final List<Double> betSpread;
+
+    public ChestTradeSessionEvent(TradeSessionManager manager, LanguageConfig languageConfig, List<Double> betSpread) {
         this.manager = manager;
         this.languageConfig = languageConfig;
+        this.betSpread = betSpread;
     }
 
 
@@ -99,6 +107,8 @@ public class ChestTradeSessionEvent implements Listener {
                 }
 
             }
+        } else if (event.getCurrentItem().getType() == Material.GOLD_NUGGET && this.isServiceSlot(event.getSlot())) {
+            this.openInventoryChangeAmount(session, (Player) event.getWhoClicked());
         }
     }
 
@@ -108,6 +118,14 @@ public class ChestTradeSessionEvent implements Listener {
         } else if (session instanceof TradeSession) {
             manager.cancelSession((TradeSession) session);
         }
+    }
+
+    private void openInventoryChangeAmount(Session session, Player whoClicked) {
+        whoClicked.openInventory(this.createInventoryForPickBet(session, whoClicked));
+    }
+
+    private Inventory createInventoryForPickBet(Session session, Player whoClicked) {
+        return new PickBetInventoryManager(session, whoClicked, languageConfig, betSpread).getInventory();
     }
 
     /**

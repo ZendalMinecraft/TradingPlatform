@@ -25,7 +25,14 @@ settings:
   #   russia
   #   english
   lang: english
+  betSpread:
+  - 1
+  - 10
+  - 100
+  - 1000
+  - 10000
 
+#Setup Socket settings
 socket:
   enable: false
   port: 2424

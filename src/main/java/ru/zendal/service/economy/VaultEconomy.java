@@ -54,4 +54,9 @@ public class VaultEconomy implements EconomyProvider {
         }
     }
 
+    @Override
+    public double getBalance(OfflinePlayer player) {
+        return economy.getBalance(player);
+    }
+
 }

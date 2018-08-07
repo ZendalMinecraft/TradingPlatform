@@ -20,6 +20,9 @@ import ru.zendal.session.TradeSessionManager;
 import ru.zendal.session.exception.TradeSessionManagerException;
 import ru.zendal.session.inventory.ViewOfflineTradeHolderInventory;
 
+/**
+ * Event for view Offline Session
+ */
 public class ChestTradeOfflineEvent implements Listener {
 
     private final TradeSessionManager sessionManager;
@@ -46,10 +49,8 @@ public class ChestTradeOfflineEvent implements Listener {
                     player.closeInventory();
                     languageConfig.getMessage("trade.offline.alreadyFinished").sendMessage(player);
                 }
-            } else {
-                if (event.getSlot() == 9 * 4 + 4) {
-                    player.closeInventory();
-                }
+            } else if (event.getSlot() == 9 * 4 + 4) {
+                player.closeInventory();
             }
         }
     }

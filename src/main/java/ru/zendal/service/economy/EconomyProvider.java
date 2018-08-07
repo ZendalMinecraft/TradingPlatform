@@ -14,14 +14,16 @@ public interface EconomyProvider {
 
     /**
      * Check Player balance
+     *
      * @param player Instance offline Player
-     * @param money Need money
+     * @param money  Need money
      * @return {@code true} if player has "need money"
      */
     boolean haveMoney(OfflinePlayer player, double money);
 
     /**
      * Withdraw (-) money
+     *
      * @param player Instance offline Player
      * @param amount Amount money
      * @throws EconomyProviderException on Transaction error
@@ -29,12 +31,21 @@ public interface EconomyProvider {
     void withdraw(OfflinePlayer player, double amount) throws EconomyProviderException;
 
 
-
     /**
      * Deposit (+) money
+     *
      * @param player Instance offline Player
      * @param amount Amount money
      * @throws EconomyProviderException on Transaction error
      */
     void deposit(OfflinePlayer player, double amount) throws EconomyProviderException;
+
+
+    /**
+     * Get balance player
+     *
+     * @param player Player
+     * @return Balance amount
+     */
+    double getBalance(OfflinePlayer player);
 }

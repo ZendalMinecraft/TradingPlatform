@@ -38,6 +38,10 @@ inventory.offlineSession.item.onSelectCreativeItems.confirm=Confirm trade
 inventory.offlineSession.item.onSelectCreativeItems.cancel=Cancel trade
 
 
+inventory.trade.item.addBet=Add %1% money.
+inventory.trade.item.DisBet=Dis %1% money.
+
+
 trade.offline.unavailable=Sorry now u can't create Offline Session.
 
 trade.offline.process=You can open your reffer use /trade open %1%

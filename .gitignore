@@ -5,12 +5,7 @@
 
 \.gradle/
 
-\build/classes/
-\build/libs/
-\build/reports/
-\build/resource/
-\build/text-results/
-\build/tmp/
+\build/
 
 
 

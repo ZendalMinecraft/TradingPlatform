@@ -18,6 +18,7 @@ import ru.zendal.session.inventory.TradeSessionHolderInventory;
 import ru.zendal.util.ItemBuilder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class TradeSession implements Session {
@@ -31,6 +32,16 @@ public class TradeSession implements Session {
     private Player seller;
 
     private Player buyer;
+
+    /**
+     * Amount bet for trade Set Seller
+     */
+    private double betSeller;
+
+    /**
+     * Amount bet for trade Set Buyer
+     */
+    private double betBuyer;
 
     protected boolean sellerReady = false;
     private boolean buyerReady = false;
@@ -62,6 +73,18 @@ public class TradeSession implements Session {
         return this;
     }
 
+    @Override
+    public double getBetSeller() {
+        return betSeller;
+    }
+
+    @Override
+    public Session setBetSeller(double bet) {
+        betSeller = bet;
+        this.updateVisualDisplayBet();
+        return this;
+    }
+
     public boolean isSellerReady() {
         return sellerReady;
     }
@@ -73,6 +96,18 @@ public class TradeSession implements Session {
     public TradeSession setReadyBuyer(boolean ready) {
         this.buyerReady = ready;
         this.checkReadyTrade();
+        return this;
+    }
+
+    @Override
+    public double getBetBuyer() {
+        return betBuyer;
+    }
+
+    @Override
+    public Session setBetBuyer(double bet) {
+        this.betBuyer = bet;
+        this.updateVisualDisplayBet();
         return this;
     }
 
@@ -113,7 +148,7 @@ public class TradeSession implements Session {
 
         ItemStack glass = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 14);
 
-
+        ItemStack golderNugget = ItemBuilder.get(Material.GOLD_NUGGET).setDisplayName("Amount").build();
         this.insertItemBetweenIndex(inventory, glass, 45, 53);
 
         ItemStack redWool = new ItemStack(Material.WOOL, 1, (short) 14);
@@ -122,6 +157,9 @@ public class TradeSession implements Session {
         inventory.setItem(9 * 4 + 4, redWool);
         inventory.setItem(9 * 1 + 4, greenWool);
         inventory.setItem(9 * 5 + 4, stick);
+
+        //Set Golder Nugget Like pick Value
+        inventory.setItem(9 * 5 + 4, this.getVisualDisplayBet().build());
     }
 
     protected void createInventory() {
@@ -147,6 +185,21 @@ public class TradeSession implements Session {
             seller.openInventory(newInventory);
 
         inventory = newInventory;
+    }
+
+
+    protected void updateVisualDisplayBet() {
+        inventory.setItem(9 * 5 + 4, this.getVisualDisplayBet().build());
+    }
+
+    protected ItemBuilder getVisualDisplayBet() {
+        ItemBuilder itemBuilder = ItemBuilder.get(Material.GOLD_NUGGET);
+        itemBuilder.setDisplayName("Amount");
+        itemBuilder.setItemLore(Arrays.asList(
+                "Bet " + seller.getDisplayName() + ": " + betSeller,
+                "Bet " + buyer.getDisplayName() + ": " + betBuyer)
+        );
+        return itemBuilder;
     }
 
     public List<ItemStack> getBuyerItems() {
@@ -188,6 +241,7 @@ public class TradeSession implements Session {
     public void enableTimer(JavaPlugin plugin) {
         new BukkitRunnable() {
             private int timerStart = 35;
+
             @Override
             public void run() {
                 if (!isBuyerReady() || !isSellerReady()) {

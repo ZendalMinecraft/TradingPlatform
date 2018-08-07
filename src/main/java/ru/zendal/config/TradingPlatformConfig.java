@@ -17,6 +17,8 @@ import ru.zendal.session.storage.SessionsStorage;
 import ru.zendal.session.storage.connection.builder.MongoConnectionBuilder;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -167,6 +169,19 @@ public class TradingPlatformConfig {
     }
 
 
+    public List<Double> getBetSpread() {
+        if (yamlConfig.contains("settings.betSpread")) {
+            List<Double> betSpread = yamlConfig.getDoubleList("settings.betSpread");
+            if (betSpread.size() == 0 || betSpread.size() > 9) {
+                logger.warning("Bad config bet Spread");
+                return new ArrayList<>();
+            }
+            return betSpread;
+        }
+        logger.warning("Bad config bet Spread");
+        return new ArrayList<>();
+    }
+
     public SessionsStorage getStorageByConfig() throws ConfigException {
         String typeStorageString = yamlConfig.getString("storage.type");
         if (typeStorageString.equalsIgnoreCase("mongo")) {
@@ -223,7 +238,7 @@ public class TradingPlatformConfig {
                     sessionsStorage = this.getMongoStorage();
             }
         }
-        return  null;
+        return null;
 
     }
 
