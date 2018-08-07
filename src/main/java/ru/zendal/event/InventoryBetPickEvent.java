@@ -7,6 +7,7 @@
 
 package ru.zendal.event;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -33,13 +34,26 @@ public class InventoryBetPickEvent implements Listener {
             return;
         }
         Player player = (Player) event.getWhoClicked();
+
         if (inventory.getHolder() instanceof PickBetHolderInventory) {
+            PickBetHolderInventory holderInventory = (PickBetHolderInventory) inventory.getHolder();
             event.setCancelled(true);
-            this.processPickBet((PickBetHolderInventory) inventory.getHolder(), player, event.getSlot());
+            if (event.getCurrentItem().getType() == Material.GOLD_NUGGET || event.getCurrentItem().getType() == Material.IRON_NUGGET) {
+                this.processPickBet(holderInventory, player, event.getSlot());
+            } else if (event.getCurrentItem().getType() == Material.BARRIER) {
+                event.getWhoClicked().openInventory(holderInventory.getSession().getInventory());
+            }
         }
 
     }
 
+    /**
+     * Process Pick Bet
+     *
+     * @param holder     Inventory holder
+     * @param whoClicked who click
+     * @param slot       index slot
+     */
     private void processPickBet(PickBetHolderInventory holder, Player whoClicked, int slot) {
         Session session = holder.getSession();
         PickBetInventoryManager manager = holder.getInventoryManager();
@@ -52,28 +66,28 @@ public class InventoryBetPickEvent implements Listener {
         double balance = economyProvider.getBalance(whoClicked);
 
         //Is Creative mode
-        if (holder.getSession() instanceof TradeOfflineSession && !isSeller){
-            balance= Double.MAX_VALUE;
+        if (holder.getSession() instanceof TradeOfflineSession && !isSeller) {
+            balance = Double.MAX_VALUE;
         }
 
         if (bet >= 0) {
             if (balance <= bet) {
                 if (isSeller) {
                     session.setBetSeller(balance);
-                }else{
+                } else {
                     session.setBetBuyer(balance);
                 }
             } else {
                 if (isSeller) {
                     session.setBetSeller(bet);
-                }else{
+                } else {
                     session.setBetBuyer(bet);
                 }
             }
         } else {
             if (isSeller) {
                 session.setBetSeller(0);
-            }else{
+            } else {
                 session.setBetBuyer(0);
             }
         }

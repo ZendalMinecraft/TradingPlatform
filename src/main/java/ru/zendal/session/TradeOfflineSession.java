@@ -13,7 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import ru.zendal.session.inventory.CreateOfflineTradeHolderInventory;
+import ru.zendal.session.inventory.holder.CreateOfflineTradeHolderInventory;
 import ru.zendal.util.ItemBuilder;
 
 import java.util.Arrays;

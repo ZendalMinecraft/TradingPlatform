@@ -15,7 +15,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import ru.zendal.TradingPlatform;
-import ru.zendal.session.inventory.StorageHolderInventory;
+import ru.zendal.session.inventory.holder.StorageHolderInventory;
 
 import java.util.ArrayList;
 import java.util.List;

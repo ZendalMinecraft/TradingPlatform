@@ -18,7 +18,7 @@ import ru.zendal.session.TradeOffline;
 import ru.zendal.session.TradeOfflineConfirmResponse;
 import ru.zendal.session.TradeSessionManager;
 import ru.zendal.session.exception.TradeSessionManagerException;
-import ru.zendal.session.inventory.ViewOfflineTradeHolderInventory;
+import ru.zendal.session.inventory.holder.ViewOfflineTradeHolderInventory;
 
 /**
  * Event for view Offline Session

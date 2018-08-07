@@ -172,7 +172,7 @@ public class TradingPlatformConfig {
     public List<Double> getBetSpread() {
         if (yamlConfig.contains("settings.betSpread")) {
             List<Double> betSpread = yamlConfig.getDoubleList("settings.betSpread");
-            if (betSpread.size() == 0 || betSpread.size() > 9) {
+            if (betSpread.size() == 0 || betSpread.size() > 8) {
                 logger.warning("Bad config bet Spread");
                 return new ArrayList<>();
             }

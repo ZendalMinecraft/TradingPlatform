@@ -36,7 +36,8 @@ public class PickBetInventoryManager implements InventoryManager {
         this.session = session;
         this.betSpread = betSpread;
         this.languageConfig = config;
-        this.offsetItems = 4 - betSpread.size() / 2;
+        //this.offsetItems = 4 - betSpread.size() / 2;
+        this.offsetItems = 0;
         this.inventory = this.createPickBetInventory(session, whoClicked);
     }
 
@@ -52,8 +53,9 @@ public class PickBetInventoryManager implements InventoryManager {
     }
 
     private void fillInventory(Inventory inventory) {
-        this.fillBetItems(inventory,offsetItems, Material.GOLD_NUGGET, "inventory.trade.item.addBet");
-        this.fillBetItems(inventory,offsetItems + 9, Material.IRON_NUGGET, "inventory.trade.item.DisBet");
+        this.fillBetItems(inventory, offsetItems, Material.GOLD_NUGGET, "inventory.trade.item.addBet");
+        this.fillBetItems(inventory, offsetItems + 9, Material.IRON_NUGGET, "inventory.trade.item.DisBet");
+        inventory.setItem(17, ItemBuilder.get(Material.BARRIER).build());
     }
 
     private void fillBetItems(Inventory inventory, int startSlot, Material material, String messagePath) {

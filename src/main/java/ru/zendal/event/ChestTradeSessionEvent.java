@@ -21,8 +21,7 @@ import ru.zendal.session.TradeSession;
 import ru.zendal.session.TradeSessionManager;
 import ru.zendal.session.exception.TradeSessionManagerException;
 import ru.zendal.session.inventory.PickBetInventoryManager;
-import ru.zendal.session.inventory.TradeSessionHolderInventory;
-import ru.zendal.util.ItemBuilder;
+import ru.zendal.session.inventory.holder.TradeSessionHolderInventory;
 
 import java.util.List;
 

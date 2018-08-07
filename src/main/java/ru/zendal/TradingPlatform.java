@@ -48,11 +48,12 @@ public class TradingPlatform extends JavaPlugin {
     public void onEnable() {
 
         this.enableConfig();
+        this.initService();
+
         //TODO Возможно такая ситуация, когда Economy Provider недоступен УЧТИ
-        tradeSessionManager = new TradeSessionManager(new MongoStorageSessions(
+        tradeSessionManager = new TradeSessionManager(economyProvider,new MongoStorageSessions(
                 new MongoConnectionBuilder(), getLogger()
         ), this, tradingPlatformConfig.getLanguageConfig());
-        this.initService();
         this.initListeners();
         this.getCommand("trade").setExecutor(new CommandProcessor(
                 tradeSessionManager,

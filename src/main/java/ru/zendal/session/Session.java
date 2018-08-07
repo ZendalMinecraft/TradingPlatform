@@ -8,6 +8,7 @@
 package ru.zendal.session;
 
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 
 /**
  * The interface Session.
@@ -38,10 +39,17 @@ public interface Session {
 
     /**
      * Get bet Seller
+     *
      * @return bet amount
      */
     double getBetSeller();
 
+    /**
+     * Set value bet Seller
+     *
+     * @param bet value bet
+     * @return Session
+     */
     Session setBetSeller(double bet);
 
 
@@ -69,11 +77,23 @@ public interface Session {
 
     /**
      * Get bet Buyer
+     *
      * @return bet amount
      */
     double getBetBuyer();
 
-
+    /**
+     * Set value bet Buyer
+     *
+     * @param bet value bet
+     * @return Session
+     */
     Session setBetBuyer(double bet);
 
+    /**
+     * Get inventory for trading
+     *
+     * @return CraftInventory
+     */
+    Inventory getInventory();
 }

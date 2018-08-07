@@ -14,7 +14,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import ru.zendal.session.inventory.TradeSessionHolderInventory;
+import ru.zendal.session.inventory.holder.TradeSessionHolderInventory;
 import ru.zendal.util.ItemBuilder;
 
 import java.util.ArrayList;

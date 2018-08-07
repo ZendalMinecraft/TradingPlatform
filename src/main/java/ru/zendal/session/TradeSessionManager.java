@@ -17,9 +17,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import ru.zendal.TradingPlatform;
 import ru.zendal.config.LanguageConfig;
+import ru.zendal.service.economy.EconomyProvider;
 import ru.zendal.session.exception.TradeSessionManagerException;
-import ru.zendal.session.inventory.CreateOfflineTradeHolderInventory;
-import ru.zendal.session.inventory.StorageHolderInventory;
+import ru.zendal.session.inventory.holder.CreateOfflineTradeHolderInventory;
+import ru.zendal.session.inventory.holder.StorageHolderInventory;
 import ru.zendal.session.listener.TradeSessionListener;
 import ru.zendal.session.storage.SessionsStorage;
 
@@ -37,6 +38,7 @@ public class TradeSessionManager {
     private final SessionsStorage storage;
     private final TradingPlatform plugin;
     private final TradeSessionCallback tradeCallback;
+    private final EconomyProvider economyProvider;
 
     /**
      * Storage simple trade sessions
@@ -68,7 +70,8 @@ public class TradeSessionManager {
      * @param plugin          Instance Plugin
      * @param config          Config language Pack
      */
-    public TradeSessionManager(SessionsStorage storageSessions, TradingPlatform plugin, LanguageConfig config) {
+    public TradeSessionManager(EconomyProvider economyProvider, SessionsStorage storageSessions, TradingPlatform plugin, LanguageConfig config) {
+        this.economyProvider = economyProvider;
         this.languageConfig = config;
         this.storage = storageSessions;
         this.plugin = plugin;
@@ -170,11 +173,17 @@ public class TradeSessionManager {
      */
     private void processOfflineTrade(TradeOfflineSession session) {
         try {
+            if (!economyProvider.haveMoney(
+                    session.getBuyer(),
+                    session.getBetSeller())) {
+                throw new TradeSessionManagerException("Uncorrected bet session");
+            }
+            //Because Creative
+            economyProvider.deposit(session.getBuyer(),session.getBetSeller());
             String uniqueId = storage.saveSession(session);
             TradeOffline tradeOffline = TradeOffline.factory(uniqueId, session);
+
             activeOfflineTrade.put(uniqueId, TradeOffline.factory(uniqueId, session));
-
-
             languageConfig.getMessage("trade.offline.process").
                     setCustomMessage(1, uniqueId).
                     getMetaData().addHoverText("Example Text").
@@ -198,6 +207,7 @@ public class TradeSessionManager {
      * @see TradeSession
      */
     private void processTrade(TradeSession session) {
+        //TODO add value support
         this.addNotFitItemsIntoStorageInventory(
                 session.getSeller().getInventory().addItem(
                         session.getBuyerItems().toArray(new ItemStack[0])),
@@ -220,6 +230,22 @@ public class TradeSessionManager {
         } catch (TradeSessionManagerException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Check correct bet session
+     *
+     * @param session Session
+     * @return {@code true} if correct else {@code false}
+     */
+    private boolean isCorrectBetSession(Session session) {
+        return economyProvider.haveMoney(
+                session.getBuyer(),
+                session.getBetBuyer()
+        ) && economyProvider.haveMoney(
+                session.getSeller(),
+                session.getBetSeller()
+        );
     }
 
     /**
