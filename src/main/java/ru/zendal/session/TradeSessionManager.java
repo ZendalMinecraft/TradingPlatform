@@ -7,6 +7,7 @@
 
 package ru.zendal.session;
 
+import net.md_5.bungee.api.chat.ClickEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -16,10 +17,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import ru.zendal.TradingPlatform;
 import ru.zendal.config.LanguageConfig;
+import ru.zendal.service.economy.EconomyProvider;
 import ru.zendal.session.exception.TradeSessionManagerException;
-import ru.zendal.session.inventory.CreateOfflineTradeHolderInventory;
-import ru.zendal.session.inventory.StorageHolderInventory;
-import ru.zendal.session.storage.StorageSessions;
+import ru.zendal.session.inventory.holder.CreateOfflineTradeHolderInventory;
+import ru.zendal.session.inventory.holder.StorageHolderInventory;
+import ru.zendal.session.listener.TradeSessionListener;
+import ru.zendal.session.storage.SessionsStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,9 +35,10 @@ import java.util.Map;
 public class TradeSessionManager {
 
     private final LanguageConfig languageConfig;
-    private final StorageSessions storage;
+    private final SessionsStorage storage;
     private final TradingPlatform plugin;
     private final TradeSessionCallback tradeCallback;
+    private final EconomyProvider economyProvider;
 
     /**
      * Storage simple trade sessions
@@ -56,6 +60,9 @@ public class TradeSessionManager {
      */
     private HashMap<String, TradeOffline> activeOfflineTrade = new HashMap<>();
 
+
+    private List<TradeSessionListener> listenersList = new ArrayList<>();
+
     /**
      * Constructor for Trade Session Manager
      *
@@ -63,7 +70,8 @@ public class TradeSessionManager {
      * @param plugin          Instance Plugin
      * @param config          Config language Pack
      */
-    public TradeSessionManager(StorageSessions storageSessions, TradingPlatform plugin, LanguageConfig config) {
+    public TradeSessionManager(EconomyProvider economyProvider, SessionsStorage storageSessions, TradingPlatform plugin, LanguageConfig config) {
+        this.economyProvider = economyProvider;
         this.languageConfig = config;
         this.storage = storageSessions;
         this.plugin = plugin;
@@ -93,9 +101,9 @@ public class TradeSessionManager {
             for (TradeOffline tradeOffline : storage.getAllSessions()) {
                 activeOfflineTrade.put(tradeOffline.getUniqueId(), tradeOffline);
             }
-        }else{
-            plugin.getLogger().warning("Storage: "+storage.getClass()+" is unavailable");
-            //Enbale timer
+        } else {
+            plugin.getLogger().warning("Storage: " + storage.getClass() + " is unavailable");
+            //Enable timer to try reconnect
         }
     }
 
@@ -120,6 +128,12 @@ public class TradeSessionManager {
         } else {
             offlineSessionList.add(new TradeOfflineSession(player, tradeCallback));
         }
+    }
+
+    public List<TradeOffline> getAllTradeOffline() {
+        List<TradeOffline> tradeOffices = new ArrayList<>();
+        activeOfflineTrade.forEach((s, tradeOffline) -> tradeOffices.add(tradeOffline));
+        return tradeOffices;
     }
 
     public void processTradeOffline(Player whoTrading, TradeOffline tradeOffline) {
@@ -159,10 +173,26 @@ public class TradeSessionManager {
      */
     private void processOfflineTrade(TradeOfflineSession session) {
         try {
+            if (!economyProvider.haveMoney(
+                    session.getBuyer(),
+                    session.getBetSeller())) {
+                throw new TradeSessionManagerException("Uncorrected bet session");
+            }
+            //Because Creative
+            economyProvider.deposit(session.getBuyer(),session.getBetSeller());
             String uniqueId = storage.saveSession(session);
+            TradeOffline tradeOffline = TradeOffline.factory(uniqueId, session);
+
             activeOfflineTrade.put(uniqueId, TradeOffline.factory(uniqueId, session));
             languageConfig.getMessage("trade.offline.process").
-                    setCustomMessage(1, uniqueId).sendMessage(session.getBuyer());
+                    setCustomMessage(1, uniqueId).
+                    getMetaData().addHoverText("Example Text").
+                    setClickEvent(ClickEvent.Action.RUN_COMMAND, "/trade open " + uniqueId).
+                    sendMessage(session.getBuyer());
+            //Invoke all listeners
+            for (TradeSessionListener listener : listenersList) {
+                listener.onCreateNewOfflineTradeSession(tradeOffline);
+            }
         } catch (Exception exception) {
             languageConfig.getMessage("trade.offline.unavailable").sendMessage(session.getBuyer());
             session.cancelTrade();
@@ -177,6 +207,7 @@ public class TradeSessionManager {
      * @see TradeSession
      */
     private void processTrade(TradeSession session) {
+        //TODO add value support
         this.addNotFitItemsIntoStorageInventory(
                 session.getSeller().getInventory().addItem(
                         session.getBuyerItems().toArray(new ItemStack[0])),
@@ -199,6 +230,22 @@ public class TradeSessionManager {
         } catch (TradeSessionManagerException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Check correct bet session
+     *
+     * @param session Session
+     * @return {@code true} if correct else {@code false}
+     */
+    private boolean isCorrectBetSession(Session session) {
+        return economyProvider.haveMoney(
+                session.getBuyer(),
+                session.getBetBuyer()
+        ) && economyProvider.haveMoney(
+                session.getSeller(),
+                session.getBetSeller()
+        );
     }
 
     /**
@@ -247,8 +294,8 @@ public class TradeSessionManager {
     public TradeSessionManager cancelOfflineSessionByPlayer(Player player) throws TradeSessionManagerException {
         for (TradeOfflineSession session : offlineSessionList) {
             if (session.getBuyer() == player || session.getSeller() == player) {
-                //TODO do...
                 offlineSessionList.remove(session);
+                session.cancelTrade();
                 return this;
             }
         }
@@ -265,6 +312,7 @@ public class TradeSessionManager {
         }
         return tradeSessions;
     }
+
 
     public Inventory getInventorySabotageForPlayer(Player player) throws TradeSessionManagerException {
         Inventory inventory = this.storageInventories.get(player.getUniqueId().toString());
@@ -365,14 +413,15 @@ public class TradeSessionManager {
 
 
     public void cancelAllSession() {
-        if (sessionList.size() == 0) {
-            return;
-        }
         for (TradeSession tradeSession : sessionList) {
             tradeSession.getSeller().getInventory().addItem(tradeSession.getSellerItems().toArray(new ItemStack[0]));
             tradeSession.getBuyer().getInventory().addItem(tradeSession.getBuyerItems().toArray(new ItemStack[0]));
             tradeSession.getBuyer().closeInventory();
             tradeSession.getSeller().closeInventory();
+        }
+
+        for (TradeOfflineSession offlineSession : offlineSessionList) {
+            offlineSession.cancelTrade();
         }
     }
 
@@ -408,5 +457,10 @@ public class TradeSessionManager {
         if (!this.activeOfflineTrade.remove(tradeOffline.getUniqueId(), tradeOffline)) {
             throw new TradeSessionManagerException("Undefined tradeOffline");
         }
+    }
+
+
+    public void addListenerOnCreateNewOfflineTrade(TradeSessionListener listener) {
+        listenersList.add(listener);
     }
 }

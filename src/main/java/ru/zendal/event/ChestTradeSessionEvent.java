@@ -14,20 +14,38 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
-import ru.zendal.TradingPlatform;
+import ru.zendal.config.LanguageConfig;
 import ru.zendal.session.Session;
 import ru.zendal.session.TradeOfflineSession;
 import ru.zendal.session.TradeSession;
+import ru.zendal.session.TradeSessionManager;
 import ru.zendal.session.exception.TradeSessionManagerException;
-import ru.zendal.session.inventory.TradeSessionHolderInventory;
+import ru.zendal.session.inventory.PickBetInventoryManager;
+import ru.zendal.session.inventory.holder.TradeSessionHolderInventory;
 
+import java.util.List;
+
+/**
+ * Event for trading all type Sessions
+ */
 public class ChestTradeSessionEvent implements Listener {
 
+    /**
+     * Session manager
+     */
+    private final TradeSessionManager manager;
+    /**
+     *
+     */
+    private final LanguageConfig languageConfig;
 
-    private final TradingPlatform plugin;
 
-    public ChestTradeSessionEvent(TradingPlatform instance) {
-        this.plugin = instance;
+    private final List<Double> betSpread;
+
+    public ChestTradeSessionEvent(TradeSessionManager manager, LanguageConfig languageConfig, List<Double> betSpread) {
+        this.manager = manager;
+        this.languageConfig = languageConfig;
+        this.betSpread = betSpread;
     }
 
 
@@ -40,7 +58,7 @@ public class ChestTradeSessionEvent implements Listener {
             }
             //TODO added method for Detect changed Inventory
             if (event.isShiftClick()) {
-                plugin.getAdaptiveMessage("trade.inventory.shift").sendMessage((Player) event.getWhoClicked());
+                languageConfig.getMessage("trade.inventory.shift").sendMessage((Player) event.getWhoClicked());
                 event.setCancelled(true);
                 return;
             }
@@ -48,7 +66,7 @@ public class ChestTradeSessionEvent implements Listener {
             if (!event.getClickedInventory().getName().equalsIgnoreCase("container.inventory")) {
                 Session session;
                 try {
-                    session = plugin.getSessionManager().getSessionByInventory(inventory);
+                    session = manager.getSessionByInventory(inventory);
                 } catch (TradeSessionManagerException e) {
                     e.printStackTrace();
                     event.setCancelled(true);
@@ -88,15 +106,25 @@ public class ChestTradeSessionEvent implements Listener {
                 }
 
             }
+        } else if (event.getCurrentItem().getType() == Material.GOLD_NUGGET && this.isServiceSlot(event.getSlot())) {
+            this.openInventoryChangeAmount(session, (Player) event.getWhoClicked());
         }
     }
 
     private void cancelSession(Session session) {
         if (session instanceof TradeOfflineSession) {
-            this.plugin.getSessionManager().cancelOfflineSession((TradeOfflineSession) session);
+            manager.cancelOfflineSession((TradeOfflineSession) session);
         } else if (session instanceof TradeSession) {
-            this.plugin.getSessionManager().cancelSession((TradeSession) session);
+            manager.cancelSession((TradeSession) session);
         }
+    }
+
+    private void openInventoryChangeAmount(Session session, Player whoClicked) {
+        whoClicked.openInventory(this.createInventoryForPickBet(session, whoClicked));
+    }
+
+    private Inventory createInventoryForPickBet(Session session, Player whoClicked) {
+        return new PickBetInventoryManager(session, whoClicked, languageConfig, betSpread).getInventory();
     }
 
     /**
@@ -114,7 +142,7 @@ public class ChestTradeSessionEvent implements Listener {
                     return;
                 }
                 try {
-                    Session session = plugin.getSessionManager().getSessionByInventory(event.getInventory());
+                    Session session = manager.getSessionByInventory(event.getInventory());
                     if (this.canInteractWithSlot(data, (Player) event.getWhoClicked(), session)) {
                         event.setCancelled(true);
                     }

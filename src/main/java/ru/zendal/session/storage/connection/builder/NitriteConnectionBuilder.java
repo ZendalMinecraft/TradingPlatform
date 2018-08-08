@@ -8,6 +8,7 @@
 package ru.zendal.session.storage.connection.builder;
 
 import org.dizitart.no2.Nitrite;
+import org.dizitart.no2.NitriteBuilder;
 import ru.zendal.session.storage.connection.ConnectionBuilder;
 
 public class NitriteConnectionBuilder implements ConnectionBuilder<Nitrite> {
@@ -16,9 +17,9 @@ public class NitriteConnectionBuilder implements ConnectionBuilder<Nitrite> {
 
     private String fileName = "TradingPlatform.db";
 
-    private String user = "user";
+    private String user = null;
 
-    private String password = "password";
+    private String password = null;
 
 
     public NitriteConnectionBuilder() {
@@ -43,11 +44,16 @@ public class NitriteConnectionBuilder implements ConnectionBuilder<Nitrite> {
 
     @Override
     public Nitrite build() {
-        return Nitrite.builder().compressed().filePath(path + fileName).openOrCreate(user, password);
+        NitriteBuilder builder = Nitrite.builder().compressed().filePath(path + fileName);
+        if (user != null && password != null) {
+            return builder.openOrCreate(user, password);
+        } else {
+            return builder.openOrCreate();
+        }
     }
 
     @Override
     public boolean hasConnected() {
-        return false;
+        return true;
     }
 }

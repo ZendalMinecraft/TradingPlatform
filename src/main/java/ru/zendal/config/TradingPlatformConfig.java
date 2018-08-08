@@ -9,13 +9,17 @@ package ru.zendal.config;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 import ru.zendal.TradingPlatform;
+import ru.zendal.config.bundle.SocketConfigBundle;
 import ru.zendal.config.exception.ConfigException;
-import ru.zendal.session.storage.StorageSessions;
+import ru.zendal.session.storage.MongoStorageSessions;
+import ru.zendal.session.storage.PacifierStorage;
+import ru.zendal.session.storage.SessionsStorage;
+import ru.zendal.session.storage.connection.builder.MongoConnectionBuilder;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Class for access to Config file plugin
@@ -26,6 +30,11 @@ public class TradingPlatformConfig {
      * Instance plugin file
      */
     private final TradingPlatform plugin;
+
+    /**
+     * Logger
+     */
+    private final Logger logger;
 
     /**
      * Available language for restore from plugin
@@ -44,12 +53,21 @@ public class TradingPlatformConfig {
 
 
     /**
+     * Socket configuration data
+     */
+    private SocketConfigBundle socketBundle;
+
+
+    private SessionsStorage sessionsStorage;
+
+    /**
      * Instantiates a new Trading platform config.
      *
      * @param plugin the plugin
      */
     public TradingPlatformConfig(TradingPlatform plugin) {
         this.plugin = plugin;
+        this.logger = plugin.getLogger();
         this.setup();
         this.processConfig();
     }
@@ -92,7 +110,6 @@ public class TradingPlatformConfig {
         }
     }
 
-
     private void checkAllLanguage() throws IOException {
         for (String lang : this.availableLanguage) {
             String langPath = "lang/" + lang + ".lang";
@@ -101,20 +118,17 @@ public class TradingPlatformConfig {
                 continue;
             }
             InputStream inputStream = null;
-            FileOutputStream fileOutputStream = null;
             try {
                 inputStream = this.plugin.getResource(langPath);
                 langFile.getParentFile().mkdirs();
-                fileOutputStream = new FileOutputStream(langFile);
-                //TODO mb remove readAllBytes, for support Java 8
-                fileOutputStream.write(inputStream.readAllBytes());
+
+                PrintWriter writer = new PrintWriter(langFile);
+                writer.print(this.getStringByInputStream(this.plugin.getResource(langPath)));
+                writer.close();
             } finally {
                 try {
                     if (inputStream != null) {
                         inputStream.close();
-                    }
-                    if (fileOutputStream != null) {
-                        fileOutputStream.close();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -138,9 +152,9 @@ public class TradingPlatformConfig {
             this.plugin.getLogger().warning("Failed create config file");
             return;
         }
-        FileOutputStream fileOutputStream = new FileOutputStream(file);
-        fileOutputStream.write(this.plugin.getResource("config.yml").readAllBytes());
-        fileOutputStream.close();
+        PrintWriter writer = new PrintWriter(file);
+        writer.print(this.getStringByInputStream(this.plugin.getResource("config.yml")));
+        writer.close();
         this.yamlConfig = YamlConfiguration.loadConfiguration(file);
     }
 
@@ -155,7 +169,20 @@ public class TradingPlatformConfig {
     }
 
 
-    public StorageSessions getStorageByConfig() throws ConfigException {
+    public List<Double> getBetSpread() {
+        if (yamlConfig.contains("settings.betSpread")) {
+            List<Double> betSpread = yamlConfig.getDoubleList("settings.betSpread");
+            if (betSpread.size() == 0 || betSpread.size() > 8) {
+                logger.warning("Bad config bet Spread");
+                return new ArrayList<>();
+            }
+            return betSpread;
+        }
+        logger.warning("Bad config bet Spread");
+        return new ArrayList<>();
+    }
+
+    public SessionsStorage getStorageByConfig() throws ConfigException {
         String typeStorageString = yamlConfig.getString("storage.type");
         if (typeStorageString.equalsIgnoreCase("mongo")) {
            /* return  new MongoStorageSessions(
@@ -167,6 +194,108 @@ public class TradingPlatformConfig {
         return null;
     }
 
-    //private ConnectionBuilder getBuilder
+    /**
+     * Return socket Bundle
+     *
+     * @return Socket configuration data
+     */
+    public SocketConfigBundle getSocketBundle() {
+
+        if (socketBundle == null) {
+            this.initSocketBundle();
+        }
+        return socketBundle;
+    }
+
+    private void initSocketBundle() {
+        socketBundle = new SocketConfigBundle();
+        if (yamlConfig.contains("socket.enable")) {
+            socketBundle.setEnableServer(yamlConfig.getBoolean("socket.enable"));
+        }
+        if (yamlConfig.contains("socket.port")) {
+            socketBundle.setPort(yamlConfig.getInt("socket.port"));
+        }
+
+        if (yamlConfig.contains("socket.charset")) {
+            socketBundle.setCharset(yamlConfig.getString("socket.charset"));
+        }
+    }
+
+    public SessionsStorage getSessionsStorage() {
+        if (sessionsStorage == null) {
+            this.initSessionsStorage();
+        }
+        return sessionsStorage;
+    }
+
+
+    private SessionsStorage initSessionsStorage() {
+        if (!yamlConfig.contains("storage.type") || !TypeStorage.hasTypeStorage(yamlConfig.getString("storage.type"))) {
+            sessionsStorage = new PacifierStorage();
+        } else {
+            switch (TypeStorage.fromName(yamlConfig.getString("storage.type"))) {
+                case MONGO_DB:
+                    sessionsStorage = this.getMongoStorage();
+            }
+        }
+        return null;
+
+    }
+
+
+    /**
+     * Get Mongo storage
+     *
+     * @return MongoDB Storage
+     */
+    private SessionsStorage getMongoStorage() {
+        MongoConnectionBuilder builder = new MongoConnectionBuilder();
+        if (yamlConfig.contains("storage.setting.host")) {
+            builder.setHost(yamlConfig.getString("storage.setting.host"));
+        }
+
+        if (yamlConfig.contains("storage.setting.port")) {
+            builder.setPort(yamlConfig.getInt("storage.setting.port"));
+        }
+        return new MongoStorageSessions(builder, logger);
+    }
+
+    /*private SessionsStorage getLocalStorage(){
+
+    }*/
+
+    /**
+     * Check is valid type storage
+     *
+     * @param nameType Name type storage
+     * @return {@code true} if valid
+     */
+    private boolean isInvalidTypeStorage(String nameType) {
+        switch (nameType.toLowerCase()) {
+            case "mongo":
+            case "mysql":
+            case "local":
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Get text By InputStream
+     *
+     * @param inputStream Input Stream
+     * @return Text
+     * @throws IOException on Error read
+     */
+    private String getStringByInputStream(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = inputStream.read(buffer)) != -1) {
+            result.write(buffer, 0, length);
+        }
+        return result.toString("UTF-8");
+    }
 
 }

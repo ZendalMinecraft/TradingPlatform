@@ -10,7 +10,9 @@ package ru.zendal.command;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import ru.zendal.TradingPlatform;
+import org.bukkit.entity.Player;
+import ru.zendal.config.LanguageConfig;
+import ru.zendal.session.TradeSessionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,43 +23,33 @@ import java.util.List;
 public class CommandProcessor implements CommandExecutor {
 
 
-    private final TradingPlatform plugin;
+    private final TradeSessionManager sessionManager;
+    private final LanguageConfig languageConfig;
     /**
      * List processors command
      */
     private List<ArgsCommandProcessor> processors = new ArrayList<>();
 
 
-    public CommandProcessor(TradingPlatform instance) {
-        this.plugin = instance;
+    public CommandProcessor(TradeSessionManager sessionManager, LanguageConfig languageConfig) {
+        this.sessionManager = sessionManager;
+        this.languageConfig = languageConfig;
         this.initArgsProcessors();
     }
 
+    /**
+     * Init argument processor
+     */
     private void initArgsProcessors() {
-        processors.add(new TradeBetweenPlayer(
-                this.plugin.getSessionManager(),
-                this.plugin.getTradingPlatformConfig().getLanguageConfig()
-        ));
+        processors.add(new TradeBetweenPlayer(sessionManager, languageConfig));
 
-        processors.add(new TradeConfirmBetweenPlayer(
-                this.plugin.getSessionManager(),
-                this.plugin.getTradingPlatformConfig().getLanguageConfig()
-        ));
+        processors.add(new TradeConfirmBetweenPlayer(sessionManager, languageConfig));
 
-        processors.add(new GetStorage(
-                this.plugin.getSessionManager(),
-                this.plugin.getTradingPlatformConfig().getLanguageConfig()
-        ));
+        processors.add(new GetStorage(sessionManager, languageConfig));
 
-        processors.add(new TradeCreate(
-                this.plugin.getSessionManager(),
-                this.plugin.getTradingPlatformConfig().getLanguageConfig()
-        ));
+        processors.add(new TradeCreate(sessionManager, languageConfig));
 
-        processors.add(new OpenOfflineSessionProcessor(
-                this.plugin.getSessionManager(),
-                this.plugin.getTradingPlatformConfig().getLanguageConfig()
-        ));
+        processors.add(new OpenOfflineSessionProcessor(sessionManager, languageConfig));
     }
 
     @Override
@@ -67,7 +59,7 @@ public class CommandProcessor implements CommandExecutor {
                 return processor.process(command, sender, args);
             }
         }
-
-        return false;
+        languageConfig.getMessage("trade.help.message").sendMessage((Player) sender);
+        return true;
     }
 }

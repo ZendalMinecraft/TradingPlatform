@@ -125,7 +125,7 @@ public class ItemBuilder {
      */
     public ItemStack build() {
         itemStack.setItemMeta(this.itemMeta);
-        return itemStack;
+        return new ItemStack(itemStack);
     }
 
     /**

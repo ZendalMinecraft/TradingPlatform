@@ -31,7 +31,7 @@ import static com.mongodb.client.model.Filters.eq;
 /**
  * NoSQL Storage (MongoDB)
  */
-public class MongoStorageSessions implements StorageSessions {
+public class MongoStorageSessions implements SessionsStorage {
 
     /**
      * Object Mongo DataBase
