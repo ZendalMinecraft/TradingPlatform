@@ -11,6 +11,7 @@ import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import ru.zendal.service.economy.EconomyProvider;
 import ru.zendal.session.TradeOffline;
 import ru.zendal.session.TradeOfflineConfirmResponse;
 import ru.zendal.session.TradeSessionManager;
@@ -21,9 +22,11 @@ import java.util.UUID;
 
 public class AcceptTradeCommand implements Command {
     private final TradeSessionManager sessionManager;
+    private final EconomyProvider economyProvider;
 
-    public AcceptTradeCommand(TradeSessionManager sessionManager) {
+    public AcceptTradeCommand(TradeSessionManager sessionManager, EconomyProvider economyProvider) {
         this.sessionManager = sessionManager;
+        this.economyProvider = economyProvider;
     }
 
     @Override
@@ -50,8 +53,8 @@ public class AcceptTradeCommand implements Command {
             }
             Player player = offlinePlayer.getPlayer();
 
-            TradeOfflineConfirmResponse response = tradeOffline.confirmTrade(player);
-            if (response.hasMissingItems()){
+            TradeOfflineConfirmResponse response = tradeOffline.confirmTrade(player,economyProvider);
+            if (response.hasMissingItems()) {
                 throw new ProcessCommandException();
             }
 
@@ -63,7 +66,7 @@ public class AcceptTradeCommand implements Command {
                 player.getInventory().setContents(response.getNewContent());
                 sessionManager.processTradeOffline(player, tradeOffline);
             } catch (TradeSessionManagerException e) {
-               // languageConfig.getMessage("trade.offline.alreadyFinished").sendMessage(player);
+                // languageConfig.getMessage("trade.offline.alreadyFinished").sendMessage(player);
             }
 
             /*offline.getOfflinePlayer().get*/

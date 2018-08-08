@@ -14,6 +14,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import ru.zendal.config.LanguageConfig;
+import ru.zendal.service.economy.EconomyProvider;
 import ru.zendal.session.TradeOffline;
 import ru.zendal.session.TradeOfflineConfirmResponse;
 import ru.zendal.session.TradeSessionManager;
@@ -27,10 +28,12 @@ public class ChestTradeOfflineEvent implements Listener {
 
     private final TradeSessionManager sessionManager;
     private final LanguageConfig languageConfig;
+    private final EconomyProvider economyProvider;
 
-    public ChestTradeOfflineEvent(TradeSessionManager sessionManager, LanguageConfig languageConfig) {
+    public ChestTradeOfflineEvent(TradeSessionManager sessionManager, EconomyProvider economyProvider, LanguageConfig languageConfig) {
         this.sessionManager = sessionManager;
         this.languageConfig = languageConfig;
+        this.economyProvider = economyProvider;
     }
 
     @EventHandler
@@ -57,8 +60,8 @@ public class ChestTradeOfflineEvent implements Listener {
 
     private void process(Player player, TradeOffline tradeOffline) {
         //TODO Move to SessionManager
-        TradeOfflineConfirmResponse response = tradeOffline.confirmTrade(player);
-        if (!response.hasMissingItems()) {
+        TradeOfflineConfirmResponse response = tradeOffline.confirmTrade(player, economyProvider);
+        if (response.canBeTrade()) {
             try {
                 sessionManager.removeTradeOffline(tradeOffline);
                 player.getInventory().clear();
@@ -73,6 +76,9 @@ public class ChestTradeOfflineEvent implements Listener {
             response.getListMissingItems().forEach(itemStack -> {
                 player.sendMessage(itemStackToString(itemStack));
             });
+            if (response.needMoney()) {
+                player.sendMessage("Money: "+String.valueOf(response.getMoney()));
+            }
         }
     }
 

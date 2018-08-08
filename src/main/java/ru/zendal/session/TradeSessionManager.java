@@ -179,7 +179,7 @@ public class TradeSessionManager {
                 throw new TradeSessionManagerException("Uncorrected bet session");
             }
             //Because Creative
-            economyProvider.deposit(session.getBuyer(),session.getBetSeller());
+            economyProvider.withdraw(session.getBuyer(), session.getBetSeller());
             String uniqueId = storage.saveSession(session);
             TradeOffline tradeOffline = TradeOffline.factory(uniqueId, session);
 
@@ -435,6 +435,7 @@ public class TradeSessionManager {
     }
 
     public TradeOffline getTradeOfflineById(String id) throws TradeSessionManagerException {
+        this.checkAvailableStorage();
         for (Map.Entry<String, TradeOffline> entry : activeOfflineTrade.entrySet()) {
             if (entry.getKey().equals(id)) {
                 return entry.getValue();
@@ -444,6 +445,7 @@ public class TradeSessionManager {
     }
 
     public TradeOffline getTradeOfflineByInventory(Inventory inventory) throws TradeSessionManagerException {
+        this.checkAvailableStorage();
         for (Map.Entry<String, TradeOffline> entry : activeOfflineTrade.entrySet()) {
             if (entry.getValue().getInventory().hashCode() == inventory.hashCode()) {
                 return entry.getValue();
@@ -462,5 +464,17 @@ public class TradeSessionManager {
 
     public void addListenerOnCreateNewOfflineTrade(TradeSessionListener listener) {
         listenersList.add(listener);
+    }
+
+
+    /**
+     * Check Available connect to storage
+     *
+     * @throws TradeSessionManagerException if storage is unavailable
+     */
+    private void checkAvailableStorage() throws TradeSessionManagerException {
+        if (!storage.isAvailable()) {
+            throw new TradeSessionManagerException("Storage is unavailable");
+        }
     }
 }
