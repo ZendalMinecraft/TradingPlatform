@@ -93,9 +93,9 @@ public class LanguageConfig {
      */
     public AdaptiveMessage getMessage(String pathMessage) {
 
-        if (langFile!=null) {
+        if (langFile != null) {
             return new AdaptiveMessage(metaData.get(pathMessage));
-        }else{
+        } else {
             return new AdaptiveMessage("is Test mode!");
         }
     }

@@ -14,7 +14,6 @@ import ru.zendal.config.exception.ConfigException;
 import ru.zendal.session.storage.StorageSessions;
 
 import java.io.*;
-import java.util.Scanner;
 
 /**
  * Class for access to Config file plugin
@@ -177,6 +176,9 @@ public class TradingPlatformConfig {
 
         if (socketBundle == null) {
             socketBundle = new SocketConfigBundle();
+            if (yamlConfig.contains("socket.enable")) {
+                socketBundle.setEnableServer(yamlConfig.getBoolean("socket.enable"));
+            }
             if (yamlConfig.contains("socket.port")) {
                 socketBundle.setPort(yamlConfig.getInt("socket.port"));
             }

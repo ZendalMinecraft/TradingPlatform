@@ -13,6 +13,11 @@ package ru.zendal.config.bundle;
 public class SocketConfigBundle {
 
     /**
+     * Enable Server
+     */
+    private boolean enableServer = false;
+
+    /**
      * Charset incoming message
      */
     private String charset = "UTF-8";
@@ -37,13 +42,24 @@ public class SocketConfigBundle {
      * Setup charset incoming message
      *
      * @param charset the charset
-     * @return charset
+     * @return bundle
      */
     public SocketConfigBundle setCharset(String charset) {
         this.charset = charset;
         return this;
     }
 
+
+    /**
+     * Setup enable server
+     *
+     * @param enableServer enable server
+     * @return bundle
+     */
+    public SocketConfigBundle setEnableServer(boolean enableServer) {
+        this.enableServer = enableServer;
+        return this;
+    }
 
     /**
      * Get listener port
@@ -64,8 +80,17 @@ public class SocketConfigBundle {
     }
 
 
+    /**
+     * Get is Enable server
+     *
+     * @return enable server
+     */
+    public boolean isEnableServer() {
+        return enableServer;
+    }
+
     @Override
     public String toString() {
-        return "{Port:" + port + ", Charset:" + charset + "}";
+        return "{Enable:" + enableServer + "Port:" + port + ", Charset:" + charset + "}";
     }
 }

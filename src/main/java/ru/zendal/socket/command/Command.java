@@ -18,6 +18,7 @@ public interface Command {
 
     /**
      * Process command
+     *
      * @param incomingDocument
      * @return
      * @throws ProcessCommandException
@@ -25,9 +26,9 @@ public interface Command {
     Document process(Document incomingDocument) throws ProcessCommandException;
 
     /**
-     * Can be this
-     * @param incomingDocument
-     * @return
+     * Get name command
+     *
+     * @return name Command
      */
-    boolean canProcess(Document incomingDocument);
+    String getNameCommand();
 }
