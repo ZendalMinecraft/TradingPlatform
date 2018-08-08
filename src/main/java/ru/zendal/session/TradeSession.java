@@ -261,6 +261,8 @@ public class TradeSession implements Session {
 
     /**
      * Set default stick item's
+     *
+     * TODO remove
      */
     private void setDefaultStickLine() {
         ItemStack stick = ItemBuilder.get(Material.STICK).build();
@@ -269,6 +271,7 @@ public class TradeSession implements Session {
                 inventory.setItem(9 * i + 4, stick);
             }
         }
+        inventory.setItem(9 * 5 + 4, this.getVisualDisplayBet().build());
     }
 
     private void setTimerItemsLine(int time) {
@@ -326,7 +329,7 @@ public class TradeSession implements Session {
      *
      * @return Title
      */
-    protected String getTitleForInventoryTrade() {
+    protected String  getTitleForInventoryTrade() {
         StringBuilder titleInventory = new StringBuilder();
         titleInventory.append(seller.getDisplayName()).append("(").append(this.sellerReady ? "✔" : "×").append(")");
 

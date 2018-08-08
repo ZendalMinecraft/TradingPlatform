@@ -97,7 +97,20 @@ public class ChestTradeSessionEvent implements Listener {
         if (event.getCurrentItem().getType() == Material.WOOL) {
             byte data = event.getCurrentItem().getData().getData();
             if (data == 14) {
-                this.cancelSession(session);
+                //2 Factor cancel trade
+                if (session.getSeller() == event.getWhoClicked()) {
+                   if (session.isSellerReady()){
+                       session.setReadySeller(false);
+                   }else{
+                       this.cancelSession(session);
+                   }
+                } else if (session.getBuyer() == event.getWhoClicked()) {
+                    if (session.isBuyerReady()){
+                        session.setReadyBuyer(false);
+                    }else{
+                        this.cancelSession(session);
+                    }
+                }
             } else if (data == 5) {
                 if (session.getSeller() == event.getWhoClicked()) {
                     session.setReadySeller(!session.isSellerReady());
@@ -107,7 +120,14 @@ public class ChestTradeSessionEvent implements Listener {
 
             }
         } else if (event.getCurrentItem().getType() == Material.GOLD_NUGGET && this.isServiceSlot(event.getSlot())) {
-            this.openInventoryChangeAmount(session, (Player) event.getWhoClicked());
+            if (session.getSeller() == event.getWhoClicked() && !session.isSellerReady()) {
+                this.openInventoryChangeAmount(session, (Player) event.getWhoClicked());
+            } else if (session.getBuyer() == event.getWhoClicked() && !session.isBuyerReady()) {
+                this.openInventoryChangeAmount(session, (Player) event.getWhoClicked());
+            } else {
+                languageConfig.getMessage("trade.cant.change.bet.onReady");
+            }
+
         }
     }
 
