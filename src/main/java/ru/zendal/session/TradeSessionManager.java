@@ -207,7 +207,32 @@ public class TradeSessionManager {
      * @see TradeSession
      */
     private void processTrade(TradeSession session) {
-        //TODO add value support
+
+        session.setReadyBuyer(
+                economyProvider.haveMoney(
+                        session.getBuyer(),
+                        session.getBetBuyer()
+                )
+        );
+
+        session.setReadyBuyer(
+                economyProvider.haveMoney(
+                        session.getSeller(),
+                        session.getBetSeller()
+                )
+        );
+
+        if (!session.isBuyerReady() || !session.isSellerReady()){
+
+            //TODO Сообщение о нехватке денег
+            return;
+        }
+
+        economyProvider.withdraw(session.getBuyer(), session.getBetBuyer());
+        economyProvider.withdraw(session.getSeller(), session.getBetSeller());
+
+        economyProvider.deposit(session.getBuyer(), session.getBetSeller());
+        economyProvider.deposit(session.getSeller(), session.getBetBuyer());
         this.addNotFitItemsIntoStorageInventory(
                 session.getSeller().getInventory().addItem(
                         session.getBuyerItems().toArray(new ItemStack[0])),
