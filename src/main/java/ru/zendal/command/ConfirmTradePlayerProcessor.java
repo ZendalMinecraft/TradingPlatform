@@ -18,12 +18,12 @@ import ru.zendal.session.exception.TradeSessionManagerException;
 
 import java.util.List;
 
-public class TradeConfirmBetweenPlayer implements ArgsCommandProcessor {
+public class ConfirmTradePlayerProcessor implements ArgsCommandProcessor {
 
     private final TradeSessionManager tradeSessionManager;
     private final LanguageConfig languageConfig;
 
-    public TradeConfirmBetweenPlayer(TradeSessionManager sessionManager, LanguageConfig languageConfig) {
+    public ConfirmTradePlayerProcessor(TradeSessionManager sessionManager, LanguageConfig languageConfig) {
         this.tradeSessionManager = sessionManager;
         this.languageConfig = languageConfig;
     }

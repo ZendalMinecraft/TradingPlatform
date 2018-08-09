@@ -21,7 +21,7 @@ import ru.zendal.session.exception.TradeSessionManagerException;
  * <p>
  * /trade to
  */
-public class TradeBetweenPlayer implements ArgsCommandProcessor {
+public class SendTradePlayerProcessor implements ArgsCommandProcessor {
 
     /**
      * Instance TradeSessionManager
@@ -38,7 +38,7 @@ public class TradeBetweenPlayer implements ArgsCommandProcessor {
      * @param sessionManager Instance TradeSessionManager
      * @param languageConfig Instance LanguageConfig
      */
-    public TradeBetweenPlayer(TradeSessionManager sessionManager, LanguageConfig languageConfig) {
+    public SendTradePlayerProcessor(TradeSessionManager sessionManager, LanguageConfig languageConfig) {
         this.tradeSessionManager = sessionManager;
         this.languageConfig = languageConfig;
     }

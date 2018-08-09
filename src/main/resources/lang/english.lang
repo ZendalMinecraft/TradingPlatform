@@ -24,6 +24,7 @@ command.to.error.onHimselfItself=You can't send Himself itself trade.
 command.confirm.message=§6Confirm trade from %seller%
 
 
+command.create.error.executorNotPlayer=Only player must call this command
 
 trade.player.offile=User %buyer% is offline.
 trade.confirm.notHaveSession=Sorry you don't have any sessions

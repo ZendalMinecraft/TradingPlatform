@@ -8,7 +8,7 @@
 package ru.zendal.config;
 
 public enum TypeStorage {
-    MONGO_DB("Mongo"),
+    MONGO_DB("MongoDB"),
     MYSQL_DB("MySQL"),
     LOCAL_STORAGE("Local");
 

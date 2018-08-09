@@ -52,20 +52,20 @@ public class CommandManager implements CommandExecutor {
     /**
      * Init Command processors
      *
-     * @see TradeBetweenPlayer
-     * @see TradeConfirmBetweenPlayer
+     * @see SendTradePlayerProcessor
+     * @see ConfirmTradePlayerProcessor
      * @see StorageCommandProcessor
-     * @see TradeCreate
+     * @see TradeCreateProcessor
      * @see OpenOfflineSessionProcessor
      */
     private void initArgsProcessors() {
-        processors.add(new TradeBetweenPlayer(sessionManager, languageConfig));
+        processors.add(new SendTradePlayerProcessor(sessionManager, languageConfig));
 
-        processors.add(new TradeConfirmBetweenPlayer(sessionManager, languageConfig));
+        processors.add(new ConfirmTradePlayerProcessor(sessionManager, languageConfig));
 
         processors.add(new StorageCommandProcessor(sessionManager, languageConfig));
 
-        processors.add(new TradeCreate(sessionManager, languageConfig));
+        processors.add(new TradeCreateProcessor(sessionManager, languageConfig));
 
         processors.add(new OpenOfflineSessionProcessor(sessionManager, languageConfig));
     }
