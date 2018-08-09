@@ -209,52 +209,34 @@ public class TradeSessionManager {
      */
     private void processTrade(TradeSession session) {
 
-        session.setReadyBuyer(
-                economyProvider.haveMoney(
-                        session.getBuyer(),
-                        session.getBetBuyer()
-                )
-        );
+        if (this.economyProcess(session)) {
+            economyProvider.withdraw(session.getBuyer(), session.getBetBuyer());
+            economyProvider.withdraw(session.getSeller(), session.getBetSeller());
 
-        session.setReadyBuyer(
-                economyProvider.haveMoney(
-                        session.getSeller(),
-                        session.getBetSeller()
-                )
-        );
+            economyProvider.deposit(session.getBuyer(), session.getBetSeller());
+            economyProvider.deposit(session.getSeller(), session.getBetBuyer());
+            this.addNotFitItemsIntoStorageInventory(
+                    session.getSeller().getInventory().addItem(
+                            session.getBuyerItems().toArray(new ItemStack[0])),
+                    session.getSeller()
+            );
+            this.addNotFitItemsIntoStorageInventory(session.getBuyer().getInventory().addItem(
+                    session.getSellerItems().toArray(new ItemStack[0])),
+                    session.getBuyer()
+            );
 
-        if (!session.isBuyerReady() || !session.isSellerReady()) {
+            if (session.getBuyer().getOpenInventory().getTopInventory().hashCode() == session.getInventory().hashCode()) {
+                session.getBuyer().closeInventory();
+            }
+            if (session.getSeller().getOpenInventory().getTopInventory().hashCode() == session.getInventory().hashCode()) {
+                session.getSeller().closeInventory();
+            }
 
-            //TODO Сообщение о нехватке денег
-            return;
-        }
-
-        economyProvider.withdraw(session.getBuyer(), session.getBetBuyer());
-        economyProvider.withdraw(session.getSeller(), session.getBetSeller());
-
-        economyProvider.deposit(session.getBuyer(), session.getBetSeller());
-        economyProvider.deposit(session.getSeller(), session.getBetBuyer());
-        this.addNotFitItemsIntoStorageInventory(
-                session.getSeller().getInventory().addItem(
-                        session.getBuyerItems().toArray(new ItemStack[0])),
-                session.getSeller()
-        );
-        this.addNotFitItemsIntoStorageInventory(session.getBuyer().getInventory().addItem(
-                session.getSellerItems().toArray(new ItemStack[0])),
-                session.getBuyer()
-        );
-
-        if (session.getBuyer().getOpenInventory().getTopInventory().hashCode() == session.getInventory().hashCode()) {
-            session.getBuyer().closeInventory();
-        }
-        if (session.getSeller().getOpenInventory().getTopInventory().hashCode() == session.getInventory().hashCode()) {
-            session.getSeller().closeInventory();
-        }
-
-        try {
-            this.removeSession(session);
-        } catch (TradeSessionManagerException e) {
-            e.printStackTrace();
+            try {
+                this.removeSession(session);
+            } catch (TradeSessionManagerException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -264,14 +246,35 @@ public class TradeSessionManager {
      * @param session Session
      * @return {@code true} if correct else {@code false}
      */
-    private boolean isCorrectBetSession(Session session) {
-        return economyProvider.haveMoney(
-                session.getBuyer(),
-                session.getBetBuyer()
-        ) && economyProvider.haveMoney(
-                session.getSeller(),
-                session.getBetSeller()
-        );
+    private boolean economyProcess(Session session) {
+        if (!economyProvider.canWithdraw(session.getBuyer(), session.getBetBuyer())) {
+            session.setReadyBuyer(false);
+        }
+
+        if (!economyProvider.canWithdraw(session.getSeller(), session.getBetSeller())) {
+            session.setReadySeller(false);
+        }
+
+        if (!session.isBuyerReady() || !session.isSellerReady()) {
+            String messageBuyer = languageConfig.getMessage("command.to.error.noMoney")
+                    .setCustomMessage(1, session.getBuyer().getDisplayName())
+                    .setCustomMessage(2, String.valueOf(session.getBetSeller() - economyProvider.getBalance(session.getBuyer()))).toString();
+
+            String messageSeller = languageConfig.getMessage("command.to.error.noMoney")
+                    .setCustomMessage(1, session.getSeller().getDisplayName())
+                    .setCustomMessage(2, String.valueOf(session.getBetBuyer() - economyProvider.getBalance(session.getSeller()))).toString();
+            if (!session.isBuyerReady()) {
+                session.getBuyer().sendMessage(messageBuyer);
+                session.getSeller().sendMessage(messageBuyer);
+            }
+
+            if (!session.isSellerReady()) {
+                session.getBuyer().sendMessage(messageSeller);
+                session.getSeller().sendMessage(messageSeller);
+            }
+            return false;
+        }
+        return true;
     }
 
     /**

@@ -47,6 +47,16 @@ public class VaultEconomy implements EconomyProvider {
     }
 
     @Override
+    public boolean canWithdraw(OfflinePlayer player, double amount) {
+        EconomyResponse economyResponse = economy.withdrawPlayer(player, amount);
+        if (economyResponse.transactionSuccess()) {
+            economy.depositPlayer(player, amount);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public void deposit(OfflinePlayer player, double amount) throws EconomyProviderException {
         EconomyResponse economyResponse = economy.depositPlayer(player, amount);
         if (!economyResponse.transactionSuccess()) {

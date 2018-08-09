@@ -19,11 +19,12 @@ command.to.error.executorNotPlayer=Only player must call this command
 command.to.error.notSetUser=Please pick user like: /trade to UserName
 command.to.error.undefinedUser=User %1% undefined.
 command.to.error.onHimselfItself=You can't send Himself itself trade.
-
+command.to.error.noMoney=%1% missing %2% money.
 
 command.confirm.message=§6Confirm trade from %seller%
 
 
+command.create.error.executorNotPlayer=Only player must call this command
 
 trade.player.offile=User %buyer% is offline.
 trade.confirm.notHaveSession=Sorry you don't have any sessions

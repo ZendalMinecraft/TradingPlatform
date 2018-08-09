@@ -10,6 +10,9 @@ package ru.zendal.service.economy;
 import org.bukkit.OfflinePlayer;
 import ru.zendal.service.economy.exception.EconomyProviderException;
 
+/**
+ * Interface of Economy Provider
+ */
 public interface EconomyProvider {
 
     /**
@@ -29,6 +32,15 @@ public interface EconomyProvider {
      * @throws EconomyProviderException on Transaction error
      */
     void withdraw(OfflinePlayer player, double amount) throws EconomyProviderException;
+
+    /**
+     * Can withdraw (-) money
+     *
+     * @param player Instance offline Player
+     * @param amount AMount money
+     * @return {@code true} if can else {@code false}
+     */
+    boolean canWithdraw(OfflinePlayer player, double amount);
 
 
     /**
