@@ -66,6 +66,7 @@ public class TradeSessionManager {
     /**
      * Constructor for Trade Session Manager
      *
+     * @param economyProvider Instance Economy Provider
      * @param storageSessions Storage where manager can store data
      * @param plugin          Instance Plugin
      * @param config          Config language Pack
@@ -311,6 +312,16 @@ public class TradeSessionManager {
         throw new TradeSessionManagerException("trade.confirm.select.undefinedSession");
     }
 
+    public List<TradeSession> getSessionsByPlayer(Player player) {
+        List<TradeSession> sessions = new ArrayList<>();
+        sessionList.forEach(session -> {
+            if (session.getBuyer() == player || session.getSeller() == player) {
+                sessions.add(session);
+            }
+        });
+        return sessions;
+    }
+
     public void cancelOfflineSession(TradeOfflineSession session) {
         this.offlineSessionList.remove(session);
         session.cancelTrade();
@@ -339,7 +350,7 @@ public class TradeSessionManager {
     }
 
 
-    public Inventory getInventorySabotageForPlayer(Player player) throws TradeSessionManagerException {
+    public Inventory getInventoryStorageByPlayer(Player player) throws TradeSessionManagerException {
         Inventory inventory = this.storageInventories.get(player.getUniqueId().toString());
         if (inventory == null) {
             throw new TradeSessionManagerException("undefined Player");

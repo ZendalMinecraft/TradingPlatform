@@ -13,6 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import ru.zendal.config.LanguageConfig;
 import ru.zendal.session.Session;
@@ -224,4 +225,10 @@ public class ChestTradeSessionEvent implements Listener {
         }
         return false;
     }
+
+    @EventHandler
+    public void cancelTradeSessionOnPlayerQuit(PlayerQuitEvent event) {
+        manager.getSessionsByPlayer(event.getPlayer()).forEach(manager::cancelSession);
+    }
+
 }

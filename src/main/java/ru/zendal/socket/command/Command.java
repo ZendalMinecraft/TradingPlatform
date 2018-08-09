@@ -19,9 +19,9 @@ public interface Command {
     /**
      * Process command
      *
-     * @param incomingDocument
-     * @return
-     * @throws ProcessCommandException
+     * @param incomingDocument BSON Document
+     * @return  BSON Document
+     * @throws ProcessCommandException on process error
      */
     Document process(Document incomingDocument) throws ProcessCommandException;
 

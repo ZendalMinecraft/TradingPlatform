@@ -169,6 +169,8 @@ public class TradeSession implements Session {
 
     /**
      * Change title inventory for users
+     *
+     * @param title Title for inventory
      */
     protected void changeTitleInventory(String title) {
         Inventory newInventory = Bukkit.createInventory(inventory.getHolder(), inventory.getSize(), title);

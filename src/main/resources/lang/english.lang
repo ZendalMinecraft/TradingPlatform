@@ -8,17 +8,24 @@ If your have more than 1 trade
 ____________________________________
 "
 
+command.storage.error.executorNotPlayer=Only player must call this command
+command.storage.message.isClear=Your storage clear.
+
+
 command.to.message=Request trade send to %buyer%.
-command.to.onSecondPlayerConfirm=For trade with %buyer% please type /trade to %buyer%
+command.to.message.onSecondPlayerConfirm=For trade with %buyer% please type /trade to %buyer%
+
+command.to.error.executorNotPlayer=Only player must call this command
+command.to.error.notSetUser=Please pick user like: /trade to UserName
 command.to.error.undefinedUser=User %1% undefined.
+command.to.error.onHimselfItself=You can't send Himself itself trade.
+
 
 command.confirm.message=§6Confirm trade from %seller%
 
 
 
-
 trade.player.offile=User %buyer% is offline.
-trade.create.between.notSetUser=Please pick user like: /trade to UserName
 trade.confirm.notHaveSession=Sorry you don't have any sessions
 trade.confirm.select.undefinedSession=Sorry we can't search session for %buyer% betwean %seller%
 
@@ -29,11 +36,8 @@ trade.confirm.list=You have many trades: %1%. For confirm type /trade confirm Us
 
 
 
-
-
 trade.inventory.shift=Sorry you can't move items with use shift, sorry.
 
-trade.storage.clear=Your storage clear.
 
 trade.confirm.tooManyItems=Some things didn't fit in your inventory so they were added to the storage /trade storage
 

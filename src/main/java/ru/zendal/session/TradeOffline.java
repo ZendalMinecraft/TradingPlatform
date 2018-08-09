@@ -152,6 +152,7 @@ public class TradeOffline {
      * Confirm this trade
      *
      * @param player Player who accept this trade
+     * @param economyProvider Instance economy Provider
      * @return A list of missing items. List can be empty.
      * @see Player
      */

@@ -22,10 +22,21 @@ import ru.zendal.session.exception.TradeSessionManagerException;
  */
 public class OpenOfflineSessionProcessor implements ArgsCommandProcessor {
 
-
+    /**
+     * Instance LanguageConfig
+     */
     private final LanguageConfig language;
+    /**
+     * Instance TradeSessionManager
+     */
     private final TradeSessionManager manager;
 
+    /**
+     * Constructor
+     *
+     * @param manager  Instance TradeSessionManager
+     * @param language Instance LanguageConfig
+     */
     public OpenOfflineSessionProcessor(TradeSessionManager manager, LanguageConfig language) {
         this.manager = manager;
         this.language = language;
@@ -38,15 +49,25 @@ public class OpenOfflineSessionProcessor implements ArgsCommandProcessor {
         if (args.length == 1) {
             language.getMessage("trade.offline.notPickId").sendMessage(player);
         } else {
-            try {
-                TradeOffline tradeOffline = manager.getTradeOfflineById(args[1]);
-                player.openInventory(tradeOffline.getInventory());
-            } catch (TradeSessionManagerException e) {
-                language.getMessage("trade.offline.udefinedId").setCustomMessage(1, args[1]).
-                        sendMessage(player);
-            }
+            this.openTradeOffline(player, args[1]);
         }
         return true;
+    }
+
+    /**
+     * Get trade and open inventory for player
+     *
+     * @param player Player
+     * @param refId  Unique Id trade
+     */
+    private void openTradeOffline(Player player, String refId) {
+        try {
+            TradeOffline tradeOffline = manager.getTradeOfflineById(refId);
+            player.openInventory(tradeOffline.getInventory());
+        } catch (TradeSessionManagerException e) {
+            language.getMessage("trade.offline.udefinedId").setCustomMessage(1, refId).
+                    sendMessage(player);
+        }
     }
 
 

@@ -12,7 +12,7 @@ public interface ConnectionBuilder<T> {
     /**
      * Get connection
      *
-     * @return
+     * @return Instance Connection
      */
     T build();
 

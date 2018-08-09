@@ -25,26 +25,48 @@ public class StorageCommandProcessor implements ArgsCommandProcessor {
     /**
      * Instance TradeSessionManager
      */
-    private final TradeSessionManager manager;
+    private final TradeSessionManager sessionManager;
     /**
      * Instance LanguageConfig
      */
     private final LanguageConfig languageConfig;
 
-    public StorageCommandProcessor(TradeSessionManager manager, LanguageConfig languageConfig) {
-        this.manager = manager;
+    /**
+     * Constructor
+     *
+     * @param sessionManager Instance TradeSessionManager
+     * @param languageConfig Instance LanguageConfig
+     */
+    public StorageCommandProcessor(TradeSessionManager sessionManager, LanguageConfig languageConfig) {
+        this.sessionManager = sessionManager;
         this.languageConfig = languageConfig;
     }
 
     @Override
     public boolean process(Command command, CommandSender sender, String[] args) {
-        try {
-            Inventory inventory = this.manager.getInventorySabotageForPlayer((Player) sender);
-            ((Player) sender).openInventory(inventory);
-        } catch (TradeSessionManagerException e) {
-            this.languageConfig.getMessage("trade.storage.clear").sendMessage((Player) sender);
+
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(
+                    languageConfig.getMessage("command.storage.error.executorNotPlayer").toString()
+            );
+        } else {
+            this.openStorageForPlayer((Player) sender);
         }
         return true;
+    }
+
+    /**
+     * Open storage for Player
+     *
+     * @param player Player
+     */
+    private void openStorageForPlayer(Player player) {
+        try {
+            Inventory inventory = this.sessionManager.getInventoryStorageByPlayer(player);
+            player.openInventory(inventory);
+        } catch (TradeSessionManagerException e) {
+            this.languageConfig.getMessage("command.storage.message.isClear").sendMessage(player);
+        }
     }
 
     @Override

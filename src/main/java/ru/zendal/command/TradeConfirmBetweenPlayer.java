@@ -90,7 +90,7 @@ public class TradeConfirmBetweenPlayer implements ArgsCommandProcessor {
 
     private void openTradeSessionAndNotificateSeller(TradeSession session) {
         session.getBuyer().openInventory(session.getInventory());
-        this.languageConfig.getMessage("command.to.onSecondPlayerConfirm").
+        this.languageConfig.getMessage("command.to.message.onSecondPlayerConfirm").
                 setBuyer(session.getBuyer()).
                 sendMessage(session.getSeller());
 

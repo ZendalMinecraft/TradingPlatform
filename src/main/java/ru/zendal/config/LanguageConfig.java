@@ -32,6 +32,7 @@ public class LanguageConfig {
      * Instantiates a new Language config.
      *
      * @param file the file
+     * @param logger Logger
      */
     public LanguageConfig(File file, Logger logger) {
         this.logger = logger;

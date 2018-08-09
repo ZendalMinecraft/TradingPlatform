@@ -56,6 +56,7 @@ public class SocketIO implements SocketServer {
      *
      * @param socketConfigBundle Config bundle for setup server
      * @param sessionManager     Instance session Manager
+     * @param economyProvider    Instance Economy Provider
      * @param logger             instance logger
      */
     public SocketIO(SocketConfigBundle socketConfigBundle,

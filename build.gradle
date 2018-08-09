@@ -55,6 +55,7 @@ jar {
 
 task finalize << {
     ant.move(file: "/Users/bigtows/Project/TradingPlatform/build/libs/TradingPlatform-"+version+".jar", tofile: "/Users/bigtows/MinecraftServer/plugins/TradingPlatform.jar")
+    print "End move"
 }
 
 build.finalizedBy(finalize)
