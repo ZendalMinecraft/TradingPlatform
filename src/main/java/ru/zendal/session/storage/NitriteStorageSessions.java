@@ -35,7 +35,8 @@ public class NitriteStorageSessions implements SessionsStorage {
         Document doc = new Document();
        /* session.ß
         builder.insert()
-       */ return null;
+       */
+        return null;
     }
 
     @Override

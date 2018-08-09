@@ -15,6 +15,11 @@ import ru.zendal.session.TradeOffline;
 import ru.zendal.session.TradeSessionManager;
 import ru.zendal.session.exception.TradeSessionManagerException;
 
+/**
+ * Open offline trade Command processor
+ * <p>
+ * /trade open
+ */
 public class OpenOfflineSessionProcessor implements ArgsCommandProcessor {
 
 

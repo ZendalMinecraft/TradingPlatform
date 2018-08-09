@@ -77,7 +77,7 @@ public class ChestTradeOfflineEvent implements Listener {
                 player.sendMessage(itemStackToString(itemStack));
             });
             if (response.needMoney()) {
-                player.sendMessage("Money: "+String.valueOf(response.getMoney()));
+                player.sendMessage("Money: " + String.valueOf(response.getMoney()));
             }
         }
     }

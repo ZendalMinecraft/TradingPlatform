@@ -53,7 +53,7 @@ public class AcceptTradeCommand implements Command {
             }
             Player player = offlinePlayer.getPlayer();
 
-            TradeOfflineConfirmResponse response = tradeOffline.confirmTrade(player,economyProvider);
+            TradeOfflineConfirmResponse response = tradeOffline.confirmTrade(player, economyProvider);
             if (response.hasMissingItems()) {
                 throw new ProcessCommandException();
             }

@@ -52,7 +52,7 @@ public class TradeConfirmBetweenPlayer implements ArgsCommandProcessor {
         if (args.length > 1) {
             Player seller = Bukkit.getPlayer(args[1]);
             if (seller == null) {
-                languageConfig.getMessage("trade.create.between.undefinedUser").setCustomMessage(1, args[1]).sendMessage(buyer);
+                languageConfig.getMessage("command.to.error.undefinedUser").setCustomMessage(1, args[1]).sendMessage(buyer);
                 return true;
             }
             try {
@@ -90,7 +90,7 @@ public class TradeConfirmBetweenPlayer implements ArgsCommandProcessor {
 
     private void openTradeSessionAndNotificateSeller(TradeSession session) {
         session.getBuyer().openInventory(session.getInventory());
-        this.languageConfig.getMessage("trade.to.openInventory").
+        this.languageConfig.getMessage("command.to.onSecondPlayerConfirm").
                 setBuyer(session.getBuyer()).
                 sendMessage(session.getSeller());
 

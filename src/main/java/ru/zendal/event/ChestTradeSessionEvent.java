@@ -99,15 +99,15 @@ public class ChestTradeSessionEvent implements Listener {
             if (data == 14) {
                 //2 Factor cancel trade
                 if (session.getSeller() == event.getWhoClicked()) {
-                   if (session.isSellerReady()){
-                       session.setReadySeller(false);
-                   }else{
-                       this.cancelSession(session);
-                   }
+                    if (session.isSellerReady()) {
+                        session.setReadySeller(false);
+                    } else {
+                        this.cancelSession(session);
+                    }
                 } else if (session.getBuyer() == event.getWhoClicked()) {
-                    if (session.isBuyerReady()){
+                    if (session.isBuyerReady()) {
                         session.setReadyBuyer(false);
-                    }else{
+                    } else {
                         this.cancelSession(session);
                     }
                 }

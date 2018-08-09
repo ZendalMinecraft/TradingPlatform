@@ -222,7 +222,7 @@ public class TradeSessionManager {
                 )
         );
 
-        if (!session.isBuyerReady() || !session.isSellerReady()){
+        if (!session.isBuyerReady() || !session.isSellerReady()) {
 
             //TODO Сообщение о нехватке денег
             return;

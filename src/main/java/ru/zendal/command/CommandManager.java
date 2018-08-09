@@ -18,12 +18,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Command processor
+ * Command manager
+ * Register all Command Processor
  */
-public class CommandProcessor implements CommandExecutor {
+public class CommandManager implements CommandExecutor {
 
-
+    /**
+     * Instance TradeSessionManager
+     */
     private final TradeSessionManager sessionManager;
+    /**
+     * Instance language config
+     */
     private final LanguageConfig languageConfig;
     /**
      * List processors command
@@ -31,21 +37,33 @@ public class CommandProcessor implements CommandExecutor {
     private List<ArgsCommandProcessor> processors = new ArrayList<>();
 
 
-    public CommandProcessor(TradeSessionManager sessionManager, LanguageConfig languageConfig) {
+    /**
+     * Constructor
+     *
+     * @param sessionManager Instance TradeSessionManager
+     * @param languageConfig Instance language config
+     */
+    public CommandManager(TradeSessionManager sessionManager, LanguageConfig languageConfig) {
         this.sessionManager = sessionManager;
         this.languageConfig = languageConfig;
         this.initArgsProcessors();
     }
 
     /**
-     * Init argument processor
+     * Init Command processors
+     *
+     * @see TradeBetweenPlayer
+     * @see TradeConfirmBetweenPlayer
+     * @see StorageCommandProcessor
+     * @see TradeCreate
+     * @see OpenOfflineSessionProcessor
      */
     private void initArgsProcessors() {
         processors.add(new TradeBetweenPlayer(sessionManager, languageConfig));
 
         processors.add(new TradeConfirmBetweenPlayer(sessionManager, languageConfig));
 
-        processors.add(new GetStorage(sessionManager, languageConfig));
+        processors.add(new StorageCommandProcessor(sessionManager, languageConfig));
 
         processors.add(new TradeCreate(sessionManager, languageConfig));
 
@@ -59,7 +77,7 @@ public class CommandProcessor implements CommandExecutor {
                 return processor.process(command, sender, args);
             }
         }
-        languageConfig.getMessage("trade.help.message").sendMessage((Player) sender);
+        languageConfig.getMessage("command.help.message").sendMessage((Player) sender);
         return true;
     }
 }

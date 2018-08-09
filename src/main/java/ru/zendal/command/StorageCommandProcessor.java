@@ -15,13 +15,23 @@ import ru.zendal.config.LanguageConfig;
 import ru.zendal.session.TradeSessionManager;
 import ru.zendal.session.exception.TradeSessionManagerException;
 
-public class GetStorage implements ArgsCommandProcessor {
+/**
+ * Command processor
+ * <p>
+ * /trade storage
+ */
+public class StorageCommandProcessor implements ArgsCommandProcessor {
 
-
+    /**
+     * Instance TradeSessionManager
+     */
     private final TradeSessionManager manager;
+    /**
+     * Instance LanguageConfig
+     */
     private final LanguageConfig languageConfig;
 
-    public GetStorage(TradeSessionManager manager, LanguageConfig languageConfig) {
+    public StorageCommandProcessor(TradeSessionManager manager, LanguageConfig languageConfig) {
         this.manager = manager;
         this.languageConfig = languageConfig;
     }

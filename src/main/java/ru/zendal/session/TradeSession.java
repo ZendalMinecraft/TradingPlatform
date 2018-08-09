@@ -261,7 +261,7 @@ public class TradeSession implements Session {
 
     /**
      * Set default stick item's
-     *
+     * <p>
      * TODO remove
      */
     private void setDefaultStickLine() {
@@ -329,7 +329,7 @@ public class TradeSession implements Session {
      *
      * @return Title
      */
-    protected String  getTitleForInventoryTrade() {
+    protected String getTitleForInventoryTrade() {
         StringBuilder titleInventory = new StringBuilder();
         titleInventory.append(seller.getDisplayName()).append("(").append(this.sellerReady ? "✔" : "×").append(")");
 

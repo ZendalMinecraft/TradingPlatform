@@ -11,7 +11,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
-import ru.zendal.command.CommandProcessor;
+import ru.zendal.command.CommandManager;
 import ru.zendal.config.TradingPlatformConfig;
 import ru.zendal.config.bundle.SocketConfigBundle;
 import ru.zendal.event.*;
@@ -55,7 +55,7 @@ public class TradingPlatform extends JavaPlugin {
                 new MongoConnectionBuilder(), getLogger()
         ), this, tradingPlatformConfig.getLanguageConfig());
         this.initListeners();
-        this.getCommand("trade").setExecutor(new CommandProcessor(
+        this.getCommand("trade").setExecutor(new CommandManager(
                 tradeSessionManager,
                 tradingPlatformConfig.getLanguageConfig())
         );
