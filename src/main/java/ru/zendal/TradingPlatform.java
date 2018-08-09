@@ -51,7 +51,7 @@ public class TradingPlatform extends JavaPlugin {
         this.initService();
 
         //TODO Возможно такая ситуация, когда Economy Provider недоступен УЧТИ
-        tradeSessionManager = new TradeSessionManager(economyProvider,new MongoStorageSessions(
+        tradeSessionManager = new TradeSessionManager(economyProvider, new MongoStorageSessions(
                 new MongoConnectionBuilder(), getLogger()
         ), this, tradingPlatformConfig.getLanguageConfig());
         this.initListeners();
@@ -86,7 +86,7 @@ public class TradingPlatform extends JavaPlugin {
 
         pluginManager.registerEvents(
                 new ChestTradeOfflineEvent(
-                        tradeSessionManager, tradingPlatformConfig.getLanguageConfig()
+                        tradeSessionManager, economyProvider, tradingPlatformConfig.getLanguageConfig()
                 ), this);
 
         pluginManager.registerEvents(new InventoryBetPickEvent(economyProvider),
@@ -101,7 +101,7 @@ public class TradingPlatform extends JavaPlugin {
         SocketConfigBundle configBundle = tradingPlatformConfig.getSocketBundle();
         if (configBundle.isEnableServer()) {
             this.getLogger().info("Start init Socket server");
-            socketServer = new SocketIO(configBundle, tradeSessionManager, getLogger());
+            socketServer = new SocketIO(configBundle, tradeSessionManager, economyProvider, getLogger());
             if (!socketServer.start()) {
                 this.getLogger().warning("Can't start SocketServer. Configuration: " +
                         configBundle.toString());

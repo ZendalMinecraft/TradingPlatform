@@ -44,7 +44,6 @@ public class InventoryBetPickEvent implements Listener {
                 event.getWhoClicked().openInventory(holderInventory.getSession().getInventory());
             }
         }
-
     }
 
     /**

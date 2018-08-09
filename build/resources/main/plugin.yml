@@ -1,6 +1,7 @@
 name: TradingPlatform
 version: 1.0
 main: ru.zendal.TradingPlatform
+depend: [Vault]
 commands:
   trade:
     usage: /trade

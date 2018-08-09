@@ -12,6 +12,7 @@ asdsad
 
 trade.confirm=§6Confirm trade from %seller%
 
+trade.cant.change.bet.onReady=You can't change bet, because your ready
 
 trade.confirm.list=You have many trades: %1%. For confirm type /trade confirm Username
 trade.to.openInventory=For trade with %buyer% please type /trade to %buyer%
