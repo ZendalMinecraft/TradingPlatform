@@ -208,7 +208,7 @@ public class TradeSessionManager {
      * @see TradeSession
      */
     private void processTrade(TradeSession session) {
-
+        //TODO simpfi
         if (this.economyProcess(session)) {
             economyProvider.withdraw(session.getBuyer(), session.getBetBuyer());
             economyProvider.withdraw(session.getSeller(), session.getBetSeller());
@@ -291,7 +291,7 @@ public class TradeSessionManager {
                 return session;
             }
         }
-        throw new TradeSessionManagerException("trade.undefinedSessions");
+        throw new TradeSessionManagerException("Undefined session");
     }
 
 
