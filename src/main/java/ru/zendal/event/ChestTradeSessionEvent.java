@@ -7,6 +7,7 @@
 
 package ru.zendal.event;
 
+import com.google.inject.Inject;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -43,6 +44,7 @@ public class ChestTradeSessionEvent implements Listener {
 
     private final List<Double> betSpread;
 
+    @Inject
     public ChestTradeSessionEvent(TradeSessionManager manager, LanguageConfig languageConfig, List<Double> betSpread) {
         this.manager = manager;
         this.languageConfig = languageConfig;

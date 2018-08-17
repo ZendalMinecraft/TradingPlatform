@@ -7,6 +7,7 @@
 
 package ru.zendal.session;
 
+import com.google.inject.Inject;
 import net.md_5.bungee.api.chat.ClickEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -71,6 +72,7 @@ public class TradeSessionManager {
      * @param plugin          Instance Plugin
      * @param config          Config language Pack
      */
+    @Inject
     public TradeSessionManager(EconomyProvider economyProvider, SessionsStorage storageSessions, TradingPlatform plugin, LanguageConfig config) {
         this.economyProvider = economyProvider;
         this.languageConfig = config;

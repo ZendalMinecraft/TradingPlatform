@@ -7,6 +7,7 @@
 
 package ru.zendal.command;
 
+import com.google.inject.Inject;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -43,6 +44,7 @@ public class CommandManager implements CommandExecutor {
      * @param sessionManager Instance TradeSessionManager
      * @param languageConfig Instance language config
      */
+    @Inject
     public CommandManager(TradeSessionManager sessionManager, LanguageConfig languageConfig) {
         this.sessionManager = sessionManager;
         this.languageConfig = languageConfig;

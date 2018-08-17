@@ -7,15 +7,22 @@
 
 package ru.zendal.config;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.ServicesManager;
 import ru.zendal.TradingPlatform;
 import ru.zendal.config.bundle.SocketConfigBundle;
 import ru.zendal.config.exception.ConfigException;
+import ru.zendal.service.economy.EconomyProvider;
+import ru.zendal.service.economy.VaultEconomy;
 import ru.zendal.session.storage.MongoStorageSessions;
 import ru.zendal.session.storage.PacifierStorage;
 import ru.zendal.session.storage.SessionsStorage;
 import ru.zendal.session.storage.connection.builder.MongoConnectionBuilder;
 
+import javax.inject.Inject;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +31,7 @@ import java.util.logging.Logger;
 /**
  * Class for access to Config file plugin
  */
-public class TradingPlatformConfig {
+public class TradingPlatformConfiguration extends AbstractModule {
 
     /**
      * Instance plugin file
@@ -65,7 +72,8 @@ public class TradingPlatformConfig {
      *
      * @param plugin the plugin
      */
-    public TradingPlatformConfig(TradingPlatform plugin) {
+    @Inject
+    public TradingPlatformConfiguration(TradingPlatform plugin) {
         this.plugin = plugin;
         this.logger = plugin.getLogger();
         this.setup();
@@ -108,6 +116,17 @@ public class TradingPlatformConfig {
         if (!new File(this.plugin.getDataFolder(), "lang").mkdirs()) {
             this.plugin.getLogger().warning("Can't create folder config");
         }
+    }
+
+
+    @Override
+    protected void configure() {
+        bind(EconomyProvider.class).to(VaultEconomy.class);
+    }
+
+
+    private void registerAllEvents(){
+
     }
 
     private void checkAllLanguage() throws IOException {
@@ -248,6 +267,7 @@ public class TradingPlatformConfig {
      *
      * @return MongoDB Storage
      */
+    @Provides
     private SessionsStorage getMongoStorage() {
         MongoConnectionBuilder builder = new MongoConnectionBuilder();
         if (yamlConfig.contains("storage.setting.host")) {
@@ -259,6 +279,9 @@ public class TradingPlatformConfig {
         }
         return new MongoStorageSessions(builder, logger);
     }
+
+
+
 
     /*private SessionsStorage getLocalStorage(){
 
@@ -296,6 +319,28 @@ public class TradingPlatformConfig {
             result.write(buffer, 0, length);
         }
         return result.toString("UTF-8");
+    }
+
+
+    @Provides
+    PluginManager providePluginManager() {
+        return this.plugin.getServer().getPluginManager();
+    }
+
+
+    @Provides
+    ServicesManager provideServicesManager() {
+        return this.plugin.getServer().getServicesManager();
+    }
+
+    @Provides
+    LanguageConfig providerLanguageConfig(){
+        return this.languageConfig;
+    }
+
+    @Provides
+    TradingPlatform providerPlugin(){
+        return this.plugin;
     }
 
 }

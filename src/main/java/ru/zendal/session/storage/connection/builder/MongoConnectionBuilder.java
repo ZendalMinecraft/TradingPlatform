@@ -20,6 +20,10 @@ import com.mongodb.event.ServerMonitorListener;
 import ru.zendal.session.storage.connection.ConnectionBuilder;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 public class MongoConnectionBuilder implements ConnectionBuilder<MongoDatabase> {
 

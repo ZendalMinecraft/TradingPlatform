@@ -7,19 +7,19 @@
 
 package ru.zendal;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
 import ru.zendal.command.CommandManager;
-import ru.zendal.config.TradingPlatformConfig;
+import ru.zendal.config.TradingPlatformConfiguration;
 import ru.zendal.config.bundle.SocketConfigBundle;
 import ru.zendal.event.*;
 import ru.zendal.service.economy.EconomyProvider;
 import ru.zendal.service.economy.VaultEconomy;
 import ru.zendal.session.TradeSessionManager;
-import ru.zendal.session.storage.MongoStorageSessions;
-import ru.zendal.session.storage.connection.builder.MongoConnectionBuilder;
 import ru.zendal.socket.SocketIO;
 import ru.zendal.socket.SocketServer;
 import ru.zendal.util.SchedulerBuilder;
@@ -28,9 +28,8 @@ import java.io.File;
 
 public class TradingPlatform extends JavaPlugin {
 
-
     private TradeSessionManager tradeSessionManager;
-    private TradingPlatformConfig tradingPlatformConfig;
+    private TradingPlatformConfiguration tradingPlatformConfiguration;
     private SchedulerBuilder schedulerBuilder = new SchedulerBuilder(this);
 
     private SocketServer socketServer;
@@ -41,55 +40,47 @@ public class TradingPlatform extends JavaPlugin {
      * Default constructor
      */
     public TradingPlatform() {
-        super();
     }
 
     @Override
     public void onEnable() {
+        Injector injector = Guice.createInjector(new TradingPlatformConfiguration(this));
 
-        this.enableConfig();
-        this.initService();
+        /*
+         * Now that we've got the injector, we can build objects.
+         */
+        tradeSessionManager = injector.getInstance(TradeSessionManager.class);
 
-        //TODO Возможно такая ситуация, когда Economy Provider недоступен УЧТИ
-        tradeSessionManager = new TradeSessionManager(economyProvider, new MongoStorageSessions(
-                new MongoConnectionBuilder(), getLogger()
-        ), this, tradingPlatformConfig.getLanguageConfig());
-        this.initListeners();
-        this.getCommand("trade").setExecutor(new CommandManager(
-                tradeSessionManager,
-                tradingPlatformConfig.getLanguageConfig())
-        );
-        this.initSocketServer();
+         this.initListeners(injector);
+        this.getCommand("trade").setExecutor(injector.getInstance(CommandManager.class));
+        //this.initSocketServer();
+
+
     }
 
 
     /**
      * Init listeners events
      */
-    private void initListeners() {
+    private void initListeners(Injector injector) {
         PluginManager pluginManager = this.getServer().getPluginManager();
 
         pluginManager.registerEvents(
-                new ChestTradeSessionEvent(
-                        tradeSessionManager,
-                        tradingPlatformConfig.getLanguageConfig(),
-                        tradingPlatformConfig.getBetSpread()
-                ), this);
+                injector.getInstance(ChestTradeSessionEvent.class)
+                , this
+        );
 
         pluginManager.registerEvents(
-                new ChestStorageEvent(this), this);
+                injector.getInstance(ChestStorageEvent.class), this);
 
         pluginManager.registerEvents(
-                new PlayerOfflineSessionEvent(
-                        tradeSessionManager, tradingPlatformConfig.getLanguageConfig()
-                ), this);
+                injector.getInstance(PlayerOfflineSessionEvent.class), this);
 
         pluginManager.registerEvents(
-                new ChestTradeOfflineEvent(
-                        tradeSessionManager, economyProvider, tradingPlatformConfig.getLanguageConfig()
+                injector.getInstance(ChestTradeOfflineEvent.class
                 ), this);
 
-        pluginManager.registerEvents(new InventoryBetPickEvent(economyProvider),
+        pluginManager.registerEvents(injector.getInstance(InventoryBetPickEvent.class),
                 this);
 
     }
@@ -98,7 +89,7 @@ public class TradingPlatform extends JavaPlugin {
      * Init socket server
      */
     private void initSocketServer() {
-        SocketConfigBundle configBundle = tradingPlatformConfig.getSocketBundle();
+        SocketConfigBundle configBundle = tradingPlatformConfiguration.getSocketBundle();
         if (configBundle.isEnableServer()) {
             this.getLogger().info("Start init Socket server");
             socketServer = new SocketIO(configBundle, tradeSessionManager, economyProvider, getLogger());
@@ -109,11 +100,6 @@ public class TradingPlatform extends JavaPlugin {
         }
     }
 
-
-    private void initService() {
-        economyProvider = new VaultEconomy(getServer());
-    }
-
     @Override
     public void onDisable() {
         tradeSessionManager.cancelAllSession();
@@ -121,11 +107,6 @@ public class TradingPlatform extends JavaPlugin {
             socketServer.stop();
         }
     }
-
-    private void enableConfig() {
-        this.tradingPlatformConfig = new TradingPlatformConfig(this);
-    }
-
 
     /**
      * Constructor for MockBukkit

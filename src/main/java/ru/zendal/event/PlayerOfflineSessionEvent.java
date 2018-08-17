@@ -7,6 +7,7 @@
 
 package ru.zendal.event;
 
+import com.google.inject.Inject;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,6 +22,7 @@ public class PlayerOfflineSessionEvent implements Listener {
     private final TradeSessionManager sessionManager;
     private final LanguageConfig languageConfig;
 
+    @Inject
     public PlayerOfflineSessionEvent(TradeSessionManager sessionManager, LanguageConfig languageConfig) {
         this.sessionManager = sessionManager;
         this.languageConfig = languageConfig;
