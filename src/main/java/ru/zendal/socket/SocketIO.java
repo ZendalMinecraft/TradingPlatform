@@ -7,6 +7,7 @@
 
 package ru.zendal.socket;
 
+import com.google.inject.Inject;
 import io.scalecube.socketio.SocketIOServer;
 import org.bson.Document;
 import org.bukkit.inventory.ItemStack;
@@ -59,6 +60,7 @@ public class SocketIO implements SocketServer {
      * @param economyProvider    Instance Economy Provider
      * @param logger             instance logger
      */
+    @Inject
     public SocketIO(SocketConfigBundle socketConfigBundle,
                     TradeSessionManager sessionManager,
                     EconomyProvider economyProvider,

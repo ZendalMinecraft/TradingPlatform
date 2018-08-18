@@ -88,7 +88,6 @@ public class MongoConnectionBuilder implements ConnectionBuilder<MongoDatabase> 
         } catch (MongoTimeoutException e) {
             hasConnected = false;
         }
-
         return MongoClients.create(settings).getDatabase(dataBaseName);
     }
 }

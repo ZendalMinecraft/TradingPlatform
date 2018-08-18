@@ -8,6 +8,7 @@
 package ru.zendal.session;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import net.md_5.bungee.api.chat.ClickEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -33,6 +34,7 @@ import java.util.Map;
 /**
  * The type Trade session manager.
  */
+@Singleton
 public class TradeSessionManager {
 
     private final LanguageConfig languageConfig;
@@ -70,12 +72,12 @@ public class TradeSessionManager {
      * @param economyProvider Instance Economy Provider
      * @param storageSessions Storage where manager can store data
      * @param plugin          Instance Plugin
-     * @param config          Config language Pack
+     * @param languageConfig          Config language Pack
      */
     @Inject
-    public TradeSessionManager(EconomyProvider economyProvider, SessionsStorage storageSessions, TradingPlatform plugin, LanguageConfig config) {
+    public TradeSessionManager(EconomyProvider economyProvider, SessionsStorage storageSessions, TradingPlatform plugin, LanguageConfig languageConfig) {
         this.economyProvider = economyProvider;
-        this.languageConfig = config;
+        this.languageConfig = languageConfig;
         this.storage = storageSessions;
         this.plugin = plugin;
         this.tradeCallback = new TradeSessionCallback() {

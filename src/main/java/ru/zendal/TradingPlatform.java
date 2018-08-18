@@ -15,12 +15,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
 import ru.zendal.command.CommandManager;
 import ru.zendal.config.TradingPlatformConfiguration;
-import ru.zendal.config.bundle.SocketConfigBundle;
 import ru.zendal.event.*;
-import ru.zendal.service.economy.EconomyProvider;
-import ru.zendal.service.economy.VaultEconomy;
 import ru.zendal.session.TradeSessionManager;
-import ru.zendal.socket.SocketIO;
 import ru.zendal.socket.SocketServer;
 import ru.zendal.util.SchedulerBuilder;
 
@@ -29,12 +25,10 @@ import java.io.File;
 public class TradingPlatform extends JavaPlugin {
 
     private TradeSessionManager tradeSessionManager;
-    private TradingPlatformConfiguration tradingPlatformConfiguration;
     private SchedulerBuilder schedulerBuilder = new SchedulerBuilder(this);
 
     private SocketServer socketServer;
 
-    private EconomyProvider economyProvider;
 
     /**
      * Default constructor
@@ -46,14 +40,11 @@ public class TradingPlatform extends JavaPlugin {
     public void onEnable() {
         Injector injector = Guice.createInjector(new TradingPlatformConfiguration(this));
 
-        /*
-         * Now that we've got the injector, we can build objects.
-         */
         tradeSessionManager = injector.getInstance(TradeSessionManager.class);
 
-         this.initListeners(injector);
+        this.initListeners(injector);
         this.getCommand("trade").setExecutor(injector.getInstance(CommandManager.class));
-        //this.initSocketServer();
+        this.socketServer = injector.getInstance(SocketServer.class);
 
 
     }
@@ -83,21 +74,6 @@ public class TradingPlatform extends JavaPlugin {
         pluginManager.registerEvents(injector.getInstance(InventoryBetPickEvent.class),
                 this);
 
-    }
-
-    /**
-     * Init socket server
-     */
-    private void initSocketServer() {
-        SocketConfigBundle configBundle = tradingPlatformConfiguration.getSocketBundle();
-        if (configBundle.isEnableServer()) {
-            this.getLogger().info("Start init Socket server");
-            socketServer = new SocketIO(configBundle, tradeSessionManager, economyProvider, getLogger());
-            if (!socketServer.start()) {
-                this.getLogger().warning("Can't start SocketServer. Configuration: " +
-                        configBundle.toString());
-            }
-        }
     }
 
     @Override

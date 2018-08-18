@@ -12,7 +12,7 @@ import ru.zendal.session.TradeOffline;
 
 import java.util.List;
 
-public interface SessionsStorage {
+public interface  SessionsStorage {
 
 
     /**

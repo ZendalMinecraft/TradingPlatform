@@ -17,6 +17,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import ru.zendal.config.LanguageConfig;
+import ru.zendal.config.bundle.InventoryConfigBundle;
 import ru.zendal.session.Session;
 import ru.zendal.session.TradeOfflineSession;
 import ru.zendal.session.TradeSession;
@@ -24,8 +25,6 @@ import ru.zendal.session.TradeSessionManager;
 import ru.zendal.session.exception.TradeSessionManagerException;
 import ru.zendal.session.inventory.PickBetInventoryManager;
 import ru.zendal.session.inventory.holder.TradeSessionHolderInventory;
-
-import java.util.List;
 
 /**
  * Event for trading all type Sessions
@@ -42,13 +41,13 @@ public class ChestTradeSessionEvent implements Listener {
     private final LanguageConfig languageConfig;
 
 
-    private final List<Double> betSpread;
+    private final InventoryConfigBundle inventoryConfigBundle;
 
     @Inject
-    public ChestTradeSessionEvent(TradeSessionManager manager, LanguageConfig languageConfig, List<Double> betSpread) {
+    public ChestTradeSessionEvent(TradeSessionManager manager, LanguageConfig languageConfig, InventoryConfigBundle inventoryConfigBundle) {
         this.manager = manager;
         this.languageConfig = languageConfig;
-        this.betSpread = betSpread;
+        this.inventoryConfigBundle = inventoryConfigBundle;
     }
 
 
@@ -147,7 +146,7 @@ public class ChestTradeSessionEvent implements Listener {
     }
 
     private Inventory createInventoryForPickBet(Session session, Player whoClicked) {
-        return new PickBetInventoryManager(session, whoClicked, languageConfig, betSpread).getInventory();
+        return new PickBetInventoryManager(session, whoClicked, languageConfig, inventoryConfigBundle.getBetSpread()).getInventory();
     }
 
     /**
