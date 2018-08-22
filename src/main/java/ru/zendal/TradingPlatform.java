@@ -34,12 +34,12 @@ public class TradingPlatform extends JavaPlugin {
      * Default constructor
      */
     public TradingPlatform() {
+
     }
 
     @Override
     public void onEnable() {
         Injector injector = Guice.createInjector(new TradingPlatformConfiguration(this));
-
         tradeSessionManager = injector.getInstance(TradeSessionManager.class);
 
         this.initListeners(injector);

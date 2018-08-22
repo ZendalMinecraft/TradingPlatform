@@ -7,18 +7,35 @@
 
 package ru.zendal.config.bundle;
 
+import ru.zendal.config.bundle.builder.InventoryConfigBundleBuilder;
+
 import java.util.List;
 
 public class InventoryConfigBundle {
 
     private List<Double> betSpread;
 
+    private boolean economyEnable = false;
 
-    public InventoryConfigBundle(List<Double> betSpread) {
-        this.betSpread = betSpread;
+    public InventoryConfigBundle(InventoryConfigBundleBuilder bundleBuilder) {
+        this.prepareBuilder(bundleBuilder);
+    }
+
+    private void prepareBuilder(InventoryConfigBundleBuilder bundleBuilder) {
+        if (bundleBuilder.hasBetSpread()) {
+            betSpread = bundleBuilder.getBetSpread();
+        }
+
+        if (bundleBuilder.hasFlagEconomyEnable()) {
+            economyEnable = bundleBuilder.getFlagEconomyEnable();
+        }
     }
 
     public List<Double> getBetSpread() {
         return this.betSpread;
+    }
+
+    public boolean isEconomyEnable() {
+        return economyEnable;
     }
 }

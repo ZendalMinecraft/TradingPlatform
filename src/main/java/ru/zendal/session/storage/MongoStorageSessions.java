@@ -15,7 +15,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
-import ru.zendal.session.Session;
 import ru.zendal.session.TradeOffline;
 import ru.zendal.session.TradeOfflineSession;
 import ru.zendal.session.storage.connection.builder.MongoConnectionBuilder;
@@ -101,13 +100,8 @@ public class MongoStorageSessions implements SessionsStorage {
     }
 
     @Override
-    public String saveSession(Session session) {
-
-        if (session instanceof TradeOfflineSession) {
-            return this.processOfflineSession((TradeOfflineSession) session);
-        }
-        return "";
-
+    public String saveSession(TradeOfflineSession session) {
+        return this.processOfflineSession(session);
     }
 
     /**

@@ -16,6 +16,8 @@ import org.bukkit.plugin.ServicesManager;
 import ru.zendal.TradingPlatform;
 import ru.zendal.config.bundle.InventoryConfigBundle;
 import ru.zendal.config.bundle.SocketConfigBundle;
+import ru.zendal.config.bundle.builder.InventoryConfigBundleBuilder;
+import ru.zendal.service.economy.DisabledEconomy;
 import ru.zendal.service.economy.EconomyProvider;
 import ru.zendal.service.economy.VaultEconomy;
 import ru.zendal.session.storage.MongoStorageSessions;
@@ -72,6 +74,9 @@ public class TradingPlatformConfiguration extends AbstractModule {
 
     private SessionsStorage sessionsStorage;
 
+
+    private final InventoryConfigBundleBuilder inventoryConfigBundleBuilder;
+
     /**
      * Instantiates a new Trading platform config.
      *
@@ -81,6 +86,7 @@ public class TradingPlatformConfiguration extends AbstractModule {
     public TradingPlatformConfiguration(TradingPlatform plugin) {
         this.plugin = plugin;
         this.logger = plugin.getLogger();
+        this.inventoryConfigBundleBuilder = new InventoryConfigBundleBuilder();
         this.setup();
         this.processConfig();
     }
@@ -126,7 +132,13 @@ public class TradingPlatformConfiguration extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(EconomyProvider.class).to(VaultEconomy.class);
+        if (plugin.getServer().getPluginManager().getPlugin("Vault") == null) {
+            bind(EconomyProvider.class).to(DisabledEconomy.class);
+            this.inventoryConfigBundleBuilder.setFlagEnableEconomy(false);
+        } else {
+            bind(EconomyProvider.class).to(VaultEconomy.class);
+            this.inventoryConfigBundleBuilder.setFlagEnableEconomy(true);
+        }
         bind(SocketServer.class).to(SocketIO.class);
     }
 
@@ -314,7 +326,10 @@ public class TradingPlatformConfiguration extends AbstractModule {
     @Provides
     @Singleton
     InventoryConfigBundle providerInventoryConfigBundle() {
-        return new InventoryConfigBundle(this.getBetSpread());
+        return this.inventoryConfigBundleBuilder
+                .setBetSpread(this.getBetSpread())
+                .build();
+
     }
 
 

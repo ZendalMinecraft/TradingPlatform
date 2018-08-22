@@ -9,6 +9,7 @@ package ru.zendal.session.storage;
 
 import ru.zendal.session.Session;
 import ru.zendal.session.TradeOffline;
+import ru.zendal.session.TradeOfflineSession;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class PacifierStorage implements SessionsStorage {
     }
 
     @Override
-    public String saveSession(Session session) {
+    public String saveSession(TradeOfflineSession session) {
         return "NOT_VALID_ID_SESSION";
     }
 

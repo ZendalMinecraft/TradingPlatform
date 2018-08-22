@@ -122,12 +122,18 @@ public class ChestTradeSessionEvent implements Listener {
 
             }
         } else if (event.getCurrentItem().getType() == Material.GOLD_NUGGET && this.isServiceSlot(event.getSlot())) {
-            if (session.getSeller() == event.getWhoClicked() && !session.isSellerReady()) {
-                this.openInventoryChangeAmount(session, (Player) event.getWhoClicked());
-            } else if (session.getBuyer() == event.getWhoClicked() && !session.isBuyerReady()) {
-                this.openInventoryChangeAmount(session, (Player) event.getWhoClicked());
+            if (this.inventoryConfigBundle.isEconomyEnable()) {
+                if (session.getSeller() == event.getWhoClicked() && !session.isSellerReady()) {
+                    this.openInventoryChangeAmount(session, (Player) event.getWhoClicked());
+                } else if (session.getBuyer() == event.getWhoClicked() && !session.isBuyerReady()) {
+                    this.openInventoryChangeAmount(session, (Player) event.getWhoClicked());
+                } else {
+                    languageConfig.getMessage("trade.cant.change.bet.onReady").sendMessage((Player) event.getWhoClicked());
+                }
             } else {
-                languageConfig.getMessage("trade.cant.change.bet.onReady");
+                languageConfig
+                        .getMessage("trade.cant.change.bet.economyIsUnavailable")
+                        .sendMessage((Player) event.getWhoClicked());
             }
 
         }
