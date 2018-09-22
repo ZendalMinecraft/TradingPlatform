@@ -12,14 +12,22 @@ public enum TypeStorage {
     MYSQL_DB("MySQL"),
     LOCAL_STORAGE("Local");
 
-    TypeStorage(String typeStorage) {
+    private String name;
 
+    TypeStorage(String typeStorage) {
+        this.name = typeStorage;
+    }
+
+    @Override
+    public String toString(){
+        return name;
     }
 
     public static TypeStorage fromName(String name) {
         for (TypeStorage typeStorage : TypeStorage.values()) {
-            if (typeStorage.name().equalsIgnoreCase(name))
+            if (typeStorage.toString().equalsIgnoreCase(name)) {
                 return typeStorage;
+            }
         }
         return null;
     }

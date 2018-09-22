@@ -7,6 +7,7 @@
 
 package ru.zendal.event;
 
+import com.google.inject.Inject;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,6 +17,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import ru.zendal.config.LanguageConfig;
+import ru.zendal.config.bundle.InventoryConfigBundle;
 import ru.zendal.session.Session;
 import ru.zendal.session.TradeOfflineSession;
 import ru.zendal.session.TradeSession;
@@ -23,8 +25,6 @@ import ru.zendal.session.TradeSessionManager;
 import ru.zendal.session.exception.TradeSessionManagerException;
 import ru.zendal.session.inventory.PickBetInventoryManager;
 import ru.zendal.session.inventory.holder.TradeSessionHolderInventory;
-
-import java.util.List;
 
 /**
  * Event for trading all type Sessions
@@ -41,12 +41,13 @@ public class ChestTradeSessionEvent implements Listener {
     private final LanguageConfig languageConfig;
 
 
-    private final List<Double> betSpread;
+    private final InventoryConfigBundle inventoryConfigBundle;
 
-    public ChestTradeSessionEvent(TradeSessionManager manager, LanguageConfig languageConfig, List<Double> betSpread) {
+    @Inject
+    public ChestTradeSessionEvent(TradeSessionManager manager, LanguageConfig languageConfig, InventoryConfigBundle inventoryConfigBundle) {
         this.manager = manager;
         this.languageConfig = languageConfig;
-        this.betSpread = betSpread;
+        this.inventoryConfigBundle = inventoryConfigBundle;
     }
 
 
@@ -121,12 +122,18 @@ public class ChestTradeSessionEvent implements Listener {
 
             }
         } else if (event.getCurrentItem().getType() == Material.GOLD_NUGGET && this.isServiceSlot(event.getSlot())) {
-            if (session.getSeller() == event.getWhoClicked() && !session.isSellerReady()) {
-                this.openInventoryChangeAmount(session, (Player) event.getWhoClicked());
-            } else if (session.getBuyer() == event.getWhoClicked() && !session.isBuyerReady()) {
-                this.openInventoryChangeAmount(session, (Player) event.getWhoClicked());
+            if (this.inventoryConfigBundle.isEconomyEnable()) {
+                if (session.getSeller() == event.getWhoClicked() && !session.isSellerReady()) {
+                    this.openInventoryChangeAmount(session, (Player) event.getWhoClicked());
+                } else if (session.getBuyer() == event.getWhoClicked() && !session.isBuyerReady()) {
+                    this.openInventoryChangeAmount(session, (Player) event.getWhoClicked());
+                } else {
+                    languageConfig.getMessage("trade.cant.change.bet.onReady").sendMessage((Player) event.getWhoClicked());
+                }
             } else {
-                languageConfig.getMessage("trade.cant.change.bet.onReady");
+                languageConfig
+                        .getMessage("trade.cant.change.bet.economyIsUnavailable")
+                        .sendMessage((Player) event.getWhoClicked());
             }
 
         }
@@ -145,7 +152,7 @@ public class ChestTradeSessionEvent implements Listener {
     }
 
     private Inventory createInventoryForPickBet(Session session, Player whoClicked) {
-        return new PickBetInventoryManager(session, whoClicked, languageConfig, betSpread).getInventory();
+        return new PickBetInventoryManager(session, whoClicked, languageConfig, inventoryConfigBundle.getBetSpread()).getInventory();
     }
 
     /**

@@ -34,6 +34,8 @@ dependencies {
     compile 'io.scalecube:socketio:2.3.4'
     compile 'io.netty:netty-buffer:4.1.6.Final'
     compile 'org.slf4j:slf4j-simple:1.7.25'
+
+    compile group: 'com.google.inject', name: 'guice', version: '4.2.0'
 }
 
 import org.apache.tools.ant.filters.ReplaceTokens
@@ -54,7 +56,7 @@ jar {
 }
 
 task finalize << {
-    ant.move(file: "/Users/bigtows/Project/TradingPlatform/build/libs/TradingPlatform-"+version+".jar", tofile: "/Users/bigtows/MinecraftServer/plugins/TradingPlatform.jar")
+    ant.move(file: "/Users/bigtows/Projects/TradingPlatform/build/libs/TradingPlatform-"+version+".jar", tofile: "/Volumes/LaCie/Spigot/server/plugins/TradingPlatform.jar")
     print "End move"
 }
 

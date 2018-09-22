@@ -7,6 +7,7 @@
 
 package ru.zendal.event;
 
+import com.google.inject.Inject;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,6 +26,7 @@ public class ChestStorageEvent implements Listener {
     private final TradingPlatform tradingPlatform;
 
     //TODO доделать
+    @Inject
     public ChestStorageEvent(TradingPlatform plugin) {
         this.tradingPlatform = plugin;
     }

@@ -9,8 +9,8 @@ package ru.zendal.session.storage;
 
 import org.dizitart.no2.Document;
 import org.dizitart.no2.NitriteCollection;
-import ru.zendal.session.Session;
 import ru.zendal.session.TradeOffline;
+import ru.zendal.session.TradeOfflineSession;
 import ru.zendal.session.storage.connection.builder.NitriteConnectionBuilder;
 
 import java.util.List;
@@ -18,10 +18,10 @@ import java.util.List;
 public class NitriteStorageSessions implements SessionsStorage {
 
 
-    private final NitriteCollection builder;
+    private final NitriteCollection collection;
 
-    public NitriteStorageSessions(NitriteConnectionBuilder builder) {
-        this.builder = builder.build().getCollection("TradingPlatform");
+    public NitriteStorageSessions(NitriteConnectionBuilder collection) {
+        this.collection = collection.build().getCollection("TradingPlatform");
     }
 
 
@@ -31,11 +31,17 @@ public class NitriteStorageSessions implements SessionsStorage {
     }
 
     @Override
-    public String saveSession(Session session) {
-        Document doc = new Document();
-       /* session.ß
-        builder.insert()
-       */
+    public String saveSession(TradeOfflineSession session) {
+        Document document = new Document();
+
+
+
+
+
+
+
+        collection.insert(document);
+
         return null;
     }
 

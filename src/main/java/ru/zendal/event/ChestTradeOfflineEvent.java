@@ -7,6 +7,7 @@
 
 package ru.zendal.event;
 
+import com.google.inject.Inject;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,6 +31,7 @@ public class ChestTradeOfflineEvent implements Listener {
     private final LanguageConfig languageConfig;
     private final EconomyProvider economyProvider;
 
+    @Inject
     public ChestTradeOfflineEvent(TradeSessionManager sessionManager, EconomyProvider economyProvider, LanguageConfig languageConfig) {
         this.sessionManager = sessionManager;
         this.languageConfig = languageConfig;

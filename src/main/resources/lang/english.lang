@@ -32,6 +32,7 @@ trade.confirm.select.undefinedSession=Sorry we can't search session for %buyer% 
 
 
 trade.cant.change.bet.onReady=You can't change bet, because your ready
+trade.cant.change.bet.economyIsUnavailable=Economy disabled.
 
 trade.confirm.list=You have many trades: %1%. For confirm type /trade confirm Username
 

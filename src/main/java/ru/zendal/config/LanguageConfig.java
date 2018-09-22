@@ -8,6 +8,7 @@
 package ru.zendal.config;
 
 import com.google.common.io.Files;
+import com.google.inject.Inject;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,9 +41,6 @@ public class LanguageConfig {
         this.processFile();
     }
 
-    public LanguageConfig(Logger logger) {
-        this.logger = logger;
-    }
 
     /**
      * Process language file

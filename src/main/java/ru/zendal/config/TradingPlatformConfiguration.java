@@ -7,24 +7,38 @@
 
 package ru.zendal.config;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.ServicesManager;
 import ru.zendal.TradingPlatform;
+import ru.zendal.config.bundle.InventoryConfigBundle;
 import ru.zendal.config.bundle.SocketConfigBundle;
-import ru.zendal.config.exception.ConfigException;
+import ru.zendal.config.bundle.builder.InventoryConfigBundleBuilder;
+import ru.zendal.service.economy.DisabledEconomy;
+import ru.zendal.service.economy.EconomyProvider;
+import ru.zendal.service.economy.VaultEconomy;
 import ru.zendal.session.storage.MongoStorageSessions;
 import ru.zendal.session.storage.PacifierStorage;
 import ru.zendal.session.storage.SessionsStorage;
 import ru.zendal.session.storage.connection.builder.MongoConnectionBuilder;
+import ru.zendal.socket.SocketIO;
+import ru.zendal.socket.SocketServer;
 
+import javax.inject.Inject;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 /**
  * Class for access to Config file plugin
  */
-public class TradingPlatformConfig {
+@Singleton
+public class TradingPlatformConfiguration extends AbstractModule {
 
     /**
      * Instance plugin file
@@ -60,14 +74,19 @@ public class TradingPlatformConfig {
 
     private SessionsStorage sessionsStorage;
 
+
+    private final InventoryConfigBundleBuilder inventoryConfigBundleBuilder;
+
     /**
      * Instantiates a new Trading platform config.
      *
      * @param plugin the plugin
      */
-    public TradingPlatformConfig(TradingPlatform plugin) {
+    @Inject
+    public TradingPlatformConfiguration(TradingPlatform plugin) {
         this.plugin = plugin;
         this.logger = plugin.getLogger();
+        this.inventoryConfigBundleBuilder = new InventoryConfigBundleBuilder();
         this.setup();
         this.processConfig();
     }
@@ -110,6 +129,19 @@ public class TradingPlatformConfig {
         }
     }
 
+
+    @Override
+    protected void configure() {
+        if (plugin.getServer().getPluginManager().getPlugin("Vault") == null) {
+            bind(EconomyProvider.class).to(DisabledEconomy.class);
+            this.inventoryConfigBundleBuilder.setFlagEnableEconomy(false);
+        } else {
+            bind(EconomyProvider.class).to(VaultEconomy.class);
+            this.inventoryConfigBundleBuilder.setFlagEnableEconomy(true);
+        }
+        bind(SocketServer.class).to(SocketIO.class);
+    }
+
     private void checkAllLanguage() throws IOException {
         for (String lang : this.availableLanguage) {
             String langPath = "lang/" + lang + ".lang";
@@ -138,10 +170,6 @@ public class TradingPlatformConfig {
     }
 
 
-    private File getLanguageFileByName(String langName) {
-        return new File(this.plugin.getDataFolder(), "lang/" + langName + ".lang");
-    }
-
     private void initConfigFile() throws IOException {
         File file = new File(this.plugin.getDataFolder(), "config.yml");
         if (file.exists()) {
@@ -169,7 +197,7 @@ public class TradingPlatformConfig {
     }
 
 
-    public List<Double> getBetSpread() {
+    private List<Double> getBetSpread() {
         if (yamlConfig.contains("settings.betSpread")) {
             List<Double> betSpread = yamlConfig.getDoubleList("settings.betSpread");
             if (betSpread.size() == 0 || betSpread.size() > 8) {
@@ -182,30 +210,6 @@ public class TradingPlatformConfig {
         return new ArrayList<>();
     }
 
-    public SessionsStorage getStorageByConfig() throws ConfigException {
-        String typeStorageString = yamlConfig.getString("storage.type");
-        if (typeStorageString.equalsIgnoreCase("mongo")) {
-           /* return  new MongoStorageSessions(
-                    new MongoConnectionBuilder().setHost();
-            )*/
-        } else {
-            throw new ConfigException("Undefined type config");
-        }
-        return null;
-    }
-
-    /**
-     * Return socket Bundle
-     *
-     * @return Socket configuration data
-     */
-    public SocketConfigBundle getSocketBundle() {
-
-        if (socketBundle == null) {
-            this.initSocketBundle();
-        }
-        return socketBundle;
-    }
 
     private void initSocketBundle() {
         socketBundle = new SocketConfigBundle();
@@ -219,27 +223,6 @@ public class TradingPlatformConfig {
         if (yamlConfig.contains("socket.charset")) {
             socketBundle.setCharset(yamlConfig.getString("socket.charset"));
         }
-    }
-
-    public SessionsStorage getSessionsStorage() {
-        if (sessionsStorage == null) {
-            this.initSessionsStorage();
-        }
-        return sessionsStorage;
-    }
-
-
-    private SessionsStorage initSessionsStorage() {
-        if (!yamlConfig.contains("storage.type") || !TypeStorage.hasTypeStorage(yamlConfig.getString("storage.type"))) {
-            sessionsStorage = new PacifierStorage();
-        } else {
-            switch (TypeStorage.fromName(yamlConfig.getString("storage.type"))) {
-                case MONGO_DB:
-                    sessionsStorage = this.getMongoStorage();
-            }
-        }
-        return null;
-
     }
 
 
@@ -260,26 +243,6 @@ public class TradingPlatformConfig {
         return new MongoStorageSessions(builder, logger);
     }
 
-    /*private SessionsStorage getLocalStorage(){
-
-    }*/
-
-    /**
-     * Check is valid type storage
-     *
-     * @param nameType Name type storage
-     * @return {@code true} if valid
-     */
-    private boolean isInvalidTypeStorage(String nameType) {
-        switch (nameType.toLowerCase()) {
-            case "mongo":
-            case "mysql":
-            case "local":
-                return true;
-            default:
-                return false;
-        }
-    }
 
     /**
      * Get text By InputStream
@@ -297,5 +260,89 @@ public class TradingPlatformConfig {
         }
         return result.toString("UTF-8");
     }
+
+
+    /**
+     * Get Mongo storage
+     *
+     * @return MongoDB Storage
+     */
+    @Provides
+    @Singleton
+    private SessionsStorage provideSessionsStorage() {
+        if (!yamlConfig.contains("storage.type") || !TypeStorage.hasTypeStorage(yamlConfig.getString("storage.type"))) {
+            logger.warning("Store type not recognised, use the Stub");
+            sessionsStorage = new PacifierStorage();
+        } else {
+            TypeStorage typeStorage = TypeStorage.fromName(yamlConfig.getString("storage.type"));
+            switch (Objects.requireNonNull(typeStorage)) {
+                case MONGO_DB:
+                    sessionsStorage = this.getMongoStorage();
+            }
+        }
+        return sessionsStorage;
+    }
+
+    @Provides
+    PluginManager providePluginManager() {
+        return this.plugin.getServer().getPluginManager();
+    }
+
+
+    @Provides
+    @Singleton
+    ServicesManager provideServicesManager() {
+        return this.plugin.getServer().getServicesManager();
+    }
+
+    /**
+     * Provider Language Config
+     *
+     * @return LanguageConfig
+     */
+    @Provides
+    @Singleton
+    LanguageConfig providerLanguageConfig() {
+        String langName = this.yamlConfig.getString("settings.lang");
+        return new LanguageConfig(this.getLanguageFileByName(langName), this.plugin.getLogger());
+    }
+
+    /**
+     * Get Language file.
+     *
+     * @param langName Language name file.
+     * @return File.
+     */
+    private File getLanguageFileByName(String langName) {
+        return new File(this.plugin.getDataFolder(), "lang/" + langName + ".lang");
+    }
+
+    @Provides
+    @Singleton
+    TradingPlatform providerPlugin() {
+        return this.plugin;
+    }
+
+    @Provides
+    @Singleton
+    InventoryConfigBundle providerInventoryConfigBundle() {
+        return this.inventoryConfigBundleBuilder
+                .setBetSpread(this.getBetSpread())
+                .build();
+
+    }
+
+    /**
+     * Return socket Bundle
+     *
+     * @return Socket configuration data
+     */
+    @Provides
+    @Singleton
+    public SocketConfigBundle providerSocketBundle() {
+        this.initSocketBundle();
+        return socketBundle;
+    }
+
 
 }
