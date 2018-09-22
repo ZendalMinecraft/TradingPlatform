@@ -332,7 +332,6 @@ public class TradingPlatformConfiguration extends AbstractModule {
 
     }
 
-
     /**
      * Return socket Bundle
      *
