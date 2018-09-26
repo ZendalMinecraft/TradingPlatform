@@ -151,7 +151,7 @@ public class TradeOffline {
     /**
      * Confirm this trade
      *
-     * @param player Player who accept this trade
+     * @param player          Player who accept this trade
      * @param economyProvider Instance economy Provider
      * @return A list of missing items. List can be empty.
      * @see Player
@@ -180,7 +180,7 @@ public class TradeOffline {
         }
         double needMoney = 0;
         if (!economyProvider.haveMoney(player, betWant)) {
-            needMoney = betWant - economyProvider.getBalance(player);
+            needMoney = economyProvider.getBalance(player) - betWant;
         }
         return new TradeOfflineConfirmResponse(listMissingItems, hasItems, needMoney);
     }
@@ -299,6 +299,24 @@ public class TradeOffline {
             }
         }
         return newStack;
+    }
+
+    /**
+     * Return bet "Left Side"
+     *
+     * @return bet for trade
+     */
+    public double getBetHas() {
+        return betHas;
+    }
+
+    /**
+     * Return bet "Right Side"
+     *
+     * @return bet for trade
+     */
+    public double getBetWant() {
+        return betWant;
     }
 
     /**

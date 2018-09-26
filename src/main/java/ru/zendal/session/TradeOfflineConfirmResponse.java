@@ -36,11 +36,11 @@ public class TradeOfflineConfirmResponse {
     }
 
     public boolean needMoney() {
-        return needMoney <= 0;
+        return needMoney < 0;
     }
 
     public boolean canBeTrade() {
-        return !this.hasMissingItems() || needMoney();
+        return !this.hasMissingItems() && !needMoney();
     }
 
     public double getMoney() {

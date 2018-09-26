@@ -65,7 +65,7 @@ public class OpenOfflineSessionProcessor implements ArgsCommandProcessor {
             TradeOffline tradeOffline = manager.getTradeOfflineById(refId);
             player.openInventory(tradeOffline.getInventory());
         } catch (TradeSessionManagerException e) {
-            language.getMessage("trade.offline.udefinedId").setCustomMessage(1, refId).
+            language.getMessage("trade.offline.undefinedId").setCustomMessage(1, refId).
                     sendMessage(player);
         }
     }

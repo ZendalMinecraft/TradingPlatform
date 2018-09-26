@@ -95,7 +95,7 @@ public class MongoStorageSessions implements SessionsStorage {
             dataBase.getCollection(nameCollection);
             return true;
         } catch (IllegalArgumentException e) {
-            return true;
+            return false;
         }
     }
 
