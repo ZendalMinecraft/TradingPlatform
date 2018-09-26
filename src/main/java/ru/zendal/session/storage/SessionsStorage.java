@@ -9,6 +9,7 @@ package ru.zendal.session.storage;
 
 import ru.zendal.session.Session;
 import ru.zendal.session.TradeOffline;
+import ru.zendal.session.TradeOfflineSession;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ public interface SessionsStorage {
      * @param session Offline session
      * @return unique Id session
      */
-    String saveSession(Session session);
+    String saveSession(TradeOfflineSession session);
 
     /**
      * Get all Sessions

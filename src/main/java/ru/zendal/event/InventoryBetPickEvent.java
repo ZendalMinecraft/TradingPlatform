@@ -7,6 +7,7 @@
 
 package ru.zendal.event;
 
+import com.google.inject.Inject;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,6 +24,7 @@ public class InventoryBetPickEvent implements Listener {
 
     private final EconomyProvider economyProvider;
 
+    @Inject
     public InventoryBetPickEvent(EconomyProvider economyProvider) {
         this.economyProvider = economyProvider;
     }

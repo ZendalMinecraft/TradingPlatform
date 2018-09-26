@@ -16,7 +16,7 @@ ru.zendal.session.inventory.holder
 ru.zendal.session.listener
 ru.zendal.session.storage
 ru.zendal.session.storage.connection
-ru.zendal.session.storage.connection.builder
+ru.zendal.session.storage.connection.collection
 ru.zendal.socket
 ru.zendal.socket.command
 ru.zendal.socket.command.exception

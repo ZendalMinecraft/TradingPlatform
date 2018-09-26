@@ -7,10 +7,10 @@
 
 package ru.zendal.command;
 
+import com.google.inject.Inject;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import ru.zendal.config.LanguageConfig;
 import ru.zendal.session.TradeSessionManager;
 
@@ -43,6 +43,7 @@ public class CommandManager implements CommandExecutor {
      * @param sessionManager Instance TradeSessionManager
      * @param languageConfig Instance language config
      */
+    @Inject
     public CommandManager(TradeSessionManager sessionManager, LanguageConfig languageConfig) {
         this.sessionManager = sessionManager;
         this.languageConfig = languageConfig;
@@ -77,7 +78,7 @@ public class CommandManager implements CommandExecutor {
                 return processor.process(command, sender, args);
             }
         }
-        languageConfig.getMessage("command.help.message").sendMessage((Player) sender);
+        sender.sendMessage(languageConfig.getMessage("command.help.message").toString());
         return true;
     }
 }
