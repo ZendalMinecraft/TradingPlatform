@@ -7,7 +7,9 @@ import java.util.List;
 
 public class MySqlSessionStorage implements SessionsStorage {
 
-    public MySqlSessionStorage()
+    public MySqlSessionStorage(){
+
+    }
 
     @Override
     public boolean isAvailable() {
