@@ -35,7 +35,12 @@ public class SocketIO implements SocketServer {
      * Session manager
      */
     private final TradeSessionManager sessionManager;
+
+    /**
+     * Instance economy provider
+     */
     private final EconomyProvider economyProvider;
+
     /**
      * Instance socket Server
      */
@@ -68,8 +73,10 @@ public class SocketIO implements SocketServer {
         this.sessionManager = sessionManager;
         this.economyProvider = economyProvider;
         this.logger = logger;
+        logger.info("Start initialize server");
         this.initServer(socketConfigBundle);
         this.prepareServer();
+        logger.info("Server success initialized");
     }
 
 
@@ -100,8 +107,10 @@ public class SocketIO implements SocketServer {
     public boolean start() {
         try {
             server.start();
+            logger.info("Socket ServerIO start success.");
             return true;
         } catch (Exception e) {
+            logger.warning("Socket ServerIO start failed: "+e.getMessage());
             return false;
         }
     }
@@ -110,8 +119,10 @@ public class SocketIO implements SocketServer {
     public boolean stop() {
         try {
             server.stop();
+            logger.info("Socket ServerIO stop success.");
             return true;
         } catch (Exception e) {
+            logger.warning("Socket ServerIO stop failed: "+e.getMessage());
             return false;
         }
     }
