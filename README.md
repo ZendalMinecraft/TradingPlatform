@@ -1,4 +1,4 @@
-# TradingPlatform (0.5 Beta)
+# TradingPlatform (0.6.5 Beta)
 
 ## Minecraft Plugin Bukkit/Spigot (1.12)
 
