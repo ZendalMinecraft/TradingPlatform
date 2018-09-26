@@ -27,6 +27,8 @@ import java.util.logging.Logger;
 
 public class MongoConnectionBuilder implements ConnectionBuilder<MongoDatabase> {
 
+    private Logger logger = Logger.getLogger(getClass().toString());
+
     private String name;
     private String password;
     private String dataBaseName = "TradingPlatform";
@@ -87,6 +89,7 @@ public class MongoConnectionBuilder implements ConnectionBuilder<MongoDatabase> 
             MongoClients.create(settings).listDatabaseNames().first();
         } catch (MongoTimeoutException e) {
             hasConnected = false;
+            logger.warning("Can't Connect to MongoDB: "+ e.getMessage());
         }
         return MongoClients.create(settings).getDatabase(dataBaseName);
     }
