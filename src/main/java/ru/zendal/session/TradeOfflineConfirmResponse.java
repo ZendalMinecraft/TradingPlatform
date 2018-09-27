@@ -14,10 +14,12 @@ import java.util.List;
 public class TradeOfflineConfirmResponse {
     private final List<ItemStack> listMissingItems;
     private final List<ItemStack> newHasItems;
+    private final double needMoney;
 
-    public TradeOfflineConfirmResponse(List<ItemStack> listMissingItems, List<ItemStack> newHasItems) {
+    public TradeOfflineConfirmResponse(List<ItemStack> listMissingItems, List<ItemStack> newHasItems, double needMoney) {
         this.listMissingItems = listMissingItems;
         this.newHasItems = newHasItems;
+        this.needMoney = needMoney;
     }
 
 
@@ -31,5 +33,17 @@ public class TradeOfflineConfirmResponse {
 
     public ItemStack[] getNewContent() {
         return newHasItems.toArray(new ItemStack[0]);
+    }
+
+    public boolean needMoney() {
+        return needMoney < 0;
+    }
+
+    public boolean canBeTrade() {
+        return !this.hasMissingItems() && !needMoney();
+    }
+
+    public double getMoney() {
+        return needMoney;
     }
 }

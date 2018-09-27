@@ -7,11 +7,13 @@
 
 package ru.zendal.socket;
 
+import com.google.inject.Inject;
 import io.scalecube.socketio.SocketIOServer;
 import org.bson.Document;
 import org.bukkit.inventory.ItemStack;
 import ru.zendal.config.bundle.SocketConfigBundle;
 import ru.zendal.entity.ExtendedItemStack;
+import ru.zendal.service.economy.EconomyProvider;
 import ru.zendal.session.TradeOffline;
 import ru.zendal.session.TradeSessionManager;
 import ru.zendal.socket.command.AcceptTradeCommand;
@@ -33,6 +35,7 @@ public class SocketIO implements SocketServer {
      * Session manager
      */
     private final TradeSessionManager sessionManager;
+    private final EconomyProvider economyProvider;
     /**
      * Instance socket Server
      */
@@ -54,12 +57,16 @@ public class SocketIO implements SocketServer {
      *
      * @param socketConfigBundle Config bundle for setup server
      * @param sessionManager     Instance session Manager
+     * @param economyProvider    Instance Economy Provider
      * @param logger             instance logger
      */
+    @Inject
     public SocketIO(SocketConfigBundle socketConfigBundle,
                     TradeSessionManager sessionManager,
+                    EconomyProvider economyProvider,
                     Logger logger) {
         this.sessionManager = sessionManager;
+        this.economyProvider = economyProvider;
         this.logger = logger;
         this.initServer(socketConfigBundle);
         this.prepareServer();
@@ -77,7 +84,7 @@ public class SocketIO implements SocketServer {
 
         adapterServerListener = new AdapterServerListener(messageCharset, logger);
         adapterServerListener.addCommandProcessors(new GetAllOfflineTradesCommand(sessionManager));
-        adapterServerListener.addCommandProcessors(new AcceptTradeCommand(sessionManager));
+        adapterServerListener.addCommandProcessors(new AcceptTradeCommand(sessionManager, economyProvider));
         sessionManager.addListenerOnCreateNewOfflineTrade(this::processCreateNewOfflineTrade);
     }
 

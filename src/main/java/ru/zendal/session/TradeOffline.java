@@ -14,6 +14,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import ru.zendal.service.economy.EconomyProvider;
 import ru.zendal.session.inventory.holder.ViewOfflineTradeHolderInventory;
 import ru.zendal.util.ItemBuilder;
 
@@ -61,6 +62,17 @@ public class TradeOffline {
     private Inventory inventory;
 
     /**
+     * Bet has
+     */
+    private double betHas;
+
+
+    /**
+     * Bet want
+     */
+    private double betWant;
+
+    /**
      * Constructor Trade Offline
      *
      * @param uniqueId Unique ID
@@ -75,6 +87,16 @@ public class TradeOffline {
         this.player = player;
         this.has = has;
         this.wants = wants;
+    }
+
+    public TradeOffline setBetHas(double bet) {
+        this.betHas = bet;
+        return this;
+    }
+
+    public TradeOffline setBetWant(double bet) {
+        this.betWant = bet;
+        return this;
     }
 
     /**
@@ -129,11 +151,12 @@ public class TradeOffline {
     /**
      * Confirm this trade
      *
-     * @param player Player who accept this trade
+     * @param player          Player who accept this trade
+     * @param economyProvider Instance economy Provider
      * @return A list of missing items. List can be empty.
      * @see Player
      */
-    public TradeOfflineConfirmResponse confirmTrade(Player player) {
+    public TradeOfflineConfirmResponse confirmTrade(Player player, EconomyProvider economyProvider) {
         List<ItemStack> listMissingItems = new ArrayList<>();
 
         List<ItemStack> needItems = this.cloneListItemStack(this.getWants());
@@ -155,7 +178,11 @@ public class TradeOffline {
                 listMissingItems.add(item);
             }
         }
-        return new TradeOfflineConfirmResponse(listMissingItems, hasItems);
+        double needMoney = 0;
+        if (!economyProvider.haveMoney(player, betWant)) {
+            needMoney = economyProvider.getBalance(player) - betWant;
+        }
+        return new TradeOfflineConfirmResponse(listMissingItems, hasItems, needMoney);
     }
 
     /**
@@ -224,7 +251,14 @@ public class TradeOffline {
         }
         inventory.setItem(9 * 1 + 4, ItemBuilder.get(Material.WOOL).setDurability((short) 5).build());
         inventory.setItem(9 * 4 + 4, ItemBuilder.get(Material.WOOL).setDurability((short) 14).build());
-
+        inventory.setItem(9 * 5 + 4,
+                ItemBuilder
+                        .get(Material.GOLD_NUGGET)
+                        .setDisplayName("Amount").setItemLore(Arrays.asList(
+                        "Bet " + player.getName() + ": " + betHas,
+                        "Bet need: " + betWant
+                )).build()
+        );
         return inventory;
     }
 
@@ -268,6 +302,24 @@ public class TradeOffline {
     }
 
     /**
+     * Return bet "Left Side"
+     *
+     * @return bet for trade
+     */
+    public double getBetHas() {
+        return betHas;
+    }
+
+    /**
+     * Return bet "Right Side"
+     *
+     * @return bet for trade
+     */
+    public double getBetWant() {
+        return betWant;
+    }
+
+    /**
      * Factory for create TradeOffline by TradeOfflineSession
      *
      * @param uniqueId Unique ID trade
@@ -276,6 +328,8 @@ public class TradeOffline {
      * @see TradeOfflineSession
      */
     public static TradeOffline factory(String uniqueId, TradeOfflineSession session) {
-        return new TradeOffline(uniqueId, session.getBuyer(), session.getSellerItems(), session.getBuyerItems());
+        return new TradeOffline(uniqueId, session.getBuyer(), session.getSellerItems(), session.getBuyerItems())
+                .setBetWant(session.getBetBuyer())
+                .setBetHas(session.getBetSeller());
     }
 }

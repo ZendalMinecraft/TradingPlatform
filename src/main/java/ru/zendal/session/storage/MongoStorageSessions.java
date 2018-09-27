@@ -15,7 +15,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
-import ru.zendal.session.Session;
 import ru.zendal.session.TradeOffline;
 import ru.zendal.session.TradeOfflineSession;
 import ru.zendal.session.storage.connection.builder.MongoConnectionBuilder;
@@ -96,18 +95,13 @@ public class MongoStorageSessions implements SessionsStorage {
             dataBase.getCollection(nameCollection);
             return true;
         } catch (IllegalArgumentException e) {
-            return true;
+            return false;
         }
     }
 
     @Override
-    public String saveSession(Session session) {
-
-        if (session instanceof TradeOfflineSession) {
-            return this.processOfflineSession((TradeOfflineSession) session);
-        }
-        return "";
-
+    public String saveSession(TradeOfflineSession session) {
+        return this.processOfflineSession(session);
     }
 
     /**
@@ -121,7 +115,9 @@ public class MongoStorageSessions implements SessionsStorage {
         Document data = new Document();
         data.append("uuidPlayer", session.getBuyer().getUniqueId().toString());
         data.append("playerItems", this.getListDocumentByArrayItemStack(session.getSellerItems().toArray(new ItemStack[0])));
+        data.append("playerBet", session.getBetSeller());
         data.append("itemsWant", this.getListDocumentByArrayItemStack(session.getBuyerItems().toArray(new ItemStack[0])));
+        data.append("betWant", session.getBetBuyer());
         tradesCollection.insertOne(data);
         return data.get("_id").toString();
     }
@@ -132,12 +128,15 @@ public class MongoStorageSessions implements SessionsStorage {
         for (Document data : tradesCollection.find()) {
             OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(data.getString("uuidPlayer")));
             try {
-                response.add(new TradeOffline(
+                TradeOffline tradeOffline = new TradeOffline(
                         data.get("_id").toString(),
                         player,
                         this.getListItemStackByListDocument((List<Document>) data.get("playerItems")),
                         this.getListItemStackByListDocument((List<Document>) data.get("itemsWant"))
-                ));
+                );
+                tradeOffline.setBetHas(data.getDouble("playerBet"));
+                tradeOffline.setBetWant(data.getDouble("betWant"));
+                response.add(tradeOffline);
             } catch (Exception e) {
                 logger.warning("Some problems with trade: " + player.getName() + " " + data.get("_id").toString());
             }

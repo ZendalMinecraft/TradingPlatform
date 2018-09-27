@@ -169,6 +169,8 @@ public class TradeSession implements Session {
 
     /**
      * Change title inventory for users
+     *
+     * @param title Title for inventory
      */
     protected void changeTitleInventory(String title) {
         Inventory newInventory = Bukkit.createInventory(inventory.getHolder(), inventory.getSize(), title);
@@ -261,6 +263,8 @@ public class TradeSession implements Session {
 
     /**
      * Set default stick item's
+     * <p>
+     * TODO remove
      */
     private void setDefaultStickLine() {
         ItemStack stick = ItemBuilder.get(Material.STICK).build();
@@ -269,6 +273,7 @@ public class TradeSession implements Session {
                 inventory.setItem(9 * i + 4, stick);
             }
         }
+        inventory.setItem(9 * 5 + 4, this.getVisualDisplayBet().build());
     }
 
     private void setTimerItemsLine(int time) {

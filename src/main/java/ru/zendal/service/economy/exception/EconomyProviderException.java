@@ -12,8 +12,7 @@ import ru.zendal.service.exception.ServiceException;
 /**
  * Economy provider exception
  */
-public class EconomyProviderException extends ServiceException
-{
+public class EconomyProviderException extends ServiceException {
     public EconomyProviderException(String message) {
         super(message);
     }

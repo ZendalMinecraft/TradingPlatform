@@ -28,7 +28,7 @@ public class GetAllOfflineTradesCommand implements Command {
     }
 
     @Override
-    public Document process(Document incomingDocument)  {
+    public Document process(Document incomingDocument) {
         Document response = new Document();
         List<Document> documents = new ArrayList<>();
         sessionManager.getAllTradeOffline().forEach(tradeOffline -> {

@@ -1,9 +1,9 @@
 storage:
   #Type storage:
   # Local - file in plugin folder
-  # Mongo - MongoDB NoSQL storage
-  # mysql - MySQL storage
-  type: mongo
+  # MongoDB - MongoDB NoSQL storage
+  # MySQL - MySQL storage
+  type: MongoDB
 
   setting:
     #host where store storage, if your use Local this parameter ignore

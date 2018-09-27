@@ -20,8 +20,14 @@ import com.mongodb.event.ServerMonitorListener;
 import ru.zendal.session.storage.connection.ConnectionBuilder;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 public class MongoConnectionBuilder implements ConnectionBuilder<MongoDatabase> {
+
+    private Logger logger = Logger.getLogger(getClass().toString());
 
     private String name;
     private String password;
@@ -83,8 +89,8 @@ public class MongoConnectionBuilder implements ConnectionBuilder<MongoDatabase> 
             MongoClients.create(settings).listDatabaseNames().first();
         } catch (MongoTimeoutException e) {
             hasConnected = false;
+            logger.warning("Can't Connect to MongoDB: "+ e.getMessage());
         }
-
         return MongoClients.create(settings).getDatabase(dataBaseName);
     }
 }

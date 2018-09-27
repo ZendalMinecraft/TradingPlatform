@@ -1,26 +1,45 @@
-trade.create.between.undefinedUser=User %1% undefined.
-trade.player.offile=User %buyer% is offline.
-trade.create.between.notSetUser=Please pick user like: /trade to UserName
-trade.confirm.notHaveSession=Sorry you don't have any sessions
-trade.confirm.select.undefinedSession=Sorry we can't search session for %buyer% betwean %seller%
-trade.help.message="
-test
-ALAlla
-asdsad
-
+command.help.message="
+            Commands
+/trade create - Create offline trade
+/trade to <NICK_NAME> - send trade to user
+/trade confirm - confirm trade
+If your have more than 1 trade
+/trade confirm <NICK_NAME>
+____________________________________
 "
 
-trade.confirm=§6Confirm trade from %seller%
+command.storage.error.executorNotPlayer=Only player must call this command
+command.storage.message.isClear=Your storage clear.
 
+
+command.to.message=Request trade send to %buyer%.
+command.to.message.onSecondPlayerConfirm=For trade with %buyer% please type /trade to %buyer%
+
+command.to.error.executorNotPlayer=Only player must call this command
+command.to.error.notSetUser=Please pick user like: /trade to UserName
+command.to.error.undefinedUser=User %1% undefined.
+command.to.error.onHimselfItself=You can't send Himself itself trade.
+command.to.error.noMoney=%1% missing %2% money.
+
+command.confirm.message=§6Confirm trade from %seller%
+
+
+command.create.error.executorNotPlayer=Only player must call this command
+
+trade.player.offile=User %buyer% is offline.
+trade.confirm.notHaveSession=Sorry you don't have any sessions
+trade.confirm.select.undefinedSession=Sorry we can't search session for %buyer% betwean %seller%
+
+
+trade.cant.change.bet.onReady=You can't change bet, because your ready
+trade.cant.change.bet.economyIsUnavailable=Economy disabled.
 
 trade.confirm.list=You have many trades: %1%. For confirm type /trade confirm Username
-trade.to.openInventory=For trade with %buyer% please type /trade to %buyer%
-trade.to.success=Request trade send to %buyer%.
+
 
 
 trade.inventory.shift=Sorry you can't move items with use shift, sorry.
 
-trade.storage.clear=Your storage clear.
 
 trade.confirm.tooManyItems=Some things didn't fit in your inventory so they were added to the storage /trade storage
 
@@ -47,8 +66,9 @@ trade.offline.unavailable=Sorry now u can't create Offline Session.
 trade.offline.process=You can open your reffer use /trade open %1%
 
 trade.offline.notPickId=Please use command /trade open <UNIQ_ID>
-trade.offline.udefinedId=Trade with id %1% is undefined
+trade.offline.undefinedId=Trade with id %1% is undefined
 trade.offline.alreadyFinished=This trade already finish.
 
+trade.offline.success=Trade success.
 
 trade.offline.cancel.message=Your trade can be canceled

@@ -7,27 +7,44 @@
 
 package ru.zendal.service.economy;
 
+import com.google.inject.Inject;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.Server;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.ServicesManager;
 import ru.zendal.service.economy.exception.EconomyProviderException;
 
+/**
+ * Vault EconomyProvider
+ *
+ * @link https://github.com/MilkBowl/Vault
+ */
 public class VaultEconomy implements EconomyProvider {
 
+    /**
+     * Instance Vault economy.
+     */
     private final Economy economy;
 
-    public VaultEconomy(Server server) {
-        if (server.getPluginManager().getPlugin("Vault") == null) {
+    /**
+     * Constructor.
+     *
+     * @param pluginManager   Plugin Manager
+     * @param servicesManager Service Manager
+     */
+    @Inject
+    public VaultEconomy(PluginManager pluginManager, ServicesManager servicesManager) {
+        if (pluginManager.getPlugin("Vault") == null) {
             throw new EconomyProviderException("Required plugin Vault don't founded");
         }
 
-        RegisteredServiceProvider<Economy> rsp = server.getServicesManager().getRegistration(Economy.class);
-        if (rsp == null) {
+        RegisteredServiceProvider<Economy> registeredServiceProvider = servicesManager.getRegistration(Economy.class);
+        if (registeredServiceProvider == null) {
             throw new EconomyProviderException("Can't get Vault service");
         }
-        economy = rsp.getProvider();
+        economy = registeredServiceProvider.getProvider();
         if (economy == null) {
             throw new EconomyProviderException("Can't get Vault provider");
         }
@@ -44,6 +61,16 @@ public class VaultEconomy implements EconomyProvider {
         if (!economyResponse.transactionSuccess()) {
             throw new EconomyProviderException("Transaction withdraw error: " + economyResponse.errorMessage);
         }
+    }
+
+    @Override
+    public boolean canWithdraw(OfflinePlayer player, double amount) {
+        EconomyResponse economyResponse = economy.withdrawPlayer(player, amount);
+        if (economyResponse.transactionSuccess()) {
+            economy.depositPlayer(player, amount);
+            return true;
+        }
+        return false;
     }
 
     @Override
