@@ -21,7 +21,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import ru.zendal.session.exception.TradeSessionManagerException;
-import ru.zendal.session.inventory.TradeSessionHolderInventory;
+import ru.zendal.session.inventory.holder.TradeSessionHolderInventory;
 
 import static org.junit.Assert.fail;
 
@@ -51,11 +51,11 @@ public class SessionTradeTest {
 
     @Test
     public void test() throws Exception {
-        /*plugin.getSessionManager().createSession(player1, player2);
-        plugin.getSessionManager().getSessionForSellerAndBuyer(player1, player2);
-        plugin.getSessionManager().getSessionByBuyer(player2);
-       *//* server.execute("trade",player1,"to p2");
-        server.execute("trade",player2,"confirm");*//*
+        plugin.getTradeSessionManager().createSession(player1, player2);
+        plugin.getTradeSessionManager().getSessionForSellerAndBuyer(player1, player2);
+        plugin.getTradeSessionManager().getSessionByBuyer(player2);
+        server.execute("trade",player1,"to p2");
+        server.execute("trade",player2,"confirm");
         if (!(player2.getOpenInventory().getTopInventory().getHolder() instanceof TradeSessionHolderInventory)){
             fail();
         }
@@ -68,11 +68,9 @@ public class SessionTradeTest {
                 InventoryAction.PICKUP_SOME);
         Bukkit.getPluginManager().callEvent(event);
         System.out.println(event.getCurrentItem());
-        //player2.simulateBlockBreak()*/
     }
 
     @Test(expected = TradeSessionManagerException.class)
     public void testUndefinedSession() throws TradeSessionManagerException {
-        plugin.getSessionManager().getSessionByBuyer(player1);
     }
 }

@@ -139,7 +139,10 @@ public class TradingPlatformConfiguration extends AbstractModule {
             bind(EconomyProvider.class).to(VaultEconomy.class);
             this.inventoryConfigBundleBuilder.setFlagEnableEconomy(true);
         }
-        bind(SocketServer.class).to(SocketIO.class);
+
+        if (this.isAvailableSocketServer()) {
+            bind(SocketServer.class).to(SocketIO.class);
+        }
     }
 
     private void checkAllLanguage() throws IOException {
@@ -345,4 +348,12 @@ public class TradingPlatformConfiguration extends AbstractModule {
     }
 
 
+    /**
+     * Available socket server
+     *
+     * @return {@code true} if socket is Available else {@code false}
+     */
+    public boolean isAvailableSocketServer() {
+        return this.yamlConfig.getBoolean("socket.enable");
+    }
 }

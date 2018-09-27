@@ -29,6 +29,7 @@ public class TradingPlatform extends JavaPlugin {
 
     private SocketServer socketServer;
 
+    private TradingPlatformConfiguration configuration;
 
     /**
      * Default constructor
@@ -39,14 +40,16 @@ public class TradingPlatform extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        Injector injector = Guice.createInjector(new TradingPlatformConfiguration(this));
+        configuration = new TradingPlatformConfiguration(this);
+        Injector injector = Guice.createInjector(configuration);
         tradeSessionManager = injector.getInstance(TradeSessionManager.class);
 
         this.initListeners(injector);
         this.getCommand("trade").setExecutor(injector.getInstance(CommandManager.class));
-        this.socketServer = injector.getInstance(SocketServer.class);
 
-
+        if (configuration.isAvailableSocketServer()) {
+            this.socketServer = injector.getInstance(SocketServer.class);
+        }
     }
 
 
@@ -82,6 +85,15 @@ public class TradingPlatform extends JavaPlugin {
         if (socketServer != null) {
             socketServer.stop();
         }
+    }
+
+    /**
+     * Return trade session manager instance
+     *
+     * @return instance session manager
+     */
+    public TradeSessionManager getTradeSessionManager() {
+        return tradeSessionManager;
     }
 
     /**
