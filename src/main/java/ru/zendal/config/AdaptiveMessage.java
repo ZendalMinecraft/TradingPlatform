@@ -10,6 +10,8 @@ package ru.zendal.config;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 
+import java.util.logging.Logger;
+
 /**
  * Adaptive message for any players
  */
@@ -18,7 +20,12 @@ public class AdaptiveMessage {
     private final MetaDataMessage metaData;
     private String message;
 
+    private Logger logger = Logger.getLogger(getClass().getName());
+
     AdaptiveMessage(String message) {
+        if (message == null) {
+            logger.warning("Please check your lang config file. Or just remove lang folder.");
+        }
         this.message = message;
         this.metaData = MetaDataMessage.getInstance(this);
     }

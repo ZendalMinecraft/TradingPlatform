@@ -69,5 +69,6 @@ trade.offline.notPickId=Please use command /trade open <UNIQ_ID>
 trade.offline.undefinedId=Trade with id %1% is undefined
 trade.offline.alreadyFinished=This trade already finish.
 
+trade.offline.success=Trade success.
 
 trade.offline.cancel.message=Your trade can be canceled

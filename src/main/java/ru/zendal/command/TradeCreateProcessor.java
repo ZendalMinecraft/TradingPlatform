@@ -50,6 +50,10 @@ public class TradeCreateProcessor implements ArgsCommandProcessor {
             );
         } else {
             Player player = (Player) sender;
+            if (!manager.isAvailableOfflineTrades()){
+                languageConfig.getMessage("trade.offline.unavailable").sendMessage(player);
+                return true;
+            }
             try {
                 player.openInventory(manager.getOfflineSessionByPlayer(player).getInventory());
             } catch (TradeSessionManagerException e) {

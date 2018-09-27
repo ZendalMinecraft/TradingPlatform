@@ -13,7 +13,7 @@ import ru.zendal.service.economy.exception.EconomyProviderException;
 public class DisabledEconomy implements EconomyProvider {
     @Override
     public boolean haveMoney(OfflinePlayer player, double money) {
-        return false;
+        return true;
     }
 
     @Override
@@ -23,7 +23,7 @@ public class DisabledEconomy implements EconomyProvider {
 
     @Override
     public boolean canWithdraw(OfflinePlayer player, double amount) {
-        return false;
+        return true;
     }
 
     @Override

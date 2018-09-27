@@ -72,7 +72,7 @@ public class TradeSessionManager {
      * @param economyProvider Instance Economy Provider
      * @param storageSessions Storage where manager can store data
      * @param plugin          Instance Plugin
-     * @param languageConfig          Config language Pack
+     * @param languageConfig  Config language Pack
      */
     @Inject
     public TradeSessionManager(EconomyProvider economyProvider, SessionsStorage storageSessions, TradingPlatform plugin, LanguageConfig languageConfig) {
@@ -141,7 +141,19 @@ public class TradeSessionManager {
         return tradeOffices;
     }
 
+    /**
+     * Process trade offline
+     *
+     * @param whoTrading   User who trading
+     * @param tradeOffline instance offline trade
+     */
     public void processTradeOffline(Player whoTrading, TradeOffline tradeOffline) {
+        economyProvider.withdraw(whoTrading, tradeOffline.getBetWant());
+        economyProvider.deposit(tradeOffline.getOfflinePlayer(), tradeOffline.getBetWant());
+
+        economyProvider.deposit(whoTrading, tradeOffline.getBetHas());
+
+
         this.addNotFitItemsIntoStorageInventory(
                 whoTrading.getInventory().addItem(tradeOffline.getHas().toArray(new ItemStack[0])),
                 whoTrading
@@ -158,6 +170,10 @@ public class TradeSessionManager {
                 itemsForStorage,
                 tradeOffline.getOfflinePlayer()
         );
+        languageConfig.getMessage("trade.offline.success").sendMessage(whoTrading);
+        if (tradeOffline.getOfflinePlayer().isOnline()) {
+            languageConfig.getMessage("trade.offline.success").sendMessage(tradeOffline.getOfflinePlayer().getPlayer());
+        }
     }
 
 
@@ -199,6 +215,7 @@ public class TradeSessionManager {
                 listener.onCreateNewOfflineTradeSession(tradeOffline);
             }
         } catch (Exception exception) {
+            plugin.getLogger().warning("Error process offline trade: " + exception.getMessage());
             languageConfig.getMessage("trade.offline.unavailable").sendMessage(session.getBuyer());
             session.cancelTrade();
         }
@@ -509,6 +526,10 @@ public class TradeSessionManager {
         listenersList.add(listener);
     }
 
+
+    public boolean isAvailableOfflineTrades() {
+        return storage.isAvailable();
+    }
 
     /**
      * Check Available connect to storage
