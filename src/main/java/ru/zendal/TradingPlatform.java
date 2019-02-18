@@ -45,8 +45,6 @@ public class TradingPlatform extends JavaPlugin {
         this.initListeners(injector);
         this.getCommand("trade").setExecutor(injector.getInstance(CommandManager.class));
         this.socketServer = injector.getInstance(SocketServer.class);
-
-
     }
 
 
@@ -57,15 +55,19 @@ public class TradingPlatform extends JavaPlugin {
         PluginManager pluginManager = this.getServer().getPluginManager();
 
         pluginManager.registerEvents(
-                injector.getInstance(ChestTradeSessionEvent.class)
-                , this
+                injector.getInstance(ChestTradeSessionEvent.class),
+                this
         );
 
         pluginManager.registerEvents(
-                injector.getInstance(ChestStorageEvent.class), this);
+                injector.getInstance(ChestStorageEvent.class),
+                this
+        );
 
         pluginManager.registerEvents(
-                injector.getInstance(PlayerOfflineSessionEvent.class), this);
+                injector.getInstance(PlayerOfflineSessionEvent.class),
+                this
+        );
 
         pluginManager.registerEvents(
                 injector.getInstance(ChestTradeOfflineEvent.class
