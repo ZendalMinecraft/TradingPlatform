@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import ru.zendal.TradingPlatform;
 import ru.zendal.config.LanguageConfig;
+import ru.zendal.config.lang.LanguageProvider;
 import ru.zendal.service.economy.EconomyProvider;
 import ru.zendal.session.exception.TradeSessionManagerException;
 import ru.zendal.session.inventory.holder.CreateOfflineTradeHolderInventory;
@@ -38,6 +39,7 @@ import java.util.Map;
 public class TradeSessionManager {
 
     private final LanguageConfig languageConfig;
+    private final LanguageProvider languageProvider;
     private final SessionsStorage storage;
     private final TradingPlatform plugin;
     private final TradeSessionCallback tradeCallback;
@@ -75,9 +77,10 @@ public class TradeSessionManager {
      * @param languageConfig  Config language Pack
      */
     @Inject
-    public TradeSessionManager(EconomyProvider economyProvider, SessionsStorage storageSessions, TradingPlatform plugin, LanguageConfig languageConfig) {
+    public TradeSessionManager(EconomyProvider economyProvider, SessionsStorage storageSessions, TradingPlatform plugin, LanguageConfig languageConfig, LanguageProvider languageProvider) {
         this.economyProvider = economyProvider;
         this.languageConfig = languageConfig;
+        this.languageProvider = languageProvider;
         this.storage = storageSessions;
         this.plugin = plugin;
         this.tradeCallback = new TradeSessionCallback() {

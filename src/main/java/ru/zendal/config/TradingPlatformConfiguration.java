@@ -17,6 +17,8 @@ import ru.zendal.TradingPlatform;
 import ru.zendal.config.bundle.InventoryConfigBundle;
 import ru.zendal.config.bundle.SocketConfigBundle;
 import ru.zendal.config.bundle.builder.InventoryConfigBundleBuilder;
+import ru.zendal.config.lang.LanguageProvider;
+import ru.zendal.config.lang.LanguageProviderSimple;
 import ru.zendal.service.economy.DisabledEconomy;
 import ru.zendal.service.economy.EconomyProvider;
 import ru.zendal.service.economy.VaultEconomy;
@@ -110,7 +112,7 @@ public class TradingPlatformConfiguration extends AbstractModule {
 
     private void initLanguage() {
         String langName = this.yamlConfig.getString("settings.lang");
-        languageConfig = new LanguageConfig(this.getLanguageFileByName(langName), this.plugin.getLogger());
+        languageConfig = new LanguageConfig(this.getLanguageFileByName(langName));
     }
 
     /**
@@ -304,7 +306,7 @@ public class TradingPlatformConfiguration extends AbstractModule {
     @Singleton
     LanguageConfig providerLanguageConfig() {
         String langName = this.yamlConfig.getString("settings.lang");
-        return new LanguageConfig(this.getLanguageFileByName(langName), this.plugin.getLogger());
+        return new LanguageConfig(this.getLanguageFileByName(langName));
     }
 
     /**

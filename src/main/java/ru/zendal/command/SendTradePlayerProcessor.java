@@ -12,6 +12,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import ru.zendal.config.LanguageConfig;
+import ru.zendal.config.lang.LanguageProvider;
 import ru.zendal.session.TradeSession;
 import ru.zendal.session.TradeSessionManager;
 import ru.zendal.session.exception.TradeSessionManagerException;
@@ -31,15 +32,18 @@ public class SendTradePlayerProcessor implements ArgsCommandProcessor {
      * Instance LanguageConfig
      */
     private final LanguageConfig languageConfig;
+    private final LanguageProvider languageProvider;
 
     /**
      * Constructor
      *
-     * @param sessionManager Instance TradeSessionManager
-     * @param languageConfig Instance LanguageConfig
+     * @param sessionManager   Instance TradeSessionManager
+     * @param languageConfig   Instance LanguageConfig
+     * @param languageProvider Instance languageProvider
      */
-    public SendTradePlayerProcessor(TradeSessionManager sessionManager, LanguageConfig languageConfig) {
+    public SendTradePlayerProcessor(TradeSessionManager sessionManager, LanguageConfig languageConfig, LanguageProvider languageProvider) {
         this.tradeSessionManager = sessionManager;
+        this.languageProvider = languageProvider;
         this.languageConfig = languageConfig;
     }
 
@@ -88,7 +92,7 @@ public class SendTradePlayerProcessor implements ArgsCommandProcessor {
             if (!buyer.isOnline()) {
                 this.languageConfig.getMessage("trade.player.offline").setBuyer(buyer).sendMessage(buyer);
             } else {
-                this.languageConfig.getMessage("command.to.message").setBuyer(buyer).sendMessage(seller);
+                languageProvider.getCommandToLanguage().sendMessageOnRequest(buyer);
                 this.languageConfig.getMessage("command.confirm.message").setBuyer(buyer).setSeller(seller).sendMessage(buyer);
                 this.tradeSessionManager.createSession(seller, buyer);
             }

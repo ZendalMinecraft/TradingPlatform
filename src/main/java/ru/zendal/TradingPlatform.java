@@ -33,9 +33,7 @@ public class TradingPlatform extends JavaPlugin {
     /**
      * Default constructor
      */
-    public TradingPlatform() {
-
-    }
+    public TradingPlatform() { }
 
     @Override
     public void onEnable() {

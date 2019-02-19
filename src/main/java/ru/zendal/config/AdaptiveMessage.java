@@ -42,13 +42,24 @@ public class AdaptiveMessage {
     }
 
     /**
-     * Replace buyer holder to name Seller
+     * Replace buyer holder to name Buyer
      *
      * @param player Instance PlayerInstance Player
      * @return self
      */
     public AdaptiveMessage setBuyer(Player player) {
         this.message = this.message.replaceAll("%buyer%", player.getDisplayName());
+        return this;
+    }
+
+    /**
+     * Replace buyer holder to name Buyer
+     *
+     * @param nameOfBuyer name of buyer
+     * @return self
+     */
+    public AdaptiveMessage setBuyer(String nameOfBuyer) {
+        this.message = this.message.replaceAll("%buyer%", nameOfBuyer);
         return this;
     }
 

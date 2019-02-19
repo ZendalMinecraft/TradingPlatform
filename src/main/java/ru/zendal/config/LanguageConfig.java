@@ -9,6 +9,7 @@ package ru.zendal.config;
 
 import com.google.common.io.Files;
 import com.google.inject.Inject;
+import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +24,7 @@ import java.util.logging.Logger;
  */
 public class LanguageConfig {
 
-    private Logger logger;
+    private Logger logger = Bukkit.getLogger();
 
     private File langFile;
 
@@ -33,10 +34,8 @@ public class LanguageConfig {
      * Instantiates a new Language config.
      *
      * @param file the file
-     * @param logger Logger
      */
-    public LanguageConfig(File file, Logger logger) {
-        this.logger = logger;
+    public LanguageConfig(File file) {
         this.langFile = file;
         this.processFile();
     }
