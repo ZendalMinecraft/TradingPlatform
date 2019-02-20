@@ -7,5 +7,8 @@ public class TradeOffline2 {
     private Player seller;
 
 
+    private StatusTradeOffline statusTradeOffline;
+    
+
 
 }
