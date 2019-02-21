@@ -1,15 +1,18 @@
 package ru.zendal;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import ru.zendal.config.TradingPlatformConfiguration;
 
+@Data
+@Builder
+@AllArgsConstructor
 public class TradingPlatformCore {
 
 
-    public TradingPlatformCore(TradingPlatformConfiguration configuration){
-         configuration.getServerSideConfiguration().getSocketServerConfiguration().getHost()
-    }
-
+    private final String pathToRoot;
 
 
 }
