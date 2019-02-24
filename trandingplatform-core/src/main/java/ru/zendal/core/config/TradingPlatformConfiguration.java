@@ -1,10 +1,17 @@
-package ru.zendal.config;
+/*
+ * Copyright (c) Alexander <gasfull98@gmail.com> Chapchuk
+ * Project name: TradingPlatform
+ *
+ * Licensed under the MIT License. See LICENSE file in the project root for license information.
+ */
+
+package test.zendal.core.core.config;
 
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.zendal.config.server.DataBaseServerConfiguration;
-import ru.zendal.config.server.SocketServerConfiguration;
+import test.zendal.core.core.config.server.DataBaseServerConfiguration;
+import test.zendal.core.core.config.server.SocketServerConfiguration;
 
 @Builder
 @Data

@@ -5,7 +5,7 @@
  * Licensed under the MIT License. See LICENSE file in the project root for license information.
  */
 
-package ru.zendal.economy.exception;
+package test.zendal.core.core.economy.exception;
 
 
 /**
