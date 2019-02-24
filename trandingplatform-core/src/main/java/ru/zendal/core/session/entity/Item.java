@@ -5,7 +5,7 @@
  * Licensed under the MIT License. See LICENSE file in the project root for license information.
  */
 
-package test.zendal.core.core.session.entity;
+package ru.zendal.core.session.entity;
 
 public class Item {
 

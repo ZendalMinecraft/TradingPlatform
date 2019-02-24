@@ -5,9 +5,9 @@
  * Licensed under the MIT License. See LICENSE file in the project root for license information.
  */
 
-package test.zendal.core.core.economy;
+package ru.zendal.core.economy;
 
-import test.zendal.core.core.economy.exception.EconomyProviderException;
+import ru.zendal.core.economy.exception.EconomyProviderException;
 
 public interface EconomyProvider<P> {
     /**

@@ -5,7 +5,7 @@
  * Licensed under the MIT License. See LICENSE file in the project root for license information.
  */
 
-package test.zendal.core.core.config.server;
+package ru.zendal.core.config.server;
 
 public enum TypeSource {
     LOCAL("local"),

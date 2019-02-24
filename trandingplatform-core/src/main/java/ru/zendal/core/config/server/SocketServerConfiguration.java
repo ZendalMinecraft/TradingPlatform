@@ -5,15 +5,13 @@
  * Licensed under the MIT License. See LICENSE file in the project root for license information.
  */
 
-package test.zendal.core.core.config.server;
+package ru.zendal.core.config.server;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 public final class SocketServerConfiguration {
 
     private boolean enable;
