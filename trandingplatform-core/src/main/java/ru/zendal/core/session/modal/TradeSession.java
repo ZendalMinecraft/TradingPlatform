@@ -15,7 +15,7 @@ import java.util.Collection;
  * @param <T> type of Trader (Player)
  * @param <I> type of item (ItemStack)
  */
-public interface Session<T, I> {
+public interface TradeSession<T, I> {
     /**
      * Get instance of main trader
      *
