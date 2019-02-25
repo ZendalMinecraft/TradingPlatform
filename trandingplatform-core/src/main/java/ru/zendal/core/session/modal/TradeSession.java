@@ -29,4 +29,18 @@ public interface Session<T, I> {
      * @return collection of items
      */
     Collection<I> getItemsMainTrader();
+
+    /**
+     * Get bet of main trader
+     *
+     * @return amount bet main trader
+     */
+    Double getBetMainTrader();
+
+    /**
+     * Set bet for main trader
+     *
+     * @param betMainTrader amount bet main trader
+     */
+    void setBetMainTrader(Double betMainTrader);
 }

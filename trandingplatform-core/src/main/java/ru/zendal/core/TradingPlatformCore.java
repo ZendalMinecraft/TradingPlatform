@@ -16,27 +16,49 @@ import org.slf4j.LoggerFactory;
 import ru.zendal.core.config.TradingPlatformConfiguration;
 import ru.zendal.core.config.parser.CoreConfigurationParser;
 import ru.zendal.core.config.parser.engine.GsonParser;
+import ru.zendal.core.config.parser.exception.TradingPlatformConfigurationParserException;
 import ru.zendal.core.economy.EconomyProvider;
 import ru.zendal.core.exception.TradingPlatformLaunchException;
+import ru.zendal.core.session.TradeSessionManager;
 
 @Data
 @Builder(buildMethodName = "buildInternal")
 @AllArgsConstructor
 public class TradingPlatformCore {
 
+    /**
+     * Logger
+     */
     private final Logger logger = LoggerFactory.getLogger(TradingPlatformCore.class);
 
+    /**
+     * Path to root where can store files.
+     */
     private final String pathToRoot;
 
-
+    /**
+     * Component, Economy provider
+     */
     private final EconomyProvider economyProvider;
 
+    /**
+     * Parser for core configuration file
+     */
     private CoreConfigurationParser parser;
 
+    private TradeSessionManager tradeSessionManager;
+
+    /**
+     * Initialize method, call after construction
+     */
     private void init() {
         try {
             logger.info("Initialize core TradingPlatformCore.");
             parser = new CoreConfigurationParser(new GsonParser(), pathToRoot);
+            tradeSessionManager = new TradeSessionManager(parser.getConfiguration(), economyProvider);
+        } catch (TradingPlatformConfigurationParserException e) {
+            logger.error("Error parse core configuration file.", e);
+            throw new TradingPlatformLaunchException("Error parse core configuration file.", e);
         } catch (Exception e) {
             logger.error("ERROR launch core!", e);
             throw new TradingPlatformLaunchException("Error launch core.", e);
@@ -52,6 +74,9 @@ public class TradingPlatformCore {
         return parser.getConfiguration();
     }
 
+    public TradeSessionManager getTradeSessionManager() {
+        return this.tradeSessionManager;
+    }
 
     public static class TradingPlatformCoreBuilder {
 

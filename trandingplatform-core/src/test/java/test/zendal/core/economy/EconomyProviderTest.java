@@ -43,8 +43,10 @@ public class EconomyProviderTest implements EconomyProvider<String> {
         Double money = storage.get(player);
         if (money == null && amount != 0) {
             return false;
+        } else if (money == null) {
+            return false;
         }
-        money = 0.0;
+
         if (money - amount < 0) {
             return false;
         }
@@ -54,6 +56,11 @@ public class EconomyProviderTest implements EconomyProvider<String> {
     @Override
     public void deposit(String player, double amount) throws EconomyProviderException {
         Double money = storage.get(player);
+        if (money != null) {
+            storage.remove(player);
+        } else {
+            money = 0.0;
+        }
         storage.remove(player);
         storage.put(player, money + amount);
     }

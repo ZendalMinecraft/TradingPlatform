@@ -16,7 +16,7 @@ import java.util.Collection;
  * @param <T> Type of trader.
  * @param <I> type of item (ItemStack).
  */
-public class DefaultTradeSession<T, I> implements Session<T, I> {
+public class DefaultTradeSession<T, I> implements TradeSession<T, I> {
 
     /**
      * Instance of trader who create trade session
@@ -24,14 +24,47 @@ public class DefaultTradeSession<T, I> implements Session<T, I> {
     private final T mainTrader;
 
     /**
+     * Items main trader
+     */
+    private Collection<I> itemsMainTraider;
+
+    /**
+     * Bet of main trader
+     */
+    private Double betMainTrader = 0.0;
+
+    /**
+     * Ready status of main trader
+     */
+    private Boolean mainTraderIsReady = false;
+
+    /**
      * Instance of trader who accept trade session
      */
     private final T secondaryTrader;
 
+    /**
+     * Items secondary trader
+     */
+    private Collection<I> itemsSecondaryTrader;
 
-    private Collection<I> itemsMainTraider;
+    /**
+     * Bet of secondary trader
+     */
+    private double betSecondaryTrader = 0.0;
+
+    /**
+     * Ready status of secondary trader
+     */
+    private Boolean secondaryTraderIsReady = false;
 
 
+    /**
+     * Instantiates a new Default trade session.
+     *
+     * @param mainTrader      the main trader
+     * @param secondaryTrader the secondary trader
+     */
     public DefaultTradeSession(T mainTrader, T secondaryTrader) {
         this.mainTrader = mainTrader;
         this.secondaryTrader = secondaryTrader;
@@ -42,13 +75,52 @@ public class DefaultTradeSession<T, I> implements Session<T, I> {
         return mainTrader;
     }
 
+    @Override
+    public Collection<I> getItemsMainTrader() {
+        return itemsMainTraider;
+    }
+
+    @Override
+    public Double getBetMainTrader() {
+        return betMainTrader;
+    }
+
+    @Override
+    public void setBetMainTrader(Double betMainTrader) {
+        this.betMainTrader = betMainTrader;
+    }
+
+    /**
+     * Set status ready for main trader
+     *
+     * @param status {@code true} if ready else {@code false}
+     */
+    public void setStatusReadyMainTrader(Boolean status) {
+        this.mainTraderIsReady = status;
+    }
+
     public T getSecondaryTrader() {
         return secondaryTrader;
     }
 
 
-    @Override
-    public Collection<I> getItemsMainTrader() {
-        return itemsMainTraider;
+    public Collection<I> getItemsSecondaryTrader() {
+        return itemsSecondaryTrader;
+    }
+
+    public Double getBetSecondaryTrader() {
+        return betSecondaryTrader;
+    }
+
+    public void setBetSecondaryTrader(Double betSecondaryTrader) {
+        this.betSecondaryTrader = betSecondaryTrader;
+    }
+
+    public void setStatusReadySecondaryTrader(Boolean status) {
+        this.secondaryTraderIsReady = status;
+    }
+
+    public boolean tradeIsReady() {
+        return this.mainTraderIsReady && this.secondaryTraderIsReady;
     }
 }

@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "serverSideConfiguration": {
+    "socket": {
+      "enable": false,
+      "host": "127.0.0.1",
+      "port": 2101
+    },
+    "dataSource": {
+      "typeSource": "LOCAL",
+      "host": "127.0.0.1",
+      "username": "root",
+      "nameDataBase": "TradingPlatform",
+      "password": "",
+      "port": 3306
+    }
+  }
+}

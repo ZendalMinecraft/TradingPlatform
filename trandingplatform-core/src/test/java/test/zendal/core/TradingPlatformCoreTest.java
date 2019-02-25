@@ -11,37 +11,48 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.zendal.core.TradingPlatformCore;
-import ru.zendal.core.config.TradingPlatformConfiguration;
-import ru.zendal.core.config.server.TypeSource;
+import ru.zendal.core.economy.EconomyProvider;
+import ru.zendal.core.economy.exception.EconomyProviderException;
+import ru.zendal.core.session.TradeSessionManager;
+import ru.zendal.core.session.modal.DefaultTradeSession;
 import test.zendal.core.economy.EconomyProviderTest;
 
 import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static test.zendal.core.TestConfig.PATH_TO_FOLDER_TEST;
 
 public class TradingPlatformCoreTest {
 
-    private final static String CONFIG_PATH = "var/TradingPlatform/";
+    private final String CONFIG_PATH = PATH_TO_FOLDER_TEST + "/TradingPlatform/" + getClass().toString();
 
-    private TradingPlatformCore core;
+    private TradeSessionManager<String, String> tradeSessionManager;
+
+    private EconomyProvider<String> economyProvider;
 
     @BeforeEach
-    public void setup() {
-       // this.core = TradingPlatformCore.builder().pathToRoot(CONFIG_PATH).economyProvider(new EconomyProviderTest()).build();
+    void setup() {
+        economyProvider = new EconomyProviderTest();
+        this.tradeSessionManager = TradingPlatformCore.builder().pathToRoot(CONFIG_PATH).economyProvider(economyProvider).build().getTradeSessionManager();
     }
 
     @AfterEach
-    public void clear() {
-      //  new File(CONFIG_PATH + "core.json").delete();
+    void clear() {
+        new File(CONFIG_PATH + "core.json").delete();
     }
 
-    //TODO remove...
-    public void createNewDefaultConfigurationFile() {
-        TradingPlatformConfiguration configuration = this.core.getConfiguration();
-        assertEquals((Long) 1L, configuration.getVersion());
-        assertEquals(TypeSource.LOCAL, configuration.getServerSideConfiguration().getDataSource().getTypeSource());
-        assertFalse(configuration.getServerSideConfiguration().getSocket().isEnable());
+    @Test
+    void testCreateTradeManager() throws EconomyProviderException {
+        economyProvider.deposit("A", 20.0);
+        economyProvider.deposit("B", 20.0);
+
+        DefaultTradeSession<String, String> tradeSession = tradeSessionManager.createTradeSession("A", "B");
+        tradeSession.setBetMainTrader(15.2);
+        tradeSession.setBetSecondaryTrader(10.0);
+        tradeSessionManager.confirmTradeSession(tradeSession);
+
+        assertEquals(14.8, economyProvider.getBalance("A"));
+        assertEquals(25.2, economyProvider.getBalance("B"));
     }
 
 
